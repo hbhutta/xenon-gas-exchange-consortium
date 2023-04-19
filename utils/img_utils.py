@@ -161,6 +161,18 @@ def smooth_image(image: np.ndarray, kernel: int = 11) -> np.ndarray:
     return ndimage.convolve(image, kernel, mode="constant")
 
 
+def interp(img: np.ndarray, factor: int = 1):
+    """Interpolate the image to be of size factor times the original size.
+
+    Args:
+        img (np.ndarray): image to interpolate
+        factor (int): factor to interpolate by
+    """
+    img_real = ndimage.zoom(np.real(img), [factor, factor, factor])
+    img_imag = ndimage.zoom(np.imag(img), [factor, factor, factor])
+    return img_real + 1j * img_imag
+
+
 def normalize(
     image: np.ndarray,
     mask: np.ndarray = np.array([0.0]),

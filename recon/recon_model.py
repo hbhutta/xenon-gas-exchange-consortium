@@ -106,8 +106,8 @@ class LSQgridded(GriddedReconModel):
         if self.verbosity:
             logging.info("-- Calculating IFFT ...")
         time_start = time.time()
-        reconVol = np.fft.fftshift(np.fft.ifftn(reconVol))
-        # reconVol = np.fft.ifftshift(np.fft.ifftn(np.fft.ifftshift(reconVol)))
+        # reconVol = np.fft.fftshift(np.fft.ifftn(reconVol))
+        reconVol = np.fft.ifftshift(np.fft.ifftn(np.fft.ifftshift(reconVol)))
         time_end = time.time()
         logging.info("The runtime for iFFT: " + str(time_end - time_start))
         if self.verbosity:

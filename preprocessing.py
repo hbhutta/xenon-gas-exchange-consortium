@@ -88,7 +88,7 @@ def prepare_data_and_traj(
 
 
 def prepare_data_and_traj_interleaved(
-    data_dict: Dict[str, Any], generate_traj: bool = True, remove_noise: bool = True
+    data_dict: Dict[str, Any], generate_traj: bool = True, remove_noise: bool = False
 ) -> Tuple[np.ndarray, ...]:
     """Prepare data and trajectory for interleaved data reconstruction.
 
@@ -163,41 +163,6 @@ def prepare_data_and_traj_interleaved(
         traj_dis = np.stack([traj_x, traj_y, traj_z], axis=-1)
         traj_gas = np.copy(traj_dis)
     return data_dis, traj_dis, data_gas, traj_gas
-
-
-def prepare_data_and_traj_keyhole(
-    data: np.ndarray,
-    traj: np.ndarray,
-    bin_indices: np.ndarray,
-    key_radius: int = 9,
-):
-    """Prepare data and trajectory for keyhole reconstruction.
-
-    Uses bin indices to construct a keyhole mask.
-
-    Args:
-        data: data FIDs of shape (n_projections, n_points)
-        traj: trajectory of shape (n_projections, n_points, 3)
-        high_bin_indices: indices of binned projections.
-        key_radius: radius of keyhole in pixels.
-    Returns:
-        A tuple of data and trajectory arrays. The data is flattened to a 1D array
-        of shape (K, 1)
-        The trajectory is flattened to a 2D array of shape (K, 3)
-    """
-    data_copy = data.copy()
-    data = data.copy()
-    data[:, 0:key_radius] = 0.0
-    normalization = (
-        np.mean(np.abs(data_copy[bin_indices, 0])) * 1 / np.abs(data_copy[:, 0])
-    )
-    data = np.divide(data, np.expand_dims(normalization, -1))
-    data[bin_indices, 0:key_radius] = data_copy[bin_indices, 0:key_radius]
-    return np.delete(
-        recon_utils.flatten_data(data), np.where(data.flatten() == 0.0), axis=0
-    ), np.delete(
-        recon_utils.flatten_traj(traj), np.where(data.flatten() == 0.0), axis=0
-    )
 
 
 def normalize_data(data: np.ndarray, normalization: np.ndarray) -> np.ndarray:

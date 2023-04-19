@@ -17,7 +17,7 @@ def reconstruct(
     kernel_extent: float = 0.32 * 9,
     overgrid_factor: int = 3,
     image_size: int = 128,
-    n_dcf_iter: int = 15,
+    n_dcf_iter: int = 20,
     verbosity: bool = True,
 ) -> np.ndarray:
     """Reconstruct k-space data and trajectory.

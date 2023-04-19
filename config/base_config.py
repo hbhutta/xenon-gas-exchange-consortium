@@ -46,7 +46,7 @@ class Config(config_dict.ConfigDict):
         self.subject_id = "test"
         self.rbc_m_ratio = 0.0
         self.remove_contamination = False
-        self.remove_noisy_projections = True
+        self.remove_noisy_projections = False
 
 
 class Process(object):
@@ -84,7 +84,8 @@ class Recon(object):
         self.kernel_sharpness_hr = 0.32
         self.n_skip_start = 60
         self.n_skip_end = 0
-        self.recon_size = 128
+        self.recon_size = 64
+        self.matrix_size = 128
         self.recon_proton = True
 
 

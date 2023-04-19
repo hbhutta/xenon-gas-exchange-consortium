@@ -214,6 +214,11 @@ class Subject(object):
             traj=recon_utils.flatten_traj(self.traj_ute),
             kernel_sharpness=float(self.config.recon.kernel_sharpness_hr),
             kernel_extent=9 * float(self.config.recon.kernel_sharpness_hr),
+            image_size=int(self.config.recon.recon_size),
+        )
+        self.image_proton = img_utils.interp(
+            self.image_proton,
+            self.config.recon.matrix_size // self.config.recon.recon_size,
         )
         self.image_proton = img_utils.flip_and_rotate_image(
             self.image_proton, orientation=self.dict_dis[constants.IOFields.ORIENTATION]
@@ -226,12 +231,22 @@ class Subject(object):
             traj=recon_utils.flatten_traj(self.traj_gas),
             kernel_sharpness=float(self.config.recon.kernel_sharpness_lr),
             kernel_extent=9 * float(self.config.recon.kernel_sharpness_lr),
+            image_size=int(self.config.recon.recon_size),
         )
         self.image_gas_highreso = reconstruction.reconstruct(
             data=(recon_utils.flatten_data(self.data_gas)),
             traj=recon_utils.flatten_traj(self.traj_gas),
             kernel_sharpness=float(self.config.recon.kernel_sharpness_hr),
             kernel_extent=9 * float(self.config.recon.kernel_sharpness_hr),
+            image_size=int(self.config.recon.recon_size),
+        )
+        self.image_gas_highreso = img_utils.interp(
+            self.image_gas_highreso,
+            self.config.recon.matrix_size // self.config.recon.recon_size,
+        )
+        self.image_gas_highsnr = img_utils.interp(
+            self.image_gas_highsnr,
+            self.config.recon.matrix_size // self.config.recon.recon_size,
         )
         self.image_gas_highsnr = img_utils.flip_and_rotate_image(
             self.image_gas_highsnr,
@@ -249,6 +264,11 @@ class Subject(object):
             traj=recon_utils.flatten_traj(self.traj_dissolved),
             kernel_sharpness=float(self.config.recon.kernel_sharpness_lr),
             kernel_extent=9 * float(self.config.recon.kernel_sharpness_lr),
+            image_size=int(self.config.recon.recon_size),
+        )
+        self.image_dissolved = img_utils.interp(
+            self.image_dissolved,
+            self.config.recon.matrix_size // self.config.recon.recon_size,
         )
         self.image_dissolved = img_utils.flip_and_rotate_image(
             self.image_dissolved,
@@ -484,6 +504,7 @@ class Subject(object):
         """Save select images to nifti files and instance variable to mat."""
         io_utils.export_nii(self.image_rbc2gas_binned, "tmp/rbc_binned.nii")
         io_utils.export_nii(np.abs(self.image_gas_highreso), "tmp/gas_highreso.nii")
+        io_utils.export_nii(self.image_gas_highsnr, "tmp/gas_highsnr.nii")
         io_utils.export_nii(np.abs(self.image_rbc), "tmp/rbc.nii")
         io_utils.export_nii(np.abs(self.image_membrane), "tmp/membrane.nii")
         io_utils.export_nii(self.mask.astype(float), "tmp/mask.nii")
