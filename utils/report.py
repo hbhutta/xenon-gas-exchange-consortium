@@ -4,7 +4,11 @@ import pdb
 import sys
 from typing import Any, Dict
 
+import numpy as np
 import pdfkit
+
+sys.path.append("..")
+from utils import constants
 
 PDF_OPTIONS = {
     "page-width": 300,
@@ -28,9 +32,12 @@ def format_dict(stats_dict: Dict[str, Any]) -> Dict[str, Any]:
     Returns:
         Dict[str, Any]: formatted dictionary
     """
+    list_round_3 = [constants.StatsIOFields.RBC_M_RATIO]
     for key in stats_dict.keys():
-        if isinstance(stats_dict[key], float):
-            stats_dict[key] = round(stats_dict[key], 2)
+        if isinstance(stats_dict[key], float) and key in list_round_3:
+            stats_dict[key] = np.round(stats_dict[key], 3)
+        elif isinstance(stats_dict[key], float) and key not in list_round_3:
+            stats_dict[key] = np.round(stats_dict[key], 2)
     return stats_dict
 
 

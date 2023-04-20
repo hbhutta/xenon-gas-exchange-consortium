@@ -162,6 +162,9 @@ config/**
 !config/demo_config.py
 
 # Keep the assets folder
+assets/demo/*
+!assets/demo/*.dat
+!assets/demo/mask.nii
 !assets/*
 
 # ignore the data folder

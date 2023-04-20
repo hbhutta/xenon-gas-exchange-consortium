@@ -23,6 +23,7 @@ from utils import (
     plot,
     recon_utils,
     report,
+    signal_utils,
     spect_utils,
     traj_utils,
 )
@@ -33,28 +34,32 @@ class Subject(object):
 
     Attributes:
         config (config_dict.ConfigDict): config dict
-        data_dissolved (np.array): dissolved-phase data of shape
-            (n_projections, n_points)
+        data_dissolved (np.array): dissolved-phase data of shape (n_projections, n_points)
         data_gas (np.array): gas-phase data of shape (n_projections, n_points)
         data_ute (np.array): UTE proton data of shape (n_projections, n_points)
         dict_dis (dict): dictionary of dissolved-phase data and metadata
         dict_dyn (dict): dictionary of dynamic spectroscopy data and metadata
         dict_ute (dict): dictionary of UTE proton data and metadata
+        image_biasfield (np.array): bias field
         image_dissolved (np.array): dissolved-phase image
+        image_gas_binned (np.array): binned gas-phase image
+        image_gas_cor (np.array): gas-phase image after bias field correction
         image_gas_highreso (np.array): high-resolution gas-phase image
         image_gas_highsnr (np.array): high-SNR gas-phase image
         image_membrane (np.array): membrane image
         image_membrane2gas (np.array): membrane image normalized by gas-phase image
+        image_membrane2gas_binned (np.array): binned image_membrane2gas
+        image_proton (np.array): UTE proton image
         image_rbc (np.array): RBC image
         image_rbc2gas (np.array): RBC image normalized by gas-phase image
-        image_proton (np.array): UTE proton image
+        image_rbc2gas_binned (np.array): binned image_rbc2gas
         mask (np.array): thoracic cavity mask
         rbc_m_ratio (float): RBC to M ratio
         stats_dict (dict): dictionary of statistics
         traj_dissolved (np.array): dissolved-phase trajectory of shape
             (n_projections, n_points, 3)
-        traj_gas (np.array): gas-phase trajectory of shape
-            (n_projections, n_points, 3)
+        traj_gas (np.array): gas-phase trajectory of shape (n_projections, n_points, 3)
+        traj_scaling_factor (float): scaling factor for trajectory
         traj_ute (np.array): UTE proton trajectory of shape
     """
 
@@ -68,10 +73,10 @@ class Subject(object):
         self.dict_dyn = {}
         self.image_biasfield = np.array([0.0])
         self.image_dissolved = np.array([0.0])
+        self.image_gas_binned = np.array([0.0])
+        self.image_gas_cor = np.array([0.0])
         self.image_gas_highreso = np.array([0.0])
         self.image_gas_highsnr = np.array([0.0])
-        self.image_gas_cor = np.array([0.0])
-        self.image_gas_binned = np.array([0.0])
         self.image_membrane = np.array([0.0])
         self.image_membrane2gas = np.array([0.0])
         self.image_membrane2gas_binned = np.array([0.0])
@@ -82,8 +87,10 @@ class Subject(object):
         self.mask = np.array([0.0])
         self.rbc_m_ratio = 0.0
         self.stats_dict = {}
+        self.traj_scaling_factor = 1.0
         self.traj_dissolved = np.array([])
         self.traj_gas = np.array([])
+        self.traj_ute = np.array([])
 
     def read_twix_files(self):
         """Read in twix files to dictionary.
@@ -134,6 +141,7 @@ class Subject(object):
         self.image_gas_highsnr = mdict["image_gas_highsnr"]
         self.image_gas_cor = mdict["image_gas_cor"]
         self.image_proton = mdict["image_proton"]
+        self.image_biasfield = mdict["image_biasfield"]
         self.mask = mdict["mask"].astype(bool)
         self.rbc_m_ratio = float(mdict["rbc_m_ratio"])
         self.traj_dissolved = mdict["traj_dissolved"]
@@ -374,6 +382,15 @@ class Subject(object):
             image2=np.abs(self.image_gas_highsnr),
             mask=self.mask,
         )
+        # scale by flip angle difference and TE90
+        scale_factor = signal_utils.calculate_flipangle_correction(
+            self.dict_dis[constants.IOFields.FA_GAS],
+            self.dict_dis[constants.IOFields.FA_DIS],
+        ) * signal_utils.calculate_t2star_correction(
+            self.dict_dis[constants.IOFields.TE90],
+        )
+        self.image_rbc2gas = scale_factor * self.image_rbc2gas
+        self.image_membrane2gas = scale_factor * self.image_membrane2gas
 
     def gas_binning(self):
         """Bin gas images to colormap bins."""
@@ -412,6 +429,9 @@ class Subject(object):
             constants.StatsIOFields.SNR_MEMBRANE: metrics.snr(
                 self.image_membrane, self.mask
             )[0],
+            constants.StatsIOFields.SNR_VENT: metrics.snr(
+                np.abs(self.image_gas_highreso), self.mask
+            )[1],
             constants.StatsIOFields.N_POINTS: self.data_gas.shape[1],
             constants.StatsIOFields.PCT_RBC_DEFECT: metrics.bin_percentage(
                 self.image_rbc2gas_binned, np.array([1])
@@ -439,6 +459,33 @@ class Subject(object):
             ),
             constants.StatsIOFields.PCT_VENT_HIGH: metrics.bin_percentage(
                 self.image_gas_binned, np.array([5, 6])
+            ),
+            constants.StatsIOFields.MEAN_VENT: metrics.mean(
+                img_utils.normalize(np.abs(self.image_gas_cor), self.mask), self.mask
+            ),
+            constants.StatsIOFields.MEAN_RBC: metrics.mean(
+                self.image_rbc2gas, self.mask
+            ),
+            constants.StatsIOFields.MEAN_MEMBRANE: metrics.mean(
+                self.image_membrane2gas, self.mask
+            ),
+            constants.StatsIOFields.MEDIAN_VENT: metrics.median(
+                img_utils.normalize(np.abs(self.image_gas_cor), self.mask), self.mask
+            ),
+            constants.StatsIOFields.MEDIAN_RBC: metrics.median(
+                self.image_rbc2gas, self.mask
+            ),
+            constants.StatsIOFields.MEDIAN_MEMBRANE: metrics.median(
+                self.image_membrane2gas, self.mask
+            ),
+            constants.StatsIOFields.STDDEV_VENT: metrics.std(
+                img_utils.normalize(np.abs(self.image_gas_cor), self.mask), self.mask
+            ),
+            constants.StatsIOFields.STDDEV_RBC: metrics.std(
+                self.image_rbc2gas, self.mask
+            ),
+            constants.StatsIOFields.STDDEV_MEMBRANE: metrics.std(
+                self.image_membrane2gas, self.mask
             ),
         }
 
@@ -488,9 +535,16 @@ class Subject(object):
             index_start=index_start,
             index_skip=index_skip,
         )
-        plot.plot_histogram_ventilation(
-            data=np.abs(self.image_gas_cor)[self.mask].flatten(),
+        plot.plot_histogram(
+            data=img_utils.normalize(self.image_gas_cor, self.mask)[
+                self.mask
+            ].flatten(),
             path="tmp/hist_vent.png",
+            color=constants.VENTHISTOGRAMFields.COLOR,
+            xlim=constants.VENTHISTOGRAMFields.XLIM,
+            ylim=constants.VENTHISTOGRAMFields.YLIM,
+            num_bins=constants.VENTHISTOGRAMFields.NUMBINS,
+            refer_fit=constants.VENTHISTOGRAMFields.REFERENCE_FIT,
         )
         plot.plot_histogram(
             data=np.abs(self.image_rbc2gas)[self.mask].flatten(),
@@ -532,9 +586,10 @@ class Subject(object):
         """Save select images to nifti files and instance variable to mat."""
         io_utils.export_nii(self.image_rbc2gas_binned, "tmp/rbc_binned.nii")
         io_utils.export_nii(np.abs(self.image_gas_highreso), "tmp/gas_highreso.nii")
-        io_utils.export_nii(self.image_gas_highsnr, "tmp/gas_highsnr.nii")
+        io_utils.export_nii(np.abs(self.image_gas_highsnr), "tmp/gas_highsnr.nii")
         io_utils.export_nii(np.abs(self.image_rbc), "tmp/rbc.nii")
         io_utils.export_nii(np.abs(self.image_membrane), "tmp/membrane.nii")
+        io_utils.export_nii(np.abs(self.image_membrane2gas), "tmp/membrane2gas.nii")
         io_utils.export_nii(self.mask.astype(float), "tmp/mask.nii")
         io_utils.export_nii(np.abs(self.image_dissolved), "tmp/dissolved.nii")
         if self.config.recon.recon_proton:

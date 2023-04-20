@@ -234,7 +234,7 @@ class StatsIOFields(object):
     PROCESS_DATE = "process_date"
     SNR_RBC = "snr_rbc"
     SNR_MEMBRANE = "snr_membrane"
-    SNR_GAS = "snr_gas"
+    SNR_VENT = "snr_vent"
     PCT_RBC_HIGH = "pct_rbc_high"
     PCT_RBC_LOW = "pct_rbc_low"
     PCT_RBC_DEFECT = "pct_rbc_defect"
@@ -244,6 +244,15 @@ class StatsIOFields(object):
     PCT_VENT_HIGH = "pct_vent_high"
     PCT_VENT_LOW = "pct_vent_low"
     PCT_VENT_DEFECT = "pct_vent_defect"
+    MEAN_RBC = "mean_rbc"
+    MEAN_MEMBRANE = "mean_membrane"
+    MEAN_VENT = "mean_vent"
+    MEDIAN_RBC = "median_rbc"
+    MEDIAN_MEMBRANE = "median_membrane"
+    MEDIAN_VENT = "median_vent"
+    STDDEV_RBC = "stddev_rbc"
+    STDDEV_MEMBRANE = "stddev_membrane"
+    STDDEV_VENT = "stddev_vent"
     N_POINTS = "n_points"
 
 
@@ -254,14 +263,14 @@ class MatIOFields(object):
     IMAGE_RBC_OSC = "image_rbc_osc"
 
 
-class VENHISTOGRAMFields(object):
+class VENTHISTOGRAMFields(object):
     """Ventilation histogram fields."""
 
     COLOR = (0.4196, 0.6824, 0.8392)
     XLIM = 1.0
     YLIM = 0.07
     NUMBINS = 50
-    REFERENCE_FIT = (0.04462, 0.52, 0.2713)
+    REFERENCE_FIT = (0.04074, 0.619, 0.196)
 
 
 class RBCHISTOGRAMFields(object):
@@ -278,9 +287,9 @@ class MEMBRANEHISTOGRAMFields(object):
     """Membrane histogram fields."""
 
     COLOR = (0.4, 0.7608, 0.6471)
-    XLIM = 1.0
-    YLIM = 0.07
-    NUMBINS = 50
+    XLIM = 2.5
+    YLIM = 0.18
+    NUMBINS = 70
     REFERENCE_FIT = (0.0700, 0.736, 0.278)
 
 

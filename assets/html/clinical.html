@@ -21,18 +21,30 @@
         <img src="../tmp/hist_vent.png" style="width: 100%" />
         <div class="top-right">
           <h2>Ventilation histogram</h2>
+          <p>SNR: {snr_vent}</p>
+          <p>Mean: {mean_vent}</p>
+          <p>Median: {median_vent}</p>
+          <p>SD: {stddev_vent}</p>
         </div>
       </div>
       <div class="hist-tile" align="right">
         <img src="../tmp/hist_membrane.png" style="width: 100%" />
         <div class="top-right">
           <h2>Membrane histogram</h2>
+          <p>SNR: {snr_membrane}</p>
+          <p>Mean: {mean_membrane}</p>
+          <p>Median: {median_membrane}</p>
+          <p>SD: {stddev_membrane}</p>
         </div>
       </div>
       <div class="hist-tile" align="right">
         <img src="../tmp/hist_rbc.png" style="width: 100%" />
         <div class="top-right">
           <h2>RBC histogram</h2>
+          <p>SNR: {snr_rbc}</p>
+          <p>Mean: {mean_rbc}</p>
+          <p>Median: {median_rbc}</p>
+          <p>SD: {stddev_rbc}</p>
         </div>
       </div>
     </div>
@@ -46,13 +58,13 @@
         />
         <img
           style="border: 10px solid black"
-          src="../tmp/montage_rbc_binned.png"
+          src="../tmp/montage_membrane_binned.png"
           width="680"
           height="170px"
         />
         <img
           style="border: 10px solid black"
-          src="../tmp/montage_membrane_binned.png"
+          src="../tmp/montage_rbc_binned.png"
           width="680"
           height="170px"
         />
@@ -71,11 +83,6 @@
           <th>Subject</th>
           <th>{subject_id}</th>
           <th>Ref</th>
-        </tr>
-        <tr class="basic">
-          <td>RBC SNR</td>
-          <td>{snr_rbc}</td>
-          <td>X &#177;Y</td>
         </tr>
         <tr class="basic">
           <td>RBC:M.</td>

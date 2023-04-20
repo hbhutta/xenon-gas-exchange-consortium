@@ -191,6 +191,29 @@ def remove_gasphase_contamination(
     return data_dissolved - contamination_kspace3
 
 
+def calculate_t2star_correction(te90: float) -> float:
+    """Calculate T2* correction factor.
+
+    Rounds to 3 decimal places.
+    Args:
+        te90 (float): echo time in seconds
+    """
+    return np.round(np.exp(te90 / 2e-3) / np.exp(te90 / 5e-2), 3)
+
+
+def calculate_flipangle_correction(fa_gas: float, fa_dis: float) -> float:
+    """Calculate flip angle correction factor.
+
+    Rounds to 3 decimal places.
+    Args:
+        fa_gas (float): gas flip angle in degrees
+        fa_dis (float): dissolved flip angle in degrees
+    """
+    return np.round(
+        (100 * np.sin(fa_gas * np.pi / 180) / np.sin(fa_dis * np.pi / 180)), 3
+    )
+
+
 def dixon_decomposition(
     data_dissolved: np.ndarray,
     rbc_m_ratio: float,
@@ -393,56 +416,3 @@ def awgn(sig: np.ndarray, SNR: float) -> np.ndarray:
             np.random.randn(len(sig)) + 1j * np.random.randn(len(sig))
         )
     return sig + noise
-
-
-def find_high_low_indices(
-    data: np.ndarray,
-    peak_distance: int,
-    distance_threshold: float = 0.2,
-    same_length: bool = True,
-    method: str = constants.BinningMethods.PEAKS,
-) -> Tuple[np.ndarray, np.ndarray]:
-    """Find indices of high and low signal bins.
-
-    Args:
-        data (np.ndarray): RBC 1-D data of shape (n_projections,)
-        peak_distance (int): distance between peaks in number of points.
-        distance_threshold (float): threshold for neighbouring peaks. Defaults to 0.2.
-            Value must be between 0 and 1 with 0 being taking only the found peaks and 1
-            being taking all points between the peaks.
-        same_length (bool): whether to force high and low bins are of the same length.
-
-    Returns:
-        Tuple of indices of high and low signal bins respectively.
-    """
-    high_indices = np.array([])
-    low_indices = np.array([])
-
-    if method == constants.BinningMethods.PEAKS:
-        high_peaks = find_peaks(data=data, distance=int(0.6 * peak_distance))
-        low_peaks = find_peaks(data=-data, distance=int(0.6 * peak_distance))
-
-        left = np.ceil(peak_distance * distance_threshold / 2).astype(int)
-        right = left + 1
-        for peak in high_peaks:
-            high_indices = np.append(high_indices, np.arange(peak - left, peak + right))
-        for peak in low_peaks:
-            low_indices = np.append(low_indices, np.arange(peak - left, peak + right))
-    elif method == constants.BinningMethods.THRESHOLD:
-        data_norm = (data - np.mean(data)) / np.std(data)
-        high_indices = np.argwhere(data_norm > 0.7).flatten()
-        low_indices = np.argwhere(data_norm < -0.7).flatten()
-    else:
-        raise ValueError(f"Method {method} not implemented.")
-
-    # remove indices that go are below zero and above length of the data
-    high_indices = np.delete(high_indices, np.argwhere(high_indices < 0))
-    low_indices = np.delete(low_indices, np.argwhere(low_indices < 0))
-    high_indices = np.delete(high_indices, np.argwhere(high_indices >= len(data)))
-    low_indices = np.delete(low_indices, np.argwhere(low_indices >= len(data)))
-    if same_length:
-        if len(high_indices) > len(low_indices):
-            high_indices = high_indices[: len(low_indices)]
-        elif len(low_indices) > len(high_indices):
-            low_indices = low_indices[: len(high_indices)]
-    return np.sort(high_indices).astype(int), np.sort(low_indices).astype(int)
