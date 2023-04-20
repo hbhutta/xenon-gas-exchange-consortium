@@ -103,8 +103,6 @@ class OutputPaths(object):
 class CNNPaths(object):
     """Paths to saved model files."""
 
-    DEFAULT = "GREModel_20190323.h5"
-
 
 class ImageType(enum.Enum):
     """Segmentation flags."""
