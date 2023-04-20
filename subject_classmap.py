@@ -132,6 +132,7 @@ class Subject(object):
         self.image_dissolved = mdict["image_dissolved"]
         self.image_gas_highreso = mdict["image_gas_highreso"]
         self.image_gas_highsnr = mdict["image_gas_highsnr"]
+        self.image_gas_cor = mdict["image_gas_cor"]
         self.image_proton = mdict["image_proton"]
         self.mask = mdict["mask"].astype(bool)
         self.rbc_m_ratio = float(mdict["rbc_m_ratio"])
@@ -412,6 +413,33 @@ class Subject(object):
                 self.image_membrane, self.mask
             )[0],
             constants.StatsIOFields.N_POINTS: self.data_gas.shape[1],
+            constants.StatsIOFields.PCT_RBC_DEFECT: metrics.bin_percentage(
+                self.image_rbc2gas_binned, np.array([1])
+            ),
+            constants.StatsIOFields.PCT_RBC_LOW: metrics.bin_percentage(
+                self.image_rbc2gas_binned, np.array([2])
+            ),
+            constants.StatsIOFields.PCT_RBC_HIGH: metrics.bin_percentage(
+                self.image_rbc2gas_binned, np.array([5, 6])
+            ),
+            constants.StatsIOFields.PCT_MEMBRANE_DEFECT: metrics.bin_percentage(
+                self.image_membrane2gas_binned, np.array([1])
+            ),
+            constants.StatsIOFields.PCT_MEMBRANE_LOW: metrics.bin_percentage(
+                self.image_membrane2gas_binned, np.array([2])
+            ),
+            constants.StatsIOFields.PCT_MEMBRANE_HIGH: metrics.bin_percentage(
+                self.image_membrane2gas_binned, np.array([6, 7, 8])
+            ),
+            constants.StatsIOFields.PCT_VENT_DEFECT: metrics.bin_percentage(
+                self.image_gas_binned, np.array([1])
+            ),
+            constants.StatsIOFields.PCT_VENT_LOW: metrics.bin_percentage(
+                self.image_gas_binned, np.array([2])
+            ),
+            constants.StatsIOFields.PCT_VENT_HIGH: metrics.bin_percentage(
+                self.image_gas_binned, np.array([5, 6])
+            ),
         }
 
     def generate_figures(self):

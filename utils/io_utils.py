@@ -424,9 +424,15 @@ def export_nii(image: np.ndarray, path: str, fov: Optional[float] = None):
     Args:
         image: np.ndarray 3D image to be exporetd
         path: str file path of nifti file
-        fov: float field of view
+        fov: float field of view in cm
     """
     nii_imge = nib.Nifti1Image(image, np.eye(4))
+    if fov:
+        nii_imge.header["pixdim"][1:4] = [
+            fov / np.shape(image)[0],
+            fov / np.shape(image)[0],
+            fov / np.shape(image)[0],
+        ]
     nib.save(nii_imge, path)
 
 

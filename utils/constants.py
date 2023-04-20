@@ -235,7 +235,15 @@ class StatsIOFields(object):
     SNR_RBC = "snr_rbc"
     SNR_MEMBRANE = "snr_membrane"
     SNR_GAS = "snr_gas"
-    KEY_RADIUS = "key_radius"
+    PCT_RBC_HIGH = "pct_rbc_high"
+    PCT_RBC_LOW = "pct_rbc_low"
+    PCT_RBC_DEFECT = "pct_rbc_defect"
+    PCT_MEMBRANE_HIGH = "pct_membrane_high"
+    PCT_MEMBRANE_LOW = "pct_membrane_low"
+    PCT_MEMBRANE_DEFECT = "pct_membrane_defect"
+    PCT_VENT_HIGH = "pct_vent_high"
+    PCT_VENT_LOW = "pct_vent_low"
+    PCT_VENT_DEFECT = "pct_vent_defect"
     N_POINTS = "n_points"
 
 
