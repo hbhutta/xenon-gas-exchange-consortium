@@ -169,11 +169,12 @@ config/tests/*
 assets/demo/*
 !assets/demo/*.dat
 !assets/demo/mask.nii
+!assets/*
 
-assets/tests/**.mat
-assets/tests/**.pdf
-assets/tests/**.pptx
-
+assets/tests/*
+!assets/tests/**/**.dat
+!assets/tests/**/**.nii
+!assets/tests/**/**.md
 # ignore the data folder
 data/*
 !data/.gitkeep
