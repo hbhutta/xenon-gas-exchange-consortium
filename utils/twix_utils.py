@@ -408,7 +408,6 @@ def get_gx_data(twix_obj: mapvbvd._attrdict.AttrDict) -> Dict[str, Any]:
     scan_date = get_scan_date(twix_obj=twix_obj)
     YYYY, MM, DD = scan_date.split("-")
     scan_datetime = datetime.datetime(int(YYYY), int(MM), int(DD))
-    pdb.set_trace()
     # check the flip angle and scan date to get the data
     if flip_angle_dissolved == 12:
         if raw_fids.shape[0] == 4200:
