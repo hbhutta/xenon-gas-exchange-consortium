@@ -3,10 +3,6 @@ import enum
 
 FOVINFLATIONSCALE3D = 1000.0
 
-_NUM_SLICE_GRE_MONTAGE = 14
-_NUM_ROWS_GRE_MONTAGE = 2
-_NUM_COLS_GRE_MONTAGE = 7
-
 _DEFAULT_SLICE_THICKNESS = 3.125
 _DEFAULT_PIXEL_SIZE = 3.125
 _DEFAULT_MAX_IMG_VALUE = 255.0
@@ -17,24 +13,41 @@ _VEN_PERCENTILE_RESCALE = 99.0
 _VEN_PERCENTILE_THRESHOLD_SEG = 80
 _PROTON_PERCENTILE_RESCALE = 99.8
 
+KCO_ALPHA = 11.2  # membrane
+KCO_BETA = 14.6  # RBC
+VA_ALPHA = 1.43
+
 
 class IOFields(object):
     """General IOFields constants."""
 
+    BANDWIDTH = "bandwidth"
     BIASFIELD_KEY = "biasfield_key"
     DWELL_TIME = "dwell_time"
     FA_DIS = "fa_dis"
     FA_GAS = "fa_gas"
+    FIDS = "fids"
     FIDS_DIS = "fids_dis"
     FIDS_GAS = "fids_gas"
-    FIDS = "fids"
+    FIELD_STRENGTH = "field_strength"
+    FLIP_ANGLE_FACTOR = "flip_angle_factor"
     FOV = "fov"
     FOV = "fov"
     FREQ_CENTER = "freq_center"
     FREQ_EXCITATION = "freq_excitation"
+    GIT_BRANCH = "git_branch"
+    GRAD_DELAY_X = "grad_delay_x"
+    GRAD_DELAY_Y = "grad_delay_y"
+    GRAD_DELAY_Z = "grad_delay_z"
     IMAGE = "image"
     INFLATION = "inflation"
+    KERNEL_SHARPNESS = "kernel_sharpness"
     MASK_REG_NII = "mask_reg_nii"
+    N_FRAMES = "n_frames"
+    N_SKIP_END = "n_skip_end"
+    N_SKIP_START = "n_skip_start"
+    N_DIS_REMOVED = "n_dis_removed"
+    N_GAS_REMOVED = "n_gas_removed"
     NPTS = "npts"
     ORIENTATION = "orientation"
     OUTPUT_PATH = "output_path"
@@ -47,13 +60,17 @@ class IOFields(object):
     RAW_PROTON_MONTAGE = "raw_proton_montage"
     REGISTRATION_KEY = "registration_key"
     REMOVEOS = "removeos"
+    REMOVE_NOISE = "remove_noise"
     SCAN_DATE = "scan_date"
     SCAN_TYPE = "scan_type"
     SEGMENTATION_KEY = "segmentation_key"
+    SHAPE_FIDS = "shape_fids"
+    SHAPE_IMAGE = "shape_image"
     SITE = "site"
     SLICE_THICKNESS = "slice_thickness"
     SOFTWARE_VERSION = "software_version"
     SUBJECT_ID = "subject_id"
+    T2_CORRECTION_FACTOR = "t2_correction_factor"
     TE90 = "te90"
     TR = "tr"
     TR_DIS = "tr_dis"
@@ -73,12 +90,6 @@ class IOFields(object):
     VEN_SNR = "ven_snr"
     VEN_STD = "ven_std"
     VENT_DICOM_DIR = "vent_dicom_dir"
-    GRAD_DELAY_X = "grad_delay_x"
-    GRAD_DELAY_Y = "grad_delay_y"
-    GRAD_DELAY_Z = "grad_delay_z"
-    N_SKIP_START = "n_skip_start"
-    N_SKIP_END = "n_skip_end"
-    N_FRAMES = "n_frames"
 
 
 class OutputPaths(object):
@@ -252,6 +263,9 @@ class StatsIOFields(object):
     STDDEV_MEMBRANE = "stddev_membrane"
     STDDEV_VENT = "stddev_vent"
     N_POINTS = "n_points"
+    DLCO = "dlco"
+    KCO = "kco"
+    ALVEOLAR_VOLUME = "alveolar_volume"
 
 
 class MatIOFields(object):

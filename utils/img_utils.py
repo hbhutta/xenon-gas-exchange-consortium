@@ -208,7 +208,7 @@ def normalize(
         raise ValueError("Invalid normalization method")
 
 
-def correct_B0(
+def correct_b0(
     image: np.ndarray, mask: np.ndarray, max_iterations: int = 100
 ) -> np.ndarray:
     """Correct B0 inhomogeneity.
@@ -255,13 +255,13 @@ def dixon_decomposition(
         Tuple of decomposed RBC and membrane images respectively.
     """
     # correct for B0 inhomogeneity
-    diffphase = correct_B0(image_gas, mask)
-    image_dissolved_B0 = np.multiply(image_dissolved, np.exp(1j * -diffphase))
+    diffphase = correct_b0(image_gas, mask)
     # calculate phase shift to separate RBC and membrane
     desired_angle = np.arctan2(rbc_m_ratio, 1.0)
-    current_angle = np.angle(np.sum(image_dissolved_B0[mask > 0]))
+    current_angle = np.angle(np.sum(image_dissolved[mask > 0]))
     delta_angle = desired_angle - current_angle
-    image_dixon = np.multiply(image_dissolved, np.exp(1j * (delta_angle - diffphase)))
+    image_dixon = np.multiply(image_dissolved, np.exp(1j * (delta_angle)))
+    image_dixon = np.multiply(image_dixon, np.exp(1j * (-diffphase)))
     # separate RBC and membrane components
     image_rbc = (
         np.imag(image_dixon)

@@ -255,11 +255,14 @@ def read_dis_twix(path: str) -> Dict[str, Any]:
     twix_obj.image.flagRemoveOS = False
 
     data_dict = twix_utils.get_gx_data(twix_obj=twix_obj)
+    filename = os.path.basename(path)
 
     return {
         constants.IOFields.DWELL_TIME: twix_utils.get_dwell_time(twix_obj),
         constants.IOFields.FA_DIS: twix_utils.get_flipangle_dissolved(twix_obj),
         constants.IOFields.FA_GAS: twix_utils.get_flipangle_gas(twix_obj),
+        constants.IOFields.FIELD_STRENGTH: twix_utils.get_field_strength(twix_obj),
+        constants.IOFields.FIDS: data_dict[constants.IOFields.FIDS],
         constants.IOFields.FIDS_DIS: data_dict[constants.IOFields.FIDS_DIS],
         constants.IOFields.FIDS_GAS: data_dict[constants.IOFields.FIDS_GAS],
         constants.IOFields.FOV: twix_utils.get_FOV(twix_obj),
@@ -279,6 +282,9 @@ def read_dis_twix(path: str) -> Dict[str, Any]:
         constants.IOFields.SOFTWARE_VERSION: twix_utils.get_software_version(twix_obj),
         constants.IOFields.TE90: twix_utils.get_TE90(twix_obj),
         constants.IOFields.TR: twix_utils.get_TR_dissolved(twix_obj),
+        constants.IOFields.BANDWIDTH: twix_utils.get_bandwidth(
+            twix_obj, data_dict, filename
+        ),
     }
 
 
@@ -315,6 +321,8 @@ def read_ute_twix(path: str) -> Dict[str, Any]:
         constants.IOFields.GRAD_DELAY_X: data_dict[constants.IOFields.GRAD_DELAY_X],
         constants.IOFields.GRAD_DELAY_Y: data_dict[constants.IOFields.GRAD_DELAY_Y],
         constants.IOFields.GRAD_DELAY_Z: data_dict[constants.IOFields.GRAD_DELAY_Z],
+        constants.IOFields.N_SKIP_END: data_dict[constants.IOFields.N_SKIP_END],
+        constants.IOFields.N_SKIP_START: data_dict[constants.IOFields.N_SKIP_START],
         constants.IOFields.N_FRAMES: data_dict[constants.IOFields.N_FRAMES],
         constants.IOFields.ORIENTATION: twix_utils.get_orientation(twix_obj),
     }
@@ -429,9 +437,9 @@ def export_nii(image: np.ndarray, path: str, fov: Optional[float] = None):
     nii_imge = nib.Nifti1Image(image, np.eye(4))
     if fov:
         nii_imge.header["pixdim"][1:4] = [
-            fov / np.shape(image)[0],
-            fov / np.shape(image)[0],
-            fov / np.shape(image)[0],
+            fov / np.shape(image)[0] / 10,
+            fov / np.shape(image)[0] / 10,
+            fov / np.shape(image)[0] / 10,
         ]
     nib.save(nii_imge, path)
 
@@ -456,7 +464,7 @@ def export_np(arr: np.ndarray, path: str):
     np.save(path, arr)
 
 
-def export_subject_csv(stats_dict: Dict[str, Any], path: str):
+def export_subject_csv(dict_stats: Dict[str, Any], path: str):
     """Export statistics to running csv file.
 
     Uses the csv.DictWriter class to write a csv file. First, checks if the csv
@@ -465,16 +473,16 @@ def export_subject_csv(stats_dict: Dict[str, Any], path: str):
     overwritten.
 
     Args:
-        stats_dict: dictionary containing statistics to be exported
+        dict_stats: dictionary containing statistics to be exported
         path: str file path of csv file
     """
-    header = stats_dict.keys()
+    header = dict_stats.keys()
     if not os.path.exists(path):
         with open(path, "w", newline="") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=header)
             writer.writeheader()
-            writer.writerow(stats_dict)
+            writer.writerow(dict_stats)
     else:
         with open(path, "a", newline="") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=header)
-            writer.writerow(stats_dict)
+            writer.writerow(dict_stats)

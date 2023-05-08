@@ -174,12 +174,12 @@ def get_ramp_time(twix_obj: mapvbvd._attrdict.AttrDict) -> float:
     """
     ramp_time = 0.0
     try:
-        ramp_time = float(twix_obj.hdr.Meas.RORampTime)
+        return float(twix_obj.hdr.Meas.RORampTime)
     except:
         pass
 
     try:
-        ramp_time = float(twix_obj["hdr"]["Meas"]["alRegridRampupTime"].split()[0])
+        return float(twix_obj["hdr"]["Meas"]["alRegridRampupTime"].split()[0])
     except:
         pass
 
@@ -255,7 +255,7 @@ def get_flipangle_dissolved(twix_obj: mapvbvd._attrdict.AttrDict) -> float:
     """
     scan_date = get_scan_date(twix_obj=twix_obj)
     YYYY, MM, DD = scan_date.split("-")
-    if datetime.datetime(int(YYYY), int(MM), int(DD)) < datetime.datetime(2020, 5, 30):
+    if datetime.datetime(int(YYYY), int(MM), int(DD)) < datetime.datetime(2021, 5, 30):
         logging.info("Checking for flip angle in old format.")
         try:
             return float(twix_obj.hdr.MeasYaps[("sWipMemBlock", "adFree", "6")])
@@ -355,6 +355,30 @@ def get_dyn_fids(
     return raw_fids[:, 0 : -(1 + n_skip_end)]
 
 
+def get_bandwidth(
+    twix_obj: mapvbvd._attrdict.AttrDict, data_dict: Dict[str, Any], filename: str
+) -> float:
+    """Get the bandwidth in Hz/pixel.
+
+    If the filename contains "BW", then this is a Ziyi-era sequence and the bandwidth
+    must be calculated differently.
+
+    Args:
+        twix_obj: twix object returned from mapVBVD function.
+        data_dict: dictionary containing the output of get_gx_data function.
+        filename: filename of the twix file.
+    Returns:
+        bandwidth in Hz/pixel
+    """
+    dwell_time = get_dwell_time(twix_obj=twix_obj)
+    npts = data_dict[constants.IOFields.FIDS_DIS].shape[1]
+    return (
+        1.0 / (2 * dwell_time * npts)
+        if "BW" not in filename
+        else 1.0 / (2 * npts * dwell_time / 2)
+    )
+
+
 def get_gx_data(twix_obj: mapvbvd._attrdict.AttrDict) -> Dict[str, Any]:
     """Get the dissolved phase and gas phase FIDs from twix object.
 
@@ -376,6 +400,7 @@ def get_gx_data(twix_obj: mapvbvd._attrdict.AttrDict) -> Dict[str, Any]:
         6. gradient delay x in microseconds.
         7. gradient delay y in microseconds.
         8. gradient delay z in microseconds.
+        9. raw fids in shape (number of projections, number of points in ray).
     """
     raw_fids = np.transpose(twix_obj.image.unsorted().astype(np.cdouble))
     flip_angle_dissolved = get_flipangle_dissolved(twix_obj)
@@ -383,6 +408,7 @@ def get_gx_data(twix_obj: mapvbvd._attrdict.AttrDict) -> Dict[str, Any]:
     scan_date = get_scan_date(twix_obj=twix_obj)
     YYYY, MM, DD = scan_date.split("-")
     scan_datetime = datetime.datetime(int(YYYY), int(MM), int(DD))
+    pdb.set_trace()
     # check the flip angle and scan date to get the data
     if flip_angle_dissolved == 12:
         if raw_fids.shape[0] == 4200:
@@ -416,7 +442,7 @@ def get_gx_data(twix_obj: mapvbvd._attrdict.AttrDict) -> Dict[str, Any]:
             raise ValueError("Cannot get data from 'medium' dixon twix object.")
     elif flip_angle_dissolved == 20:
         if raw_fids.shape[0] == 2030:
-            logging.info("Reading in 'normal' dixon data on Siemens Prisma.")
+            logging.info("Reading in 'normal' dixon data on Siemens Prisma w/ bonus.")
             data_gas = raw_fids[:-30][0::2, :]
             data_dis = raw_fids[:-30][1::2, :]
             n_frames = data_dis.shape[0]
@@ -424,7 +450,7 @@ def get_gx_data(twix_obj: mapvbvd._attrdict.AttrDict) -> Dict[str, Any]:
             n_skip_end = 0
             grad_delay_x, grad_delay_y, grad_delay_z = -5, -5, -5
         elif raw_fids.shape[0] == 2002:
-            if scan_datetime > datetime.datetime(2017, 9, 21):
+            if scan_datetime > datetime.datetime(2017, 12, 31):
                 logging.info("Reading in 'normal' dixon data on Siemens Trio.")
                 data_gas = raw_fids[:-2][2::2, :]
                 data_dis = raw_fids[:-2][3::2, :]
@@ -460,6 +486,7 @@ def get_gx_data(twix_obj: mapvbvd._attrdict.AttrDict) -> Dict[str, Any]:
             raise ValueError("Cannot get data from normal dixon twix object.")
     else:
         raise ValueError("Cannot get data from twix object.")
+
     return {
         constants.IOFields.FIDS_GAS: data_gas,
         constants.IOFields.FIDS_DIS: data_dis,
@@ -469,6 +496,7 @@ def get_gx_data(twix_obj: mapvbvd._attrdict.AttrDict) -> Dict[str, Any]:
         constants.IOFields.GRAD_DELAY_X: grad_delay_x,
         constants.IOFields.GRAD_DELAY_Y: grad_delay_y,
         constants.IOFields.GRAD_DELAY_Z: grad_delay_z,
+        constants.IOFields.FIDS: raw_fids,
     }
 
 
@@ -486,21 +514,35 @@ def get_ute_data(twix_obj: mapvbvd._attrdict.AttrDict) -> Dict[str, Any]:
         1. UTE FIDs in shape (number of projections,
             number of points in ray).
         2. number of FIDs to use for generating trajectory.
-        3. gradient delay x in microseconds.
-        4. gradient delay y in microseconds.
-        5. gradient delay z in microseconds.
+        3. number of FIDs to skip from the beginning. This may be due to a noise frame.
+        4. number of FIDs to skip from the end. This may be due to blank frame.
+        5. gradient delay x in microseconds.
+        6. gradient delay y in microseconds.
+        7. gradient delay z in microseconds.
     """
-    raw_fids = twix_obj.image.unsorted().astype(np.cdouble)
+    raw_fids = np.array(twix_obj.image.unsorted().astype(np.cdouble))
 
     if raw_fids.ndim == 3:
-        data = np.transpose(np.squeeze(raw_fids[:, 0, :]))
-        data = data[:4600, :]
+        raw_fids = np.squeeze(raw_fids[:, 0, :])
+
+    if raw_fids.shape[1] == 4601:
+        # For some reason, the raw data is 4601 points long. We need to remove the
+        # last projection.
+        raw_fids = raw_fids[:, :4600]
+        nframes = 4601
+        n_skip_start = 0
+        n_skip_end = 1
     else:
-        data = np.transpose(raw_fids)
+        nframes = raw_fids.shape[1]
+        n_skip_start = 0
+        n_skip_end = 0
+    data = np.transpose(raw_fids)
 
     return {
         constants.IOFields.FIDS: data,
-        constants.IOFields.N_FRAMES: data.shape[0],
+        constants.IOFields.N_FRAMES: nframes,
+        constants.IOFields.N_SKIP_START: n_skip_start,
+        constants.IOFields.N_SKIP_END: n_skip_end,
         constants.IOFields.GRAD_DELAY_X: -5,
         constants.IOFields.GRAD_DELAY_Y: -5,
         constants.IOFields.GRAD_DELAY_Z: -5,

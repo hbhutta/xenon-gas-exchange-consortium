@@ -11,7 +11,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as stats
-
+import cv2
 from utils import constants, io_utils
 
 
@@ -116,6 +116,39 @@ def map_and_overlay_to_rgb(
         image_out[:, :, i, :] = _merge_rgb_and_gray(
             image_background[:, :, i], image_rgb[:, :, i, :]
         )
+    return image_out
+
+
+def overlay_mask_on_image(image: np.ndarray, mask: np.ndarray) -> np.ndarray:
+    """Overlay the border of a binary mask on a greyscale image in red.
+
+    Args:
+        image (np.ndarray): Greyscale image of shape (x, y, z)
+        mask (np.ndarray): Binary mask of shape (x, y, z)
+
+    Returns:
+        np.ndarray: Overlaid image of shape (x, y, z, 3)
+    """
+    # divide by the maximum value to normalize to [0, 1]
+    image = image / np.max(image)
+
+    def border_mask(mask: np.ndarray) -> np.ndarray:
+        mask_dilated = np.zeros_like(mask)
+        for i in range(mask.shape[2]):
+            mask_dilated[:, :, i] = cv2.dilate(
+                mask[:, :, i].astype(np.uint8), np.ones((3, 3)), iterations=1
+            )
+        return mask_dilated - mask
+
+    border = border_mask(mask)
+
+    image_out = np.zeros((image.shape[0], image.shape[1], image.shape[2], 3))
+    for i in range(image.shape[2]):
+        image_slice = np.repeat(image[:, :, i][:, :, np.newaxis], 3, axis=2)
+        border_slice = border[:, :, i][:, :, np.newaxis]
+        image_slice[border_slice[..., 0] == 1] = [1, 0, 0]
+        image_out[:, :, i, :] = image_slice
+
     return image_out
 
 

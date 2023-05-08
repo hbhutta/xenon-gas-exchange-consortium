@@ -26,7 +26,11 @@ def gx_mapping_reconstruction(config: base_config.Config):
     try:
         subject.read_twix_files()
     except:
-        subject.read_mrd_files()
+        logging.warning("No twix files found.")
+        try:
+            subject.read_mrd_files()
+        except:
+            raise ValueError("Cannot read in raw data files.")
     logging.info("Getting RBC:M ratio from static spectroscopy.")
     subject.calculate_rbc_m_ratio()
     logging.info("Reconstructing images")
@@ -39,12 +43,13 @@ def gx_mapping_reconstruction(config: base_config.Config):
     subject.segmentation()
     subject.registration()
     subject.biasfield_correction()
+    subject.gas_binning()
     subject.save_subject_to_mat()
     subject.dixon_decomposition()
     subject.dissolved_analysis()
-    subject.gas_binning()
     subject.dissolved_binning()
     subject.get_statistics()
+    subject.get_info()
     subject.write_stats_to_csv()
     subject.generate_figures()
     subject.generate_pdf()
@@ -63,12 +68,13 @@ def gx_mapping_readin(config: base_config.Config):
     if FLAGS.force_segmentation:
         logging.info("Segmenting Proton Mask")
         subject.segmentation()
+    subject.gas_binning()
     subject.save_subject_to_mat()
     subject.dixon_decomposition()
     subject.dissolved_analysis()
-    subject.gas_binning()
     subject.dissolved_binning()
     subject.get_statistics()
+    subject.get_info()
     subject.write_stats_to_csv()
     subject.generate_figures()
     subject.generate_pdf()

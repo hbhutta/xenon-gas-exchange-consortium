@@ -27,54 +27,28 @@
           <p>SD: {stddev_vent}</p>
         </div>
       </div>
-      <div class="hist-tile" align="right">
-        <img src="../tmp/hist_membrane.png" style="width: 100%" />
-        <div class="top-right">
-          <h2>Membrane histogram</h2>
-          <p>SNR: {snr_membrane}</p>
-          <p>Mean: {mean_membrane}</p>
-          <p>Median: {median_membrane}</p>
-          <p>SD: {stddev_membrane}</p>
-        </div>
-      </div>
-      <div class="hist-tile" align="right">
-        <img src="../tmp/hist_rbc.png" style="width: 100%" />
-        <div class="top-right">
-          <h2>RBC histogram</h2>
-          <p>SNR: {snr_rbc}</p>
-          <p>Mean: {mean_rbc}</p>
-          <p>Median: {median_rbc}</p>
-          <p>SD: {stddev_rbc}</p>
-        </div>
       </div>
     </div>
     <div class="map-container">
       <div class="map-tile">
         <img
           style="border: 10px solid black"
-          src="../tmp/montage_gas_binned.png"
+          src="../tmp/montage_vent_qa.png"
           width="680"
           height="170px"
         />
         <img
           style="border: 10px solid black"
-          src="../tmp/montage_membrane_binned.png"
+          src="../tmp/montage_dissolved_qa.png"
           width="680"
           height="170px"
         />
         <img
           style="border: 10px solid black"
-          src="../tmp/montage_rbc_binned.png"
+          src="../tmp/montage_proton_qa.png"
           width="680"
           height="170px"
         />
-      </div>
-      <div class="colorbar-tile">
-        <img src=../assets/img/colorbin_short.png height=150px>
-        <div class="space"></div>
-        <img src=../assets/img/colorbin_long.png height=200px>
-        <div class="space"></div>
-        <img src=../assets/img/colorbin_short.png height=150px>
       </div>
       <div class="predict-values">
         <p>Estimated KCO:{kco} ---- VA:{alveolar_volume} ---- DLCO:{dlco}</p>

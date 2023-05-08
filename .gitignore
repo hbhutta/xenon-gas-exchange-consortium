@@ -160,13 +160,17 @@ option/*.json
 config/**
 !config/base_config.py
 !config/demo_config.py
+!config/tests/**.py
 
 # Keep the assets folder
 assets/demo/*
 !assets/demo/*.dat
 !assets/demo/mask.nii
 !assets/*
-
+assets/tests/*
+!assets/tests/**.dat
+!assets/tests/**.nii
+!assets/tests/**.md
 # ignore the data folder
 data/*
 !data/.gitkeep

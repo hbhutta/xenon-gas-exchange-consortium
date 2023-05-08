@@ -1,4 +1,4 @@
-"""Module for oscillation imaging subject."""
+"""Module for gas exchange imaging subject."""
 import glob
 import logging
 import os
@@ -6,9 +6,8 @@ import pdb
 
 import nibabel as nib
 import numpy as np
-
+from typing import Any, Dict
 import biasfield
-import oscillation_binning as ob
 import preprocessing as pp
 import reconstruction
 import registration
@@ -30,7 +29,7 @@ from utils import (
 
 
 class Subject(object):
-    """Module to for processing oscillation imaging.
+    """Module to for processing gas exchange imaging.
 
     Attributes:
         config (config_dict.ConfigDict): config dict
@@ -40,6 +39,8 @@ class Subject(object):
         dict_dis (dict): dictionary of dissolved-phase data and metadata
         dict_dyn (dict): dictionary of dynamic spectroscopy data and metadata
         dict_ute (dict): dictionary of UTE proton data and metadata
+        dict_stats (dict): dictionary of statistics for reporting
+        dict_info (dict): dictionary of information for reporting
         image_biasfield (np.array): bias field
         image_dissolved (np.array): dissolved-phase image
         image_gas_binned (np.array): binned gas-phase image
@@ -54,8 +55,8 @@ class Subject(object):
         image_rbc2gas (np.array): RBC image normalized by gas-phase image
         image_rbc2gas_binned (np.array): binned image_rbc2gas
         mask (np.array): thoracic cavity mask
+        mask_vent (np.ndarray): thoracic cavity mask without ventilation defects
         rbc_m_ratio (float): RBC to M ratio
-        stats_dict (dict): dictionary of statistics
         traj_dissolved (np.array): dissolved-phase trajectory of shape
             (n_projections, n_points, 3)
         traj_gas (np.array): gas-phase trajectory of shape (n_projections, n_points, 3)
@@ -65,7 +66,7 @@ class Subject(object):
 
     def __init__(self, config: base_config.Config):
         """Init object."""
-        logging.info("Initializing oscillation imaging subject.")
+        logging.info("Initializing gas exchange imaging subject.")
         self.config = config
         self.data_dissolved = np.array([])
         self.data_gas = np.array([])
@@ -85,8 +86,10 @@ class Subject(object):
         self.image_rbc2gas = np.array([0.0])
         self.image_rbc2gas_binned = np.array([0.0])
         self.mask = np.array([0.0])
+        self.mask_vent = np.array([0.0])
         self.rbc_m_ratio = 0.0
-        self.stats_dict = {}
+        self.dict_stats = {}
+        self.dict_info = {}
         self.traj_scaling_factor = 1.0
         self.traj_dissolved = np.array([])
         self.traj_gas = np.array([])
@@ -143,6 +146,7 @@ class Subject(object):
         self.image_proton = mdict["image_proton"]
         self.image_biasfield = mdict["image_biasfield"]
         self.mask = mdict["mask"].astype(bool)
+        self.mask_vent = mdict["mask_vent"].astype(bool)
         self.rbc_m_ratio = float(mdict["rbc_m_ratio"])
         self.traj_dissolved = mdict["traj_dissolved"]
         self.traj_gas = mdict["traj_gas"]
@@ -172,7 +176,7 @@ class Subject(object):
         Also, calculates the scaling factor for the trajectory.
         """
         generate_traj = not constants.IOFields.TRAJ in self.dict_dis.keys()
-        if self.config.remove_contamination:
+        if self.config.recon.remove_contamination:
             self.dict_dis = pp.remove_contamination(self.dict_dyn, self.dict_dis)
         (
             self.data_dissolved,
@@ -182,7 +186,6 @@ class Subject(object):
         ) = pp.prepare_data_and_traj_interleaved(
             self.dict_dis,
             generate_traj=generate_traj,
-            remove_noise=self.config.remove_noisy_projections,
         )
         self.data_dissolved, self.traj_dissolved = pp.truncate_data_and_traj(
             self.data_dissolved,
@@ -196,6 +199,14 @@ class Subject(object):
             n_skip_start=0,
             n_skip_end=int(self.config.recon.n_skip_end),
         )
+
+        if self.config.recon.remove_noisy_projections:
+            self.data_gas, self.traj_gas = pp.remove_noisy_projections(
+                self.data_gas, self.traj_gas
+            )
+            self.data_dissolved, self.traj_dissolved = pp.remove_noisy_projections(
+                self.data_dissolved, self.traj_dissolved
+            )
         self.traj_scaling_factor = traj_utils.get_scaling_factor(
             recon_size=int(self.config.recon.recon_size),
             n_points=self.data_gas.shape[1],
@@ -215,6 +226,10 @@ class Subject(object):
                 n_skip_end=0,
             )
             self.traj_ute *= self.traj_scaling_factor
+            if self.config.recon.remove_noisy_projections:
+                self.data_ute, self.traj_ute = pp.remove_noisy_projections(
+                    self.data_ute, self.traj_ute
+                )
 
     def reconstruction_ute(self):
         """Reconstruct the UTE image."""
@@ -363,24 +378,35 @@ class Subject(object):
         else:
             raise ValueError("Invalid bias field correction key.")
 
+    def gas_binning(self):
+        """Bin gas images to colormap bins."""
+        self.image_gas_binned = binning.linear_bin(
+            image=img_utils.normalize(self.image_gas_cor, self.mask),
+            mask=self.mask,
+            thresholds=self.config.params.threshold_vent,
+        )
+        self.mask_vent = np.logical_and(self.image_gas_binned > 1, self.mask)
+
     def dixon_decomposition(self):
         """Perform Dixon decomposition on the dissolved-phase images."""
         self.image_rbc, self.image_membrane = img_utils.dixon_decomposition(
             image_gas=self.image_gas_highsnr,
             image_dissolved=self.image_dissolved,
-            mask=self.mask,
+            mask=self.mask_vent,
             rbc_m_ratio=self.rbc_m_ratio,
         )
 
     def dissolved_analysis(self):
         """Calculate the dissolved-phase images relative to gas image."""
         self.image_rbc2gas = img_utils.divide_images(
-            image1=self.image_rbc, image2=np.abs(self.image_gas_highsnr), mask=self.mask
+            image1=self.image_rbc,
+            image2=np.abs(self.image_gas_highsnr),
+            mask=self.mask_vent,
         )
         self.image_membrane2gas = img_utils.divide_images(
             image1=self.image_membrane,
             image2=np.abs(self.image_gas_highsnr),
-            mask=self.mask,
+            mask=self.mask_vent,
         )
         # scale by flip angle difference and TE90
         scale_factor = signal_utils.calculate_flipangle_correction(
@@ -392,30 +418,26 @@ class Subject(object):
         self.image_rbc2gas = scale_factor * self.image_rbc2gas
         self.image_membrane2gas = scale_factor * self.image_membrane2gas
 
-    def gas_binning(self):
-        """Bin gas images to colormap bins."""
-        self.image_gas_binned = binning.linear_bin(
-            image=img_utils.normalize(self.image_gas_cor, self.mask),
-            mask=self.mask,
-            thresholds=self.config.params.threshold_vent,
-        )
-
     def dissolved_binning(self):
         """Bin dissolved images to colormap bins."""
         self.image_rbc2gas_binned = binning.linear_bin(
             image=self.image_rbc2gas,
-            mask=self.mask,
+            mask=self.mask_vent,
             thresholds=self.config.params.threshold_rbc,
         )
         self.image_membrane2gas_binned = binning.linear_bin(
             image=self.image_membrane2gas,
-            mask=self.mask,
+            mask=self.mask_vent,
             thresholds=self.config.params.threshold_membrane,
         )
 
-    def get_statistics(self):
-        """Calculate image statistics."""
-        self.stats_dict = {
+    def get_statistics(self) -> Dict[str, Any]:
+        """Calculate image statistics.
+
+        Returns:
+            dict_stats: Dictionary of statistics for reporting
+        """
+        self.dict_stats = {
             constants.StatsIOFields.SUBJECT_ID: self.config.subject_id,
             constants.StatsIOFields.INFLATION: metrics.inflation_volume(
                 self.mask, self.dict_dis[constants.IOFields.FOV]
@@ -434,64 +456,161 @@ class Subject(object):
             )[1],
             constants.StatsIOFields.N_POINTS: self.data_gas.shape[1],
             constants.StatsIOFields.PCT_RBC_DEFECT: metrics.bin_percentage(
-                self.image_rbc2gas_binned, np.array([1])
+                self.image_rbc2gas_binned, np.array([1]), self.mask
             ),
             constants.StatsIOFields.PCT_RBC_LOW: metrics.bin_percentage(
-                self.image_rbc2gas_binned, np.array([2])
+                self.image_rbc2gas_binned, np.array([2]), self.mask
             ),
             constants.StatsIOFields.PCT_RBC_HIGH: metrics.bin_percentage(
-                self.image_rbc2gas_binned, np.array([5, 6])
+                self.image_rbc2gas_binned, np.array([5, 6]), self.mask
             ),
             constants.StatsIOFields.PCT_MEMBRANE_DEFECT: metrics.bin_percentage(
-                self.image_membrane2gas_binned, np.array([1])
+                self.image_membrane2gas_binned, np.array([1]), self.mask
             ),
             constants.StatsIOFields.PCT_MEMBRANE_LOW: metrics.bin_percentage(
-                self.image_membrane2gas_binned, np.array([2])
+                self.image_membrane2gas_binned, np.array([2]), self.mask
             ),
             constants.StatsIOFields.PCT_MEMBRANE_HIGH: metrics.bin_percentage(
-                self.image_membrane2gas_binned, np.array([6, 7, 8])
+                self.image_membrane2gas_binned, np.array([6, 7, 8]), self.mask
             ),
             constants.StatsIOFields.PCT_VENT_DEFECT: metrics.bin_percentage(
-                self.image_gas_binned, np.array([1])
+                self.image_gas_binned, np.array([1]), self.mask
             ),
             constants.StatsIOFields.PCT_VENT_LOW: metrics.bin_percentage(
-                self.image_gas_binned, np.array([2])
+                self.image_gas_binned, np.array([2]), self.mask
             ),
             constants.StatsIOFields.PCT_VENT_HIGH: metrics.bin_percentage(
-                self.image_gas_binned, np.array([5, 6])
+                self.image_gas_binned, np.array([5, 6]), self.mask
             ),
             constants.StatsIOFields.MEAN_VENT: metrics.mean(
                 img_utils.normalize(np.abs(self.image_gas_cor), self.mask), self.mask
             ),
             constants.StatsIOFields.MEAN_RBC: metrics.mean(
-                self.image_rbc2gas, self.mask
+                self.image_rbc2gas, self.mask_vent
             ),
             constants.StatsIOFields.MEAN_MEMBRANE: metrics.mean(
-                self.image_membrane2gas, self.mask
+                self.image_membrane2gas, self.mask_vent
             ),
             constants.StatsIOFields.MEDIAN_VENT: metrics.median(
                 img_utils.normalize(np.abs(self.image_gas_cor), self.mask), self.mask
             ),
             constants.StatsIOFields.MEDIAN_RBC: metrics.median(
-                self.image_rbc2gas, self.mask
+                self.image_rbc2gas, self.mask_vent
             ),
             constants.StatsIOFields.MEDIAN_MEMBRANE: metrics.median(
-                self.image_membrane2gas, self.mask
+                self.image_membrane2gas, self.mask_vent
             ),
             constants.StatsIOFields.STDDEV_VENT: metrics.std(
                 img_utils.normalize(np.abs(self.image_gas_cor), self.mask), self.mask
             ),
             constants.StatsIOFields.STDDEV_RBC: metrics.std(
-                self.image_rbc2gas, self.mask
+                self.image_rbc2gas, self.mask_vent
             ),
             constants.StatsIOFields.STDDEV_MEMBRANE: metrics.std(
-                self.image_membrane2gas, self.mask
+                self.image_membrane2gas, self.mask_vent
+            ),
+            constants.StatsIOFields.ALVEOLAR_VOLUME: metrics.alveolar_volume(
+                self.image_gas_binned, self.mask, self.dict_dis[constants.IOFields.FOV]
+            ),
+            constants.StatsIOFields.KCO: metrics.kco(
+                self.image_membrane2gas,
+                self.image_rbc2gas,
+                self.mask_vent,
+                self.config.params.mean_membrane,
+                self.config.params.mean_rbc,
+            ),
+            constants.StatsIOFields.DLCO: metrics.dlco(
+                self.image_gas_binned,
+                self.image_membrane2gas,
+                self.image_rbc2gas,
+                self.mask,
+                self.mask_vent,
+                self.dict_dis[constants.IOFields.FOV],
+                self.config.params.mean_membrane,
+                self.config.params.mean_rbc,
             ),
         }
+        return self.dict_stats
+
+    def get_info(self) -> Dict[str, Any]:
+        """Gather information about the data and processing steps.
+
+        Returns:
+            dict_info: Dictionary of information.
+        """
+        self.dict_info = {
+            constants.IOFields.BANDWIDTH: self.dict_dis[constants.IOFields.BANDWIDTH],
+            constants.IOFields.DWELL_TIME: (
+                1e6 * self.dict_dis[constants.IOFields.DWELL_TIME]
+            ),
+            constants.IOFields.FA_DIS: self.dict_dis[constants.IOFields.FA_DIS],
+            constants.IOFields.FA_GAS: self.dict_dis[constants.IOFields.FA_GAS],
+            constants.IOFields.FIELD_STRENGTH: self.dict_dis[
+                constants.IOFields.FIELD_STRENGTH
+            ],
+            constants.IOFields.FLIP_ANGLE_FACTOR: signal_utils.calculate_flipangle_factor(
+                self.dict_dis[constants.IOFields.FA_GAS],
+                self.dict_dis[constants.IOFields.FA_DIS],
+            ),
+            constants.IOFields.FOV: self.dict_dis[constants.IOFields.FOV],
+            constants.IOFields.FREQ_EXCITATION: self.dict_dis[
+                constants.IOFields.FREQ_EXCITATION
+            ],
+            constants.IOFields.GIT_BRANCH: report.get_git_branch(),
+            constants.IOFields.GRAD_DELAY_X: self.dict_dis[
+                constants.IOFields.GRAD_DELAY_X
+            ],
+            constants.IOFields.GRAD_DELAY_Y: self.dict_dis[
+                constants.IOFields.GRAD_DELAY_Y
+            ],
+            constants.IOFields.GRAD_DELAY_Z: self.dict_dis[
+                constants.IOFields.GRAD_DELAY_Z
+            ],
+            constants.IOFields.KERNEL_SHARPNESS: self.config.recon.kernel_sharpness_hr,
+            constants.IOFields.N_SKIP_START: self.config.recon.n_skip_start,
+            constants.IOFields.N_DIS_REMOVED: len(
+                self.dict_dis[constants.IOFields.FIDS_DIS]
+            )
+            - np.sum(
+                recon_utils.get_noisy_projections(
+                    data=self.dict_dis[constants.IOFields.FIDS_DIS]
+                )
+            ),
+            constants.IOFields.N_GAS_REMOVED: len(
+                self.dict_dis[constants.IOFields.FIDS_GAS]
+            )
+            - np.sum(
+                recon_utils.get_noisy_projections(
+                    data=self.dict_dis[constants.IOFields.FIDS_GAS]
+                )
+            ),
+            constants.IOFields.PROCESS_DATE: metrics.process_date(),
+            constants.IOFields.REMOVE_NOISE: self.config.recon.remove_noisy_projections,
+            constants.IOFields.SCAN_DATE: self.dict_dis[constants.IOFields.SCAN_DATE],
+            constants.IOFields.SCAN_TYPE: self.config.recon.scan_type,
+            constants.IOFields.SHAPE_FIDS: self.dict_dis[constants.IOFields.FIDS].shape,
+            constants.IOFields.SHAPE_IMAGE: self.image_gas_highreso.shape,
+            constants.IOFields.SOFTWARE_VERSION: self.dict_dis[
+                constants.IOFields.SOFTWARE_VERSION
+            ],
+            constants.IOFields.SUBJECT_ID: self.config.subject_id,
+            constants.IOFields.T2_CORRECTION_FACTOR: signal_utils.calculate_t2star_correction(
+                self.dict_dis[constants.IOFields.TE90],
+            ),
+            constants.IOFields.TE90: 1e6 * self.dict_dis[constants.IOFields.TE90],
+            constants.IOFields.TR_DIS: self.dict_dis[constants.IOFields.TR],
+        }
+
+        return self.dict_info
 
     def generate_figures(self):
         """Export image figures."""
         index_start, index_skip = plot.get_plot_indices(self.mask)
+        proton_reg = img_utils.normalize(
+            np.abs(self.image_proton),
+            self.mask,
+            method=constants.NormalizationMethods.PERCENTILE,
+        )
         plot.plot_montage_grey(
             image=np.abs(self.image_gas_highreso),
             path="tmp/montage_vent.png",
@@ -504,10 +623,11 @@ class Subject(object):
             index_start=index_start,
             index_skip=index_skip,
         )
-        proton_reg = img_utils.normalize(
-            np.abs(self.image_proton),
-            self.mask,
-            method=constants.NormalizationMethods.PERCENTILE,
+        plot.plot_montage_grey(
+            image=np.abs(self.image_rbc),
+            path="tmp/montage_rbc.png",
+            index_start=index_start,
+            index_skip=index_skip,
         )
         plot.plot_montage_color(
             image=plot.map_and_overlay_to_rgb(
@@ -535,9 +655,31 @@ class Subject(object):
             index_start=index_start,
             index_skip=index_skip,
         )
+        plot.plot_montage_color(
+            image=plot.overlay_mask_on_image(proton_reg, self.mask.astype("uint8")),
+            path="tmp/montage_proton_qa.png",
+            index_start=index_start,
+            index_skip=index_skip,
+        )
+        plot.plot_montage_color(
+            image=plot.overlay_mask_on_image(
+                np.abs(self.image_gas_highreso), self.mask.astype("uint8")
+            ),
+            path="tmp/montage_vent_qa.png",
+            index_start=index_start,
+            index_skip=index_skip,
+        )
+        plot.plot_montage_color(
+            image=plot.overlay_mask_on_image(
+                np.abs(self.image_dissolved), self.mask.astype("uint8")
+            ),
+            path="tmp/montage_dissolved_qa.png",
+            index_start=index_start,
+            index_skip=index_skip,
+        )
         plot.plot_histogram(
             data=img_utils.normalize(self.image_gas_cor, self.mask)[
-                self.mask
+                np.array(self.mask, dtype=bool)
             ].flatten(),
             path="tmp/hist_vent.png",
             color=constants.VENTHISTOGRAMFields.COLOR,
@@ -547,7 +689,7 @@ class Subject(object):
             refer_fit=constants.VENTHISTOGRAMFields.REFERENCE_FIT,
         )
         plot.plot_histogram(
-            data=np.abs(self.image_rbc2gas)[self.mask].flatten(),
+            data=np.abs(self.image_rbc2gas)[np.array(self.mask, dtype=bool)].flatten(),
             path="tmp/hist_rbc.png",
             color=constants.RBCHISTOGRAMFields.COLOR,
             xlim=constants.RBCHISTOGRAMFields.XLIM,
@@ -556,7 +698,9 @@ class Subject(object):
             refer_fit=constants.RBCHISTOGRAMFields.REFERENCE_FIT,
         )
         plot.plot_histogram(
-            data=np.abs(self.image_membrane2gas)[self.mask].flatten(),
+            data=np.abs(self.image_membrane2gas)[
+                np.array(self.mask, dtype=bool)
+            ].flatten(),
             path="tmp/hist_membrane.png",
             color=constants.MEMBRANEHISTOGRAMFields.COLOR,
             xlim=constants.MEMBRANEHISTOGRAMFields.XLIM,
@@ -569,13 +713,32 @@ class Subject(object):
         """Generate HTML and PDF files."""
         path = os.path.join(
             self.config.data_dir,
+            "report_intro_{}.pdf".format(self.config.subject_id),
+        )
+        report.intro(self.dict_info, path=path)
+        path = os.path.join(
+            self.config.data_dir,
+            "report_grayscale_{}.pdf".format(self.config.subject_id),
+        )
+        report.grayscale(
+            {**self.dict_stats, **self.config.params.reference_stats}, path=path
+        )
+        path = os.path.join(
+            self.config.data_dir,
             "report_clinical_{}.pdf".format(self.config.subject_id),
         )
-        report.clinical(self.stats_dict, path=path)
+        report.clinical(
+            {**self.dict_stats, **self.config.params.reference_stats}, path=path
+        )
+        path = os.path.join(
+            self.config.data_dir,
+            "report_qa_{}.pdf".format(self.config.subject_id),
+        )
+        report.qa({**self.dict_stats, **self.config.params.reference_stats}, path=path)
 
     def write_stats_to_csv(self):
         """Write statistics to file."""
-        io_utils.export_subject_csv(self.stats_dict, path="data/stats_all.csv")
+        io_utils.export_subject_csv(self.dict_stats, path="data/stats_all.csv")
 
     def save_subject_to_mat(self):
         """Save the instance variables into a mat file."""
@@ -584,13 +747,46 @@ class Subject(object):
 
     def save_files(self):
         """Save select images to nifti files and instance variable to mat."""
-        io_utils.export_nii(self.image_rbc2gas_binned, "tmp/rbc_binned.nii")
-        io_utils.export_nii(np.abs(self.image_gas_highreso), "tmp/gas_highreso.nii")
-        io_utils.export_nii(np.abs(self.image_gas_highsnr), "tmp/gas_highsnr.nii")
-        io_utils.export_nii(np.abs(self.image_rbc), "tmp/rbc.nii")
-        io_utils.export_nii(np.abs(self.image_membrane), "tmp/membrane.nii")
-        io_utils.export_nii(np.abs(self.image_membrane2gas), "tmp/membrane2gas.nii")
-        io_utils.export_nii(self.mask.astype(float), "tmp/mask.nii")
-        io_utils.export_nii(np.abs(self.image_dissolved), "tmp/dissolved.nii")
+        io_utils.export_nii(
+            self.image_rbc2gas_binned,
+            "tmp/rbc_binned.nii",
+            self.dict_dis[constants.IOFields.FOV],
+        )
+        io_utils.export_nii(
+            np.abs(self.image_gas_highreso),
+            "tmp/gas_highreso.nii",
+            self.dict_dis[constants.IOFields.FOV],
+        )
+        io_utils.export_nii(
+            np.abs(self.image_gas_highsnr),
+            "tmp/gas_highsnr.nii",
+            self.dict_dis[constants.IOFields.FOV],
+        )
+        io_utils.export_nii(
+            np.abs(self.image_rbc), "tmp/rbc.nii", self.dict_dis[constants.IOFields.FOV]
+        )
+        io_utils.export_nii(
+            np.abs(self.image_membrane),
+            "tmp/membrane.nii",
+            self.dict_dis[constants.IOFields.FOV],
+        )
+        io_utils.export_nii(
+            np.abs(self.image_membrane2gas),
+            "tmp/membrane2gas.nii",
+            self.dict_dis[constants.IOFields.FOV],
+        )
+        io_utils.export_nii(
+            self.mask.astype(float),
+            "tmp/mask.nii",
+            self.dict_dis[constants.IOFields.FOV],
+        )
+        io_utils.export_nii(
+            np.abs(self.image_dissolved),
+            "tmp/dissolved.nii",
+            self.dict_dis[constants.IOFields.FOV],
+        )
         if self.config.recon.recon_proton:
-            io_utils.export_nii(np.abs(self.image_proton), "tmp/proton.nii")
+            io_utils.export_nii(
+                np.abs(self.image_proton),
+                "tmp/proton.nii",
+            )

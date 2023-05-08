@@ -214,6 +214,17 @@ def calculate_flipangle_correction(fa_gas: float, fa_dis: float) -> float:
     )
 
 
+def calculate_flipangle_factor(fa_gas: float, fa_dis: float) -> float:
+    """Calculate ratio between dissolved and gas flip angles.
+
+    Rounds to 2 decimal places.
+    Args:
+        fa_gas (float): gas flip angle in degrees
+        fa_dis (float): dissolved flip angle in degrees
+    """
+    return np.round((np.sin(fa_dis * np.pi / 180) / np.sin(fa_gas * np.pi / 180)), 2)
+
+
 def dixon_decomposition(
     data_dissolved: np.ndarray,
     rbc_m_ratio: float,

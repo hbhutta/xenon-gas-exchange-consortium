@@ -23,12 +23,32 @@ class Config(base_config.Config):
         super().__init__()
         self.data_dir = "assets/demo/"
         self.platform = constants.Platform.SIEMENS.value
-        self.scan_type = constants.ScanType.NORMALDIXON.value
         self.segmentation_key = constants.SegmentationKey.MANUAL_VENT.value
         self.manual_seg_filepath = os.path.join(self.data_dir, "mask.nii")
         self.site = constants.Site.DUKE.value
         self.subject_id = "test"
         self.rbc_m_ratio = 0.202
+        self.recon = Recon()
+
+
+class Recon(base_config.Recon):
+    """Define reconstruction configurations.
+
+    Attributes:
+        scan_type: str, the scan type
+        kernel_sharpness_lr: float, the kernel sharpness for low resolution, higher
+            SNR images
+        kernel_sharpness_hr: float, the kernel sharpness for high resolution, lower
+            SNR images
+        n_skip_start: int, the number of frames to skip at the beginning
+        n_skip_end: int, the number of frames to skip at the end
+        key_radius: int, the key radius for the keyhole image
+    """
+
+    def __init__(self):
+        """Initialize the reconstruction parameters."""
+        super().__init__()
+        self.remove_noisy_projections = True
 
 
 def get_config() -> config_dict.ConfigDict:

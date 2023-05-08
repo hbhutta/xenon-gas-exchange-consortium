@@ -72,34 +72,22 @@ def prepare_data_and_traj(
             traj_z = traj_z[nskip_start : shape_traj[0] - (nskip_end)]
     else:
         raise ValueError("Manual trajectory import not implemented yet.")
-    # remove noisy radial projections
-    indices = recon_utils.remove_noise_rays(data=data)
-    data, traj_x, traj_y, traj_z = recon_utils.apply_indices_mask(
-        data=data,
-        traj_x=traj_x,
-        traj_y=traj_y,
-        traj_z=traj_z,
-        indices=indices,
-    )
-
     traj = np.stack([traj_x, traj_y, traj_z], axis=-1)
-
     return data, traj
 
 
 def prepare_data_and_traj_interleaved(
-    data_dict: Dict[str, Any], generate_traj: bool = True, remove_noise: bool = False
+    data_dict: Dict[str, Any], generate_traj: bool = True
 ) -> Tuple[np.ndarray, ...]:
     """Prepare data and trajectory for interleaved data reconstruction.
 
     Uses a trajectory generated from the metadata in the twix file if generate_traj is
-    True. Otherwise, it uses a manually imported trajectory. Then, it removes noise.
+    True. Otherwise, it uses a manually imported trajectory.
 
     Args:
         data_dict: dictionary containing data and metadata extracted from the twix file.
         Optionally also contains trajectories.
         generate_traj: bool flag to generate trajectory from metadata in twix file.
-        remove_noise: bool flag to remove noisy radial projections.
 
     Returns:
         A tuple of data and trajectory arrays in the following order:
@@ -110,6 +98,7 @@ def prepare_data_and_traj_interleaved(
     """
     data_gas = data_dict[constants.IOFields.FIDS_GAS]
     data_dis = data_dict[constants.IOFields.FIDS_DIS]
+
     if generate_traj:
         traj_x, traj_y, traj_z = traj_utils.generate_trajectory(
             dwell_time=1e6 * data_dict[constants.IOFields.DWELL_TIME],
@@ -133,35 +122,10 @@ def prepare_data_and_traj_interleaved(
     traj_x = traj_x[nskip_start : shape_traj[0] - (nskip_end)]
     traj_y = traj_y[nskip_start : shape_traj[0] - (nskip_end)]
     traj_z = traj_z[nskip_start : shape_traj[0] - (nskip_end)]
-    # remove noisy radial projections
-    if remove_noise:
-        indices_dis = recon_utils.remove_noise_rays(
-            data=data_dis,
-        )
-        indices_gas = recon_utils.remove_noise_rays(
-            data=data_gas,
-        )
-        # ensure that same projections are removed for dissolved and gas
-        indices = np.logical_and(indices_dis, indices_gas)
-        data_gas, traj_gas_x, traj_gas_y, traj_gas_z = recon_utils.apply_indices_mask(
-            data=data_gas,
-            traj_x=traj_x,
-            traj_y=traj_y,
-            traj_z=traj_z,
-            indices=indices,
-        )
-        data_dis, traj_dis_x, traj_dis_y, traj_dis_z = recon_utils.apply_indices_mask(
-            data=data_dis,
-            traj_x=traj_x,
-            traj_y=traj_y,
-            traj_z=traj_z,
-            indices=indices,
-        )
-        traj_dis = np.stack([traj_dis_x, traj_dis_y, traj_dis_z], axis=-1)
-        traj_gas = np.stack([traj_gas_x, traj_gas_y, traj_gas_z], axis=-1)
-    else:
-        traj_dis = np.stack([traj_x, traj_y, traj_z], axis=-1)
-        traj_gas = np.copy(traj_dis)
+    # stack trajectory
+    traj_dis = np.stack([traj_x, traj_y, traj_z], axis=-1)
+    traj_gas = np.copy(traj_dis)
+
     return data_dis, traj_dis, data_gas, traj_gas
 
 
@@ -199,3 +163,23 @@ def truncate_data_and_traj(
         data[n_skip_start : shape_data[0] - (n_skip_end)],
         traj[n_skip_start : shape_traj[0] - (n_skip_end)],
     )
+
+
+def remove_noisy_projections(
+    data: np.ndarray, traj: np.ndarray
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Remove noisy projections from data and trajectory.
+
+    Returns:
+        Tuple of data, trajectory with noisy projections removed
+    """
+    # remove noisy radial projections
+    indices = recon_utils.get_noisy_projections(
+        data=data,
+    )
+    data, traj = recon_utils.apply_indices_mask(
+        data=data,
+        traj=traj,
+        indices=np.array(indices),
+    )
+    return data, traj

@@ -3,11 +3,11 @@ import sys
 
 sys.path.append("..")
 from typing import Tuple
-
+import pdb
 import numpy as np
 
 
-def remove_noise_rays(
+def get_noisy_projections(
     data: np.ndarray,
     snr_threshold: float = 0.7,
     tail: float = 10,
@@ -26,36 +26,26 @@ def remove_noise_rays(
     """
     thre_dis = snr_threshold * np.average(abs(data[:, :5]))
     max_tail = np.amax(abs(data[:, tail:]), axis=1)
-
     return max_tail < thre_dis
 
 
 def apply_indices_mask(
     data: np.ndarray,
-    traj_x: np.ndarray,
-    traj_y: np.ndarray,
-    traj_z: np.ndarray,
+    traj: np.ndarray,
     indices: np.ndarray,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> Tuple[np.ndarray, np.ndarray]:
     """Apply indices mask to data and trajectory.
 
     Args:
         data (np.ndarray): k space datadata of shape (n_projections, n_points)
-        x (np.ndarray): x coordinates in trajectory of shape (n_projections, n_points)
-        y (np.ndarray): y coordinates in trajectory of shape (n_projections, n_points)
-        z (np.ndarray): z coordinates in trajectory of shape (n_projections, n_points)
+        traj (np.ndarray): trajectory of shape (n_projections, n_points, 3)
         indices (np.ndarray): boolean mask of indices to keep.
 
     Returns:
-        Tuple of the data, x, y, and z k-space coordinates with the noisy FIDs removed
+        Tuple of the data, and traj coordinates with the noisy FIDs removed
         given by the indices mask.
     """
-    return (
-        data[indices],
-        traj_x[indices],
-        traj_y[indices],
-        traj_z[indices],
-    )
+    return (data[indices], traj[indices])
 
 
 def flatten_data(data: np.ndarray) -> np.ndarray:

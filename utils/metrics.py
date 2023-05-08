@@ -1,5 +1,5 @@
 """Metrics for evaluating images."""
-
+import pdb
 import math
 import sys
 from datetime import datetime
@@ -91,7 +91,7 @@ def process_date() -> str:
     return now.strftime("%Y-%m-%d")
 
 
-def bin_percentage(image: np.ndarray, bins: np.ndarray) -> float:
+def bin_percentage(image: np.ndarray, bins: np.ndarray, mask: np.ndarray) -> float:
     """Get the percentage of voxels in the given bins.
 
     Args:
@@ -99,8 +99,11 @@ def bin_percentage(image: np.ndarray, bins: np.ndarray) -> float:
             integers representing the bin number. Bin 0 is the region outside the mask
             and Bin 1 is the lowest bin, etc.
         bins: np.ndarray list of bins to include in the percentage calculation.
+        mask: np.ndarray mask of the region of interest.
+    Returns:
+        Percentage of voxels in the given bins.
     """
-    return 100 * np.sum(np.isin(image, bins)) / np.sum(image > 0)
+    return 100 * np.sum(np.isin(image, bins)) / np.sum(mask > 0)
 
 
 def mean(image: np.ndarray, mask: np.ndarray) -> float:
@@ -108,7 +111,9 @@ def mean(image: np.ndarray, mask: np.ndarray) -> float:
 
     Args:
         image: np.ndarray. The image.
-        mask: np.ndarray. mask of the region of interest.
+        mask: np.ndarray. mask of the region of interest.()
+    Returns:
+        Mean of the image.
     """
     return np.mean(image[mask])
 
@@ -119,6 +124,8 @@ def negative_percentage(image: np.ndarray, mask: np.ndarray) -> float:
     Args:
         image: np.ndarray. The image.
         mask: np.ndarray. mask of the region of interest.
+    Returns:
+        Percentage of voxels in the image that are negative.
     """
     return 100 * np.sum(image[mask] < 0) / np.sum(mask)
 
@@ -129,6 +136,8 @@ def median(image: np.ndarray, mask: np.ndarray) -> float:
     Args:
         image: np.ndarray. The image.
         mask: np.ndarray. mask of the region of interest.
+    Returns:
+        Median of the image.
     """
     return np.median(image[mask])
 
@@ -139,5 +148,78 @@ def std(image: np.ndarray, mask: np.ndarray) -> float:
     Args:
         image: np.ndarray. The image.
         mask: np.ndarray. mask of the region of interest.
+    Returns:
+        Standard deviation of the image.
     """
     return np.std(image[mask])
+
+
+def dlco(
+    image_gas: np.ndarray,
+    image_membrane: np.ndarray,
+    image_rbc: np.ndarray,
+    mask: np.ndarray,
+    mask_vent: np.ndarray,
+    fov: float,
+    mean_membrane: float = 0.736,
+    mean_rbc: float = 0.471,
+) -> float:
+    """Get the DLCO of the image.
+
+    Reference: https://journals.physiology.org/doi/epdf/10.1152/japplphysiol.00702.2020
+    Args:
+        image_gas: np.ndarray. The ventilation image.
+        image_membrane: np.ndarray. The membrane image.
+        img_rbc: np.ndarray. The RBC image.
+        mask: np.ndarray. thoracic cavity mask.
+        mask_vent: np.ndarray. mask of the non-VDP region.
+        fov: float. field of view in cm.
+        mean_membrane: float. The mean membrane in healthy subjects.
+        mean_rbc: float. The mean RBC in healthy subjects.
+    """
+    return kco(
+        image_membrane, image_rbc, mask_vent, mean_membrane, mean_rbc
+    ) * alveolar_volume(image_gas, mask, fov)
+
+
+def alveolar_volume(image: np.ndarray, mask: np.ndarray, fov: float) -> float:
+    """Get the alveolar volume of the image.
+
+    Reference: https://journals.physiology.org/doi/epdf/10.1152/japplphysiol.00702.2020
+    Args:
+        image: np.ndarray. The binned ventilation image.
+        mask: np.ndarray. thoracic cavity mask.
+        fov: float. field of view in cm.
+    Returns:
+        Alveolar volume in L.
+    """
+    return (
+        constants.VA_ALPHA
+        * inflation_volume(mask, fov)
+        * (1.0 - bin_percentage(image, np.asarray([1]), mask) / 100)
+    )
+
+
+def kco(
+    image_membrane: np.ndarray,
+    image_rbc: np.ndarray,
+    mask: np.ndarray,
+    mean_membrane: float = 0.736,
+    mean_rbc: float = 0.471,
+) -> float:
+    """Get the KCO of the image.
+
+    Reference: https://journals.physiology.org/doi/epdf/10.1152/japplphysiol.00702.2020
+    Args:
+        image_membrane: np.ndarray. The membrane image.
+        img_rbc: np.ndarray. The RBC image.
+        mask: np.ndarray. mask of non-VDP region.
+        mean_membrane: float. The mean membrane in healthy subjects.
+        mean_rbc: float. The mean RBC in healthy subjects.
+    """
+    membrane_rel = mean(image_membrane, mask) / mean_membrane
+    rbc_rel = mean(image_rbc, mask) / mean_rbc
+    membrane_rel = 1.0 / membrane_rel if membrane_rel > 1 else membrane_rel
+    return 1 / (
+        1 / (constants.KCO_ALPHA * membrane_rel) + 1 / (constants.KCO_BETA * rbc_rel)
+    )
