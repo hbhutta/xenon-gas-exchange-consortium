@@ -157,20 +157,24 @@ z_connection_lost.txt
 
 # Don't upload contents in option folder
 option/*.json
-config/**
+config/*
 !config/base_config.py
 !config/demo_config.py
-!config/tests/**.py
+!config/config_utils.py
+!config/tests/
+config/tests/*
+!config/tests/*.py
 
 # Keep the assets folder
 assets/demo/*
 !assets/demo/*.dat
 !assets/demo/mask.nii
 !assets/*
+
 assets/tests/*
-!assets/tests/**.dat
-!assets/tests/**.nii
-!assets/tests/**.md
+!assets/tests/**/**.dat
+!assets/tests/**/**.nii
+!assets/tests/**/**.md
 # ignore the data folder
 data/*
 !data/.gitkeep
