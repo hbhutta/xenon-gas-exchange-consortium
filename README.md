@@ -1,4 +1,4 @@
-# xe-gas-exchange-python-ver3
+# xenon-gas-exchange-python
 
 Gas exchange pipeline, developed at the [Driehuyslab](https://sites.duke.edu/driehuyslab/), processes raw MRI data and produce summary report to analyze the functionality of the human lung. The details of the workflow can be seen in the Wiki(see left menu bar)-- work in progress. This ReadMe presents the installation procedure of the pipeline. Before moving to the installation process, download or clone this repository in your computer.
 
@@ -12,14 +12,14 @@ Gas exchange pipeline, developed at the [Driehuyslab](https://sites.duke.edu/dri
 
 4. [Acknowledgments](#acknowledgements)
 
-
 ## Setup
 
 Gas exchange pipeline is a cross platform program that works on Windows, Mac and Linux system. At least 8GB of RAM is required to run this pipeline. Windows users can install Windows Subsystem for Linux (WSL) or install Ubuntu as dual boot/in the virtual box. The details of WSL installation can be seen in Section 1.1. Warning: run time in WSL can be slower compare to Linux or Mac system.
 
-Mac and Linux users skip to installation.  Note: Currently, this pipeline works on intel based Mac. Apple silicon based mac is not supported at this moment.
+Mac and Linux users skip to installation. Note: Currently, this pipeline works on intel based Mac. Apple silicon based mac is not supported at this moment.
 
 ### 1.1. Windows Subsystem for Linux
+
 Windows Subsystem for Linux installation process can seem overwhelming, espcially following the procedure in the microsoft [documentation](https://docs.microsoft.com/en-us/windows/wsl/install-win10). However a short Youtube video can make the install process much easier. One good example YouTube instruction can be seen [here](https://www.youtube.com/watch?v=X-DHaQLrBi8&t=385s&ab_channel=ProgrammingKnowledge2ProgrammingKnowledge2). Note: If the YouTube link is broken, please search in YouTube.
 
 Next for opening any GUIs or graphical applications in WSL, you need to [install XMing](https://sourceforge.net/projects/xming/). Open the XMing when you want to run this pipeline. Write the following command in the terminal to show the GUI:
@@ -27,27 +27,33 @@ Next for opening any GUIs or graphical applications in WSL, you need to [install
 ```
 export DISPLAY=:0;
 ```
+
 To avoide writing above command everytime, add this line to the `bashrc`. To find out the bashrc file, write `cd ~`, and open the file using a text editor. A text editor called `nano` can be installed using: sudo apt install nano
 
 Now you can open the bashrc file using: nano bashrc ; then insert the command in the file and save it.
 
 ## Installation
+
 This program is written in Python. Some of the code is written in C language. We will begin with Python installation.
 
 ### 2.1. Python Installation
+
 First step of the installation process is to install python. This gas exchange pipeline works with Python 3.8.8 in its current version. In order to install necessary Python Libraries, Python 3.8.8 version is required. To create a virtual environment, a 'conda' distribution is required. If you don't have conda distribution installed into your machine, you can install one downloading 'Anaconda' or 'Miniconda'. You can download the 'Anaconda Distribution' from this [link](https://www.anaconda.com/products/individual), or 'Miniconda' from this [link](https://docs.conda.io/en/latest/miniconda.html). Here, command line installation procedure has been presented. So, Mac user can download the Command Line Installer.
 
 #### 2.1.1. Conda Installation on Mac or Linux:
+
 Now, open the terminal. You need to write a command to install Anaconda/Miniconda. Command to install the Anaconda or Miniconda is:
 
 ```bash
 bash ~/path/filename
 ```
+
 Example: If your downloaded Anaconda file is in the "Downloads" folder and the file name is "Anaconda3-2020.11-Linux-x86_64.sh", write the following in the terminal:
 
 ```bash
 bash ~/Downloads/Anaconda3-2020.11-Linux-x86_64.sh
 ```
+
 Here, path = Downloads and filename = Anaconda3-2020.11-Linux-x86_64.sh
 
 Press "enter" and reply "yes" to agree to the license agreements. After completing the installation process, close and reopen the terminal. You can verify if you have `conda` now by typing `which conda` in your terminal.
@@ -55,21 +61,26 @@ Press "enter" and reply "yes" to agree to the license agreements. After completi
 If you don't see 'conda' directory after verifing, you can review the details of [Anconda](https://docs.anaconda.com/anaconda/install/linux/) or [Miniconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html) installation.
 
 #### 2.1.2. Conda Installtion on Windows Subsystem for Linux(WSL):
-WSL users need to install `Anaconda` or 'Miniconda' for Linux inside the WSL shell. Change your current directory to where you have downloaded your Anaconda or Miniconda installation file (.sh file).  Then run the:
+
+WSL users need to install `Anaconda` or 'Miniconda' for Linux inside the WSL shell. Change your current directory to where you have downloaded your Anaconda or Miniconda installation file (.sh file). Then run the:
+
 ```bash
 bash filename
 ```
+
 You can verify if you have `conda` now by typing `which conda` in your terminal.
 
 ### 2.2. Virtual Environment Creation and Python Package Installation
 
-#### 2.2.1. Create Virtual Environment  
+#### 2.2.1. Create Virtual Environment
+
 To create a virtual environment using `conda` execute the command in the terminal:
 
 ```bash
 conda create --name XeGas python=3.8.8
 ```
-Here, XeGas is the the given name, but any name can be given. 
+
+Here, XeGas is the the given name, but any name can be given.
 
 To activate the environment, execute the command
 
@@ -78,6 +89,7 @@ conda activate XeGas
 ```
 
 #### 2.2.2. Install Required Packages
+
 We will be using pip to install the required packages. First update the pip using: pip install --upgrade pip
 
 Now install a c compiler. Here we will install gcc compiler.
@@ -88,19 +100,24 @@ Get updates: sudo apt-get update
 
 Install gcc executing this command: sudo apt install gcc
 
-##### Mac Users: 
+##### Mac Users:
 
-To install pacakges, a homebrew can be installed using this command: 
+To install pacakges, a homebrew can be installed using this command:
+
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
+
 Don't forget to add homebrew to your path. Check if homebrew installed correctly, writing `which brew`. The details of homebrew can be seen [here](https://brew.sh/).
 
 Now install gcc:
+
 ```bash
 brew install gcc
 ```
+
 ##### Installing Packages in the Virtual Environment:
+
 Now we are ready to install necessary packages. Packages must be installed inside the virtual conda environment. The list of packages are in the requirements.txt or requirements_ubuntu.txt file. These two files can be found in the setup folder of the main program directory. If in the terminal you are not in the main program directory, change the directory using cd command. To install the required packages, execute the command:
 
 ```bash
@@ -112,21 +129,27 @@ To confirm that correct packages are installed, execute the command
 ```
 pip list
 ```
-and verify that the packages in the virtual environment agree with that in the `requirements.txt` file. 
+
+and verify that the packages in the virtual environment agree with that in the `requirements.txt` file.
 
 ##### Install Packages in your Native Computer:
 
-For Linux and WSL: 
+For Linux and WSL:
+
 ```
 sudo apt install wkhtmltopdf
 sudo apt install poppler-utils
 ```
-For Mac: 
+
+For Mac:
+
 ```
 brew install wkhtmltopdf
 brew install poppler
 ```
+
 ### 2.3. Compilation and Download Necessary tools
+
 #### 2.3.1. For Image Reconstruction: Compile C code
 
 A C compiler is required that you already installed in Section 2.2.2.
@@ -142,10 +165,13 @@ A C compiler is required that you already installed in Section 2.2.2.
    ```bash
    gcc -shared -o libtraj.so -fPIC C_code/gen_traj.c
    ```
+
 #### 2.3.2. For Segmentation: Downloading the h5 models for machine learning
+
 Check the `models/weights` folder if two `.h5` files are not available there, download `model_ANATOMY_UTE.h5` and `model_ANATOMY_VEN.h5` from this [link](https://drive.google.com/drive/folders/1gcwT14_6Tl_2zkLZ_MHsm-pAYHXWtVOA?usp=sharing) and place it in the `models/weights` folder in your main program directory.
 
 #### 2.3.3. For Registration: Compiling ANTs
+
 Compiling ANTs require to install git, cmake, g++, zlib. Following commands will install these packages.
 
 #### Linux and Windows Subsystem For Linux(WSL) user: execute following commands on your terminal:
@@ -158,13 +184,17 @@ sudo apt-get -y install zlib1g-dev
 ```
 
 #### Mac User: check you have git, cmake, g++ writing, e.g. which git, which cmake
-If you don't have any of these, you have to install in the command line.Now you can install packages writing following commands:  
+
+If you don't have any of these, you have to install in the command line.Now you can install packages writing following commands:
+
 ```bash
 brew install git
 brew install cmake
 brew install g++
 ```
+
 Now we are ready to perform SuperBuild. Execute the following commands on your terminal.
+
 ```bash
 workingDir=${PWD}
 git clone https://github.com/ANTsX/ANTs.git
@@ -177,7 +207,8 @@ make -j 4 2>&1 | tee build.log
 cd ANTS-build
 make install 2>&1 | tee install.log
 ```
-Warning: This might take a while. 
+
+Warning: This might take a while.
 
 After sucessful ANTs SuperBuild, you will have to copy 'antApplyTransforms', 'antsRegistration' and 'N4BisaFieldCorrection' files from the `install/bin`, and paste it to the main program directory. Now we are ready to process MRI scan of human lung.
 
@@ -185,23 +216,24 @@ Note: If necesary, the details of ANTs Compilation can be seen [here](https://gi
 
 ## Execution
 
-To process raw MRI data, you can follow the Team Xenon workflow outlined below. Note: Wiki presents the code structure and workflow of this pipeline -- work-in-progress.   
+To process raw MRI data, you can follow the Team Xenon workflow outlined below. Note: Wiki presents the code structure and workflow of this pipeline -- work-in-progress.
 
 ### 3.1. Team Xenon Worflow for External Sites (Such as UVA, UM, SickKids, Western, etc.)
 
- ```bash
-   conda activate XeGas #activates the conda environment
-   python GX_GUI_launch.py
-   ```
-The above comands should open the GUI. 
+```bash
+  conda activate XeGas #activates the conda environment
+  python GX_GUI_launch.py
+```
+
+The above comands should open the GUI.
 
 WSL user: Did you write "export DISPLAY=:0;" in your terminal? Is your Xming open? If not, open the Xming and write "export DISPLAY=:0;" in the WSL terminal. Then execute the above commands.
 
 After opening the GUI:
 Direct the GX Scan folder to the folder that has the twix files. Execute the sequence, don't forget to check segmentation if it is very off.
 
-   1. When the program is done running, it will automatically create a `Gas_Exchange` folder and a `Dedicated_Ventilation` folder (if you have a 3D radial dedicated ventilation scan) with all the analyzed files inside
-   2. Edit the segmentation as needed (if not, you are done)
+1.  When the program is done running, it will automatically create a `Gas_Exchange` folder and a `Dedicated_Ventilation` folder (if you have a 3D radial dedicated ventilation scan) with all the analyzed files inside
+2.  Edit the segmentation as needed (if not, you are done)
 
 ### 3.2. Team Xenon Worflow for Duke Data Processing
 
@@ -213,33 +245,24 @@ Warning: this is the Team Xenon workflow only. Other users do not have to follow
 
 3. Process the Spectroscopy using MATLAB first. Instructions are on the repository ("Spectroscopy_Processing_Production").
 
-
-3. Now to process Dixon scan using Gas Exchange pipeline, navigate to the repository folder (xe-gas-exchange-ver3). Before you run any code, make sure you have the latest updates. You can do this by
+4. Now to process Dixon scan using Gas Exchange pipeline, navigate to the repository folder (xe-gas-exchange-ver3). Before you run any code, make sure you have the latest updates. You can do this by
 
    ```
    git pull
    ```
 
-4. Launch the GUI by
+5. Create a new config file titled "[subject_id].py" in lower case by copying the demo config file. Then, edit the parameters like subjet id and rbc:m ratio and save it.
+
+6. Run the pipeline by
 
    ```bash
    conda activate XeGas #activates the conda environment
-   python GX_GUI_launch.py
+   python main --config [path to config file]
    ```
 
-5. Direct the GX Scan folder to the folder that has the twix files (if there are 2 dixon scans, you would have to do this process twice). Execute the sequence, don't forget to check segmentation if it is very off.
+7. Copy all the contents in the subject folder and paste it into `smb://duhsnas-pri/duhs_radiology/Private/TeamXenon/01_ClinicalOutput/Processed_Subjects`
 
-   1. When the program is done running, it will automatically create a `Gas_Exchange` folder and a `Dedicated_Ventilation` folder with all the analyzed files inside
-   2. Edit the segmentation as needed (if not, you are done)
-   3. Repeat this process for each dixon scan
-
-
-*** Warning: after processing the scan, analyst must check the RBC-to-Barrier Ratio and compare with MATLAB report (it's the intensity ratio on the top left table). If they are very different, Analyst should process the scan again with using the RBC2Barrier ratio from MATLAB report. MATLAB report should be generated using the code on the repository ("Spectroscopy_Processing_Production").
-
-6. Copy all the contents in the subject folder and paste it into `smb://duhsnas-pri/duhs_radiology/Private/TeamXenon/01_ClinicalOutput/Processed_Subjects` 
-
-7. Upload `.pptx` reports to Slack
-
+8. Upload `.pptx` reports to Slack
 
 ## Acknowledgements:
 
