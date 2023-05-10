@@ -27,9 +27,12 @@ def get_git_branch() -> str:
     """Get the current git branch.
 
     Returns:
-        str: current git branch
+        str: current git branch, if not in git repo, return "unknown"
     """
-    return Repo("./").active_branch.name
+    try:
+        return Repo("./").active_branch.name
+    except:
+        return "unknown"
 
 
 def format_dict(dict_stats: Dict[str, Any]) -> Dict[str, Any]:
