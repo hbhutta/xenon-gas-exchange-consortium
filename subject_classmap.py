@@ -747,6 +747,11 @@ class Subject(object):
 
     def save_files(self):
         """Save select images to nifti files and instance variable to mat."""
+        proton_reg = img_utils.normalize(
+            np.abs(self.image_proton),
+            self.mask,
+            method=constants.NormalizationMethods.PERCENTILE,
+        )
         io_utils.export_nii(
             self.image_rbc2gas_binned,
             "tmp/rbc_binned.nii",
@@ -790,3 +795,23 @@ class Subject(object):
                 np.abs(self.image_proton),
                 "tmp/proton.nii",
             )
+        io_utils.export_nii_4d(
+            plot.map_and_overlay_to_rgb(
+                self.image_rbc2gas_binned, proton_reg, constants.CMAP.RBC_BIN2COLOR
+            ),
+            "tmp/rbc2gas_rgb.nii",
+        )
+        io_utils.export_nii_4d(
+            plot.map_and_overlay_to_rgb(
+                self.image_membrane2gas_binned,
+                proton_reg,
+                constants.CMAP.MEMBRANE_BIN2COLOR,
+            ),
+            "tmp/membrane2gas_rgb.nii",
+        )
+        io_utils.export_nii_4d(
+            plot.map_and_overlay_to_rgb(
+                self.image_gas_binned, proton_reg, constants.CMAP.VENT_BIN2COLOR
+            ),
+            "tmp/gas_rgb.nii",
+        )

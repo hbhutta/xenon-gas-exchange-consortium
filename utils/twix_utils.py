@@ -531,6 +531,12 @@ def get_ute_data(twix_obj: mapvbvd._attrdict.AttrDict) -> Dict[str, Any]:
         nframes = 4601
         n_skip_start = 0
         n_skip_end = 1
+    elif raw_fids.shape[1] == 4630:
+        # bonus spectra at the end
+        raw_fids = raw_fids[:, :4600]
+        nframes = 4600
+        n_skip_start = 0
+        n_skip_end = 0
     else:
         nframes = raw_fids.shape[1]
         n_skip_start = 0

@@ -430,11 +430,43 @@ def export_nii(image: np.ndarray, path: str, fov: Optional[float] = None):
     """Export image as nifti file.
 
     Args:
-        image: np.ndarray 3D image to be exporetd
+        image: np.ndarray 3D image to be exported
         path: str file path of nifti file
         fov: float field of view in cm
     """
     nii_imge = nib.Nifti1Image(image, np.eye(4))
+    if fov:
+        nii_imge.header["pixdim"][1:4] = [
+            fov / np.shape(image)[0] / 10,
+            fov / np.shape(image)[0] / 10,
+            fov / np.shape(image)[0] / 10,
+        ]
+    nib.save(nii_imge, path)
+
+
+def export_nii_4d(image, path, fov=None):
+    """Export 4d image image as nifti file.
+
+    Args:
+        image: np.ndarray 4D image to be exported of shape (x,y,z,3)
+        path: str file path of nifti file
+        fov: float field of view in cm
+    """
+    color = (np.copy(image) * 255).astype("uint8")  # need uint8 to save to RGB
+    # some fancy and tricky re-arrange
+    color = np.transpose(color, [2, 3, 0, 1])
+    cline = np.reshape(color, (1, np.size(color)))
+    color = np.reshape(cline, np.shape(image), order="A")
+    color = np.transpose(color, [2, 1, 0, 3])
+    # stake the RGB channels
+    shape_3d = image.shape[0:3]
+    rgb_dtype = np.dtype([("R", "u1"), ("G", "u1"), ("B", "u1")])
+    nii_data = (
+        color.copy().view(dtype=rgb_dtype).reshape(shape_3d)
+    )  # copy used to force fresh internal structure
+
+    # write voxel dimensions to nifti header if available
+    nii_imge = nib.Nifti1Image(nii_data, np.eye(4))
     if fov:
         nii_imge.header["pixdim"][1:4] = [
             fov / np.shape(image)[0] / 10,
