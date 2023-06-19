@@ -5,7 +5,7 @@ import pdb
 
 import numpy as np
 from absl import app, logging
-
+import time
 from recon import dcf, kernel, proximity, recon_model, system_model
 from utils import io_utils
 
@@ -37,6 +37,7 @@ def reconstruct(
     Returns:
         np.ndarray: reconstructed image volume
     """
+    start_time = time.time()
     prox_obj = proximity.L2Proximity(
         kernel_obj=kernel.Gaussian(
             kernel_extent=kernel_extent,
@@ -60,6 +61,9 @@ def reconstruct(
     )
     image = recon_obj.reconstruct(data=data, traj=traj)
     del recon_obj, dcf_obj, system_obj, prox_obj
+    end_time = time.time()
+    execution_time = end_time - start_time
+    logging.info("Execution time: {:.2f} seconds".format(execution_time))
     return image
 
 
