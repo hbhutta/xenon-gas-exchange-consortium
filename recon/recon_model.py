@@ -30,7 +30,7 @@ class GriddedReconModel(ABC):
             system_obj (MatrixSystemModel): A subclass of the SystemModel
             verbosity (int): either 0 or 1 whether to log output messages
         """
-        self.deapodize = False
+        self.deapodize = True
         self.crop = True
         self.verbosity = verbosity
         self.system_obj = system_obj
@@ -117,7 +117,9 @@ class LSQgridded(GriddedReconModel):
         if self.deapodize:
             if self.verbosity:
                 logging.info("-- Calculating k-space deapodization function")
-            deapVol = self.grid(~np.any(traj > 0, axis=1)).astype(np.float32)
+            deapVol = self.grid(
+                np.expand_dims((~np.any(traj > 0, axis=1)).astype(np.float32), -1)
+            )
             deapVol = np.reshape(deapVol, np.ceil(self.system_obj.full_size))
             if self.verbosity:
                 logging.info("-- Calculating image-space deapodization function")
