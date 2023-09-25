@@ -117,7 +117,7 @@ class LSQgridded(GriddedReconModel):
         if self.deapodize:
             if self.verbosity:
                 logging.info("-- Calculating k-space deapodization function")
-            deapVol = self.grid(~np.any(traj, axis=1)).astype(np.float32)
+            deapVol = self.grid(~np.any(traj > 0, axis=1)).astype(np.float32)
             deapVol = np.reshape(deapVol, np.ceil(self.system_obj.full_size))
             if self.verbosity:
                 logging.info("-- Calculating image-space deapodization function")

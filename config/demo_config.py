@@ -22,13 +22,13 @@ class Config(base_config.Config):
         """Initialize config parameters."""
         super().__init__()
         self.data_dir = "assets/demo/"
-        self.platform = constants.Platform.SIEMENS.value
-        self.segmentation_key = constants.SegmentationKey.MANUAL_VENT.value
         self.manual_seg_filepath = os.path.join(self.data_dir, "mask.nii")
-        self.site = constants.Site.DUKE.value
-        self.subject_id = "test"
+        self.platform = constants.Platform.SIEMENS.value
         self.rbc_m_ratio = 0.202
         self.recon = Recon()
+        self.segmentation_key = constants.SegmentationKey.MANUAL_VENT.value
+        self.site = constants.Site.DUKE.value
+        self.subject_id = "test"
 
 
 class Recon(base_config.Recon):
@@ -48,6 +48,7 @@ class Recon(base_config.Recon):
     def __init__(self):
         """Initialize the reconstruction parameters."""
         super().__init__()
+        self.recon_key = constants.ReconKey.ROBERTSON
         self.remove_noisy_projections = True
 
 

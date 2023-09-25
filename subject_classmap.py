@@ -3,10 +3,11 @@ import glob
 import logging
 import os
 import pdb
+from typing import Any, Dict
 
 import nibabel as nib
 import numpy as np
-from typing import Any, Dict
+
 import biasfield
 import preprocessing as pp
 import reconstruction
@@ -233,37 +234,65 @@ class Subject(object):
 
     def reconstruction_ute(self):
         """Reconstruct the UTE image."""
-        self.image_proton = reconstruction.reconstruct(
-            data=(recon_utils.flatten_data(self.data_ute)),
-            traj=recon_utils.flatten_traj(self.traj_ute),
-            kernel_sharpness=float(self.config.recon.kernel_sharpness_hr),
-            kernel_extent=9 * float(self.config.recon.kernel_sharpness_hr),
-            image_size=int(self.config.recon.recon_size),
-        )
+        if self.config.recon.recon_key == constants.ReconKey.ROBERTSON.value:
+            self.image_proton = reconstruction.reconstruct(
+                data=(recon_utils.flatten_data(self.data_ute)),
+                traj=recon_utils.flatten_traj(self.traj_ute),
+                kernel_sharpness=float(self.config.recon.kernel_sharpness_hr),
+                kernel_extent=9 * float(self.config.recon.kernel_sharpness_hr),
+                image_size=int(self.config.recon.recon_size),
+            )
+            orientation = self.dict_dis[constants.IOFields.ORIENTATION]
+        elif self.config.recon.recon_key == constants.ReconKey.PLUMMER.value:
+            self.image_proton = reconstruction.reconstruct_cs(
+                data=(recon_utils.flatten_data(self.data_ute)),
+                traj=recon_utils.flatten_traj(self.traj_ute),
+                image_size=int(self.config.recon.recon_size),
+            )
+            orientation = constants.Orientation.NONE
+        else:
+            raise ValueError(f"Unknown reconstruction key")
         self.image_proton = img_utils.interp(
             self.image_proton,
             self.config.recon.matrix_size // self.config.recon.recon_size,
         )
         self.image_proton = img_utils.flip_and_rotate_image(
-            self.image_proton, orientation=self.dict_dis[constants.IOFields.ORIENTATION]
+            self.image_proton,
+            orientation=orientation,
         )
+        io_utils.export_nii(np.abs(self.image_proton), "tmp/image_proton.nii")
 
     def reconstruction_gas(self):
         """Reconstruct the gas phase image."""
-        self.image_gas_highsnr = reconstruction.reconstruct(
-            data=(recon_utils.flatten_data(self.data_gas)),
-            traj=recon_utils.flatten_traj(self.traj_gas),
-            kernel_sharpness=float(self.config.recon.kernel_sharpness_lr),
-            kernel_extent=9 * float(self.config.recon.kernel_sharpness_lr),
-            image_size=int(self.config.recon.recon_size),
-        )
-        self.image_gas_highreso = reconstruction.reconstruct(
-            data=(recon_utils.flatten_data(self.data_gas)),
-            traj=recon_utils.flatten_traj(self.traj_gas),
-            kernel_sharpness=float(self.config.recon.kernel_sharpness_hr),
-            kernel_extent=9 * float(self.config.recon.kernel_sharpness_hr),
-            image_size=int(self.config.recon.recon_size),
-        )
+        if self.config.recon.recon_key == constants.ReconKey.ROBERTSON.value:
+            self.image_gas_highsnr = reconstruction.reconstruct(
+                data=(recon_utils.flatten_data(self.data_gas)),
+                traj=recon_utils.flatten_traj(self.traj_gas),
+                kernel_sharpness=float(self.config.recon.kernel_sharpness_lr),
+                kernel_extent=9 * float(self.config.recon.kernel_sharpness_lr),
+                image_size=int(self.config.recon.recon_size),
+            )
+            self.image_gas_highreso = reconstruction.reconstruct(
+                data=(recon_utils.flatten_data(self.data_gas)),
+                traj=recon_utils.flatten_traj(self.traj_gas),
+                kernel_sharpness=float(self.config.recon.kernel_sharpness_hr),
+                kernel_extent=9 * float(self.config.recon.kernel_sharpness_hr),
+                image_size=int(self.config.recon.recon_size),
+            )
+            orientation = self.dict_dis[constants.IOFields.ORIENTATION]
+        elif self.config.recon.recon_key == constants.ReconKey.PLUMMER.value:
+            self.image_gas_highsnr = reconstruction.reconstruct_cs(
+                data=recon_utils.flatten_data(self.data_gas),
+                traj=recon_utils.flatten_traj(self.traj_gas),
+                image_size=int(self.config.recon.recon_size),
+            )
+            self.image_gas_highreso = self.image_gas_highsnr
+            orientation = constants.Orientation.NONE
+        else:
+            raise ValueError(
+                f"Unknown reconstruction key: {self.config.recon.recon_key}"
+            )
+
         self.image_gas_highreso = img_utils.interp(
             self.image_gas_highreso,
             self.config.recon.matrix_size // self.config.recon.recon_size,
@@ -274,29 +303,45 @@ class Subject(object):
         )
         self.image_gas_highsnr = img_utils.flip_and_rotate_image(
             self.image_gas_highsnr,
-            orientation=self.dict_dis[constants.IOFields.ORIENTATION],
+            orientation=orientation,
         )
         self.image_gas_highreso = img_utils.flip_and_rotate_image(
             self.image_gas_highreso,
-            orientation=self.dict_dis[constants.IOFields.ORIENTATION],
+            orientation=orientation,
+        )
+        io_utils.export_nii(np.abs(self.image_gas_highsnr), "tmp/image_gas_highsnr.nii")
+        io_utils.export_nii(
+            np.abs(self.image_gas_highreso), "tmp/image_gas_highreso.nii"
         )
 
     def reconstruction_dissolved(self):
         """Reconstruct the dissolved phase image."""
-        self.image_dissolved = reconstruction.reconstruct(
-            data=(recon_utils.flatten_data(self.data_dissolved)),
-            traj=recon_utils.flatten_traj(self.traj_dissolved),
-            kernel_sharpness=float(self.config.recon.kernel_sharpness_lr),
-            kernel_extent=9 * float(self.config.recon.kernel_sharpness_lr),
-            image_size=int(self.config.recon.recon_size),
-        )
+        if self.config.recon.recon_key == constants.ReconKey.ROBERTSON.value:
+            self.image_dissolved = reconstruction.reconstruct(
+                data=(recon_utils.flatten_data(self.data_dissolved)),
+                traj=recon_utils.flatten_traj(self.traj_dissolved),
+                kernel_sharpness=float(self.config.recon.kernel_sharpness_lr),
+                kernel_extent=9 * float(self.config.recon.kernel_sharpness_lr),
+                image_size=int(self.config.recon.recon_size),
+            )
+            orientation = self.dict_dis[constants.IOFields.ORIENTATION]
+        elif self.config.recon.recon_key == constants.ReconKey.PLUMMER.value:
+            self.image_dissolved = reconstruction.reconstruct_cs(
+                data=recon_utils.flatten_data(self.data_dissolved),
+                traj=recon_utils.flatten_traj(self.traj_dissolved),
+                image_size=int(self.config.recon.recon_size),
+            )
+            # self.image_dissolved = np.conjugate(self.image_dissolved)
+            orientation = constants.Orientation.NONE
+        else:
+            raise ValueError(f"Unknown reconstruction key")
         self.image_dissolved = img_utils.interp(
             self.image_dissolved,
             self.config.recon.matrix_size // self.config.recon.recon_size,
         )
         self.image_dissolved = img_utils.flip_and_rotate_image(
             self.image_dissolved,
-            orientation=self.dict_dis[constants.IOFields.ORIENTATION],
+            orientation=orientation,
         )
 
     def segmentation(self):

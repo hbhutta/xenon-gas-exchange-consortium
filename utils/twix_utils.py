@@ -173,13 +173,19 @@ def get_ramp_time(twix_obj: mapvbvd._attrdict.AttrDict) -> float:
         ramp time in us
     """
     ramp_time = 0.0
+    scan_date = get_scan_date(twix_obj=twix_obj)
+    YYYY, MM, DD = scan_date.split("-")
+    scan_datetime = datetime.datetime(int(YYYY), int(MM), int(DD))
+
     try:
-        return float(twix_obj.hdr.Meas.RORampTime)
+        ramp_time = float(twix_obj.hdr.Meas.RORampTime)
+        if scan_datetime > datetime.datetime(2018, 9, 21):
+            return ramp_time
     except:
         pass
 
     try:
-        return float(twix_obj["hdr"]["Meas"]["alRegridRampupTime"].split()[0])
+        ramp_time = float(twix_obj["hdr"]["Meas"]["alRegridRampupTime"].split()[0])
     except:
         pass
 

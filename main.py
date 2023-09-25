@@ -35,10 +35,10 @@ def gx_mapping_reconstruction(config: base_config.Config):
     subject.calculate_rbc_m_ratio()
     logging.info("Reconstructing images")
     subject.preprocess()
-    if config.recon.recon_proton:
-        subject.reconstruction_ute()
     subject.reconstruction_gas()
     subject.reconstruction_dissolved()
+    if config.recon.recon_proton:
+        subject.reconstruction_ute()
     logging.info("Segmenting Proton Mask")
     subject.segmentation()
     subject.registration()

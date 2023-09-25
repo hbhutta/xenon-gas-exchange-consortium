@@ -91,6 +91,8 @@ def flip_and_rotate_image(
         image = np.rot90(image, 1, axes=(0, 1))
         image = np.flip(image, axis=2)
         return image
+    elif orientation == constants.Orientation.NONE:
+        return image
     else:
         raise ValueError("Invalid orientation: {}.".format(orientation))
 

@@ -165,6 +165,18 @@ class BiasfieldKey(enum.Enum):
     RF_DEPOLARIZATION = "rf_depolarization"
 
 
+class ReconKey(enum.Enum):
+    """Reconstruction flags.
+
+    Options:
+    ROBERTSON: scott recon
+    PLUMMER: joey p. recon
+    """
+
+    ROBERTSON = "robertson"
+    PLUMMER = "plummer"
+
+
 class ScanType(enum.Enum):
     """Scan type."""
 
@@ -204,6 +216,7 @@ class Orientation(object):
     AXIAL = "axial"
     TRANSVERSE = "transverse"
     CORONAL_CCHMC = "coronal_cchmc"
+    NONE = "none"
 
 
 class DCFSpace(object):

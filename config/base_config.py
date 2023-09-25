@@ -3,6 +3,7 @@ import sys
 
 import numpy as np
 from ml_collections import config_dict
+
 from config import config_utils
 
 # parent directory
@@ -66,6 +67,7 @@ class Recon(object):
     """Define reconstruction configurations.
 
     Attributes:
+        recon_key: str, the reconstruction key
         scan_type: str, the scan type
         kernel_sharpness_lr: float, the kernel sharpness for low resolution, higher
             SNR images
@@ -78,6 +80,7 @@ class Recon(object):
 
     def __init__(self):
         """Initialize the reconstruction parameters."""
+        self.recon_key = constants.ReconKey.ROBERTSON.value
         self.scan_type = constants.ScanType.NORMALDIXON.value
         self.kernel_sharpness_lr = 0.14
         self.kernel_sharpness_hr = 0.32
