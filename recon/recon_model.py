@@ -30,7 +30,7 @@ class GriddedReconModel(ABC):
             system_obj (MatrixSystemModel): A subclass of the SystemModel
             verbosity (int): either 0 or 1 whether to log output messages
         """
-        self.deapodize = True
+        self.deapodize = False
         self.crop = True
         self.verbosity = verbosity
         self.system_obj = system_obj
