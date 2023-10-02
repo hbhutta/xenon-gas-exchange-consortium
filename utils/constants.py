@@ -177,6 +177,18 @@ class ReconKey(enum.Enum):
     PLUMMER = "plummer"
 
 
+class HbCorrectionKey(enum.Enum):
+    """Hb correction flags.
+
+    Defines what level of Hb correction to apply to dissolved-phase signal. Options:
+    RBC_AND_M: Apply Hb correction to both RBC and membrane signals
+    RBC_ONLY: Apply Hb correction only to RBC signal
+    """
+
+    RBC_AND_M = "rbc_and_m"
+    RBC_ONLY = "rbc_only"
+
+
 class ScanType(enum.Enum):
     """Scan type."""
 
