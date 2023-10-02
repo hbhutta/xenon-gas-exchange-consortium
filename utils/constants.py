@@ -393,7 +393,7 @@ class CMAP(object):
     }
 
 
-class HbCorrectionEquations(object):
+class HbCorEqs(object):
     """Equations to define hb correction."""
 
     HB_REF = 14.0  # reference hb value in g/dL
