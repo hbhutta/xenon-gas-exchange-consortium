@@ -490,6 +490,19 @@ class Subject(object):
             thresholds=self.config.params.threshold_membrane,
         )
 
+        # if hb correction applied, bin hb-corrected maps
+        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE:
+            self.image_rbc2gas_hb_cor_binned = binning.linear_bin(
+                image=self.image_rbc2gas_hb_cor,
+                mask=self.mask_vent,
+                thresholds=self.config.params.threshold_rbc,
+            )
+            self.image_membrane2gas_hb_cor_binned = binning.linear_bin(
+                image=self.image_membrane2gas_hb_cor,
+                mask=self.mask_vent,
+                thresholds=self.config.params.threshold_membrane,
+            )
+
     def apply_hb_correction(self):
         """Apply hemoglobin correction."""
 
