@@ -872,6 +872,51 @@ class Subject(object):
             refer_fit=constants.MEMBRANEHISTOGRAMFields.REFERENCE_FIT,
         )
 
+        # if applying hb correction, generate hb-corrected figures
+        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE:
+            plot.plot_montage_color(
+                image=plot.map_and_overlay_to_rgb(
+                    self.image_rbc2gas_hb_cor_binned,
+                    proton_reg,
+                    constants.CMAP.RBC_BIN2COLOR,
+                ),
+                path="tmp/montage_rbc_hb_cor_binned.png",
+                index_start=index_start,
+                index_skip=index_skip,
+            )
+            plot.plot_montage_color(
+                image=plot.map_and_overlay_to_rgb(
+                    self.image_membrane2gas_hb_cor_binned,
+                    proton_reg,
+                    constants.CMAP.MEMBRANE_BIN2COLOR,
+                ),
+                path="tmp/montage_membrane_hb_cor_binned.png",
+                index_start=index_start,
+                index_skip=index_skip,
+            )
+            plot.plot_histogram(
+                data=np.abs(self.image_rbc2gas_hb_cor)[
+                    np.array(self.mask, dtype=bool)
+                ].flatten(),
+                path="tmp/hist_rbc_hb_cor.png",
+                color=constants.RBCHISTOGRAMFields.COLOR,
+                xlim=constants.RBCHISTOGRAMFields.XLIM,
+                ylim=constants.RBCHISTOGRAMFields.YLIM,
+                num_bins=constants.RBCHISTOGRAMFields.NUMBINS,
+                refer_fit=constants.RBCHISTOGRAMFields.REFERENCE_FIT,
+            )
+            plot.plot_histogram(
+                data=np.abs(self.image_membrane2gas_hb_cor)[
+                    np.array(self.mask, dtype=bool)
+                ].flatten(),
+                path="tmp/hist_membrane_hb_cor.png",
+                color=constants.MEMBRANEHISTOGRAMFields.COLOR,
+                xlim=constants.MEMBRANEHISTOGRAMFields.XLIM,
+                ylim=constants.MEMBRANEHISTOGRAMFields.YLIM,
+                num_bins=constants.MEMBRANEHISTOGRAMFields.NUMBINS,
+                refer_fit=constants.MEMBRANEHISTOGRAMFields.REFERENCE_FIT,
+            )
+
     def generate_pdf(self):
         """Generate HTML and PDF files."""
         path = os.path.join(
