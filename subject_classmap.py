@@ -517,6 +517,8 @@ class Subject(object):
             self.image_membrane2gas_hb_cor = (
                 self.image_membrane2gas * self.m_hb_cor_factor
             )
+        elif self.config.hb_cor_key == constants.HbCorrectionKey.RBC_ONLY:
+            self.image_membrane2gas_hb_cor = self.image_membrane2gas
 
     def get_statistics(self) -> Dict[str, Any]:
         """Calculate image statistics.
