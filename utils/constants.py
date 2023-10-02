@@ -181,10 +181,12 @@ class HbCorrectionKey(enum.Enum):
     """Hb correction flags.
 
     Defines what level of Hb correction to apply to dissolved-phase signal. Options:
+    NONE: Apply no hb correction
     RBC_AND_M: Apply Hb correction to both RBC and membrane signals
     RBC_ONLY: Apply Hb correction only to RBC signal
     """
 
+    NONE = "none"
     RBC_AND_M = "rbc_and_m"
     RBC_ONLY = "rbc_only"
 
@@ -389,3 +391,12 @@ class CMAP(object):
         7: [225.0 / 255.0, 129.0 / 255.0, 162.0 / 255.0],
         8: [197.0 / 255.0, 27.0 / 255.0, 125.0 / 255.0],
     }
+
+
+class HbCorrectionEquations(object):
+    """Equations to define hb correction."""
+
+    HB_REF = 14.0  # reference hb value in g/dL
+    R1 = 0.288  # coefficient of rbc hb correction equation
+    M1 = 0.029  # first coefficient of membrane hb correction equation
+    M2 = 0.011  # second coefficient of membrane hb correction equation

@@ -24,6 +24,8 @@ class Config(config_dict.ConfigDict):
         params: Params, the important parameters
         platform: Platform, the scanner vendor platform
         segmentation_key: str, the segmentation key
+        hb_cor_key: str, hemoglobin correction key
+        hb: float, subject measured hb value
         site: str, the scan site
         subject_id: str, the subject id
         rbc_m_ratio: float, the RBC to M ratio
@@ -42,7 +44,8 @@ class Config(config_dict.ConfigDict):
         self.segmentation_key = constants.SegmentationKey.CNN_VENT.value
         self.registration_key = constants.RegistrationKey.SKIP.value
         self.bias_key = constants.BiasfieldKey.N4ITK.value
-        self.hb_cor_key = constants.HbCorrectionKey.RBC_AND_M.value
+        self.hb_cor_key = constants.HbCorrectionKey.NONE.value
+        self.hb = constants.HbCorrectionEquations.HB_REF
         self.site = constants.Site.DUKE.value
         self.subject_id = "test"
         self.rbc_m_ratio = 0.0
