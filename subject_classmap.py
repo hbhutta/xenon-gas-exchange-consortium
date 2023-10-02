@@ -51,13 +51,18 @@ class Subject(object):
         image_membrane (np.array): membrane image
         image_membrane2gas (np.array): membrane image normalized by gas-phase image
         image_membrane2gas_binned (np.array): binned image_membrane2gas
+        image_membrane2gas_hb_cor (np.array): image_membrane2gas corrected for hemoglobin
+        image_membrane2gas_hb_cor_binned (np.array): binned image_membrane2gas_hb_cor
         image_proton (np.array): UTE proton image
         image_rbc (np.array): RBC image
         image_rbc2gas (np.array): RBC image normalized by gas-phase image
         image_rbc2gas_binned (np.array): binned image_rbc2gas
+        image_rbc2gas_hb_cor (np.array): image_rbc2gas corrected for hemoglobin
+        image_rbc2gas_hb_cor_binned (np.array): binned image_rbc2gas_hb_cor
         mask (np.array): thoracic cavity mask
         mask_vent (np.ndarray): thoracic cavity mask without ventilation defects
         rbc_m_ratio (float): RBC to M ratio
+        rbc_m_ratio_hb_cor (float): RBC to M ratio corrected for hb
         traj_dissolved (np.array): dissolved-phase trajectory of shape
             (n_projections, n_points, 3)
         traj_gas (np.array): gas-phase trajectory of shape (n_projections, n_points, 3)
@@ -82,13 +87,18 @@ class Subject(object):
         self.image_membrane = np.array([0.0])
         self.image_membrane2gas = np.array([0.0])
         self.image_membrane2gas_binned = np.array([0.0])
+        self.image_membrane2gas_hb_cor = np.array([0.0])
+        self.image_membrane2gas_hb_cor_binned = np.array([0.0])
         self.image_proton = np.array([0.0])
         self.image_rbc = np.array([0.0])
         self.image_rbc2gas = np.array([0.0])
         self.image_rbc2gas_binned = np.array([0.0])
+        self.image_rbc2gas_hb_cor = np.array([0.0])
+        self.image_rbc2gas_hb_cor_binned = np.array([0.0])
         self.mask = np.array([0.0])
         self.mask_vent = np.array([0.0])
         self.rbc_m_ratio = 0.0
+        self.rbc_m_ratio_hb_cor = 0.0
         self.dict_stats = {}
         self.dict_info = {}
         self.traj_scaling_factor = 1.0
