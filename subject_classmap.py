@@ -53,12 +53,14 @@ class Subject(object):
         image_membrane2gas_binned (np.array): binned image_membrane2gas
         image_membrane2gas_hb_cor (np.array): image_membrane2gas corrected for hemoglobin
         image_membrane2gas_hb_cor_binned (np.array): binned image_membrane2gas_hb_cor
+        m_hb_cor_factor (float): membrane hb correction scaling factor
         image_proton (np.array): UTE proton image
         image_rbc (np.array): RBC image
         image_rbc2gas (np.array): RBC image normalized by gas-phase image
         image_rbc2gas_binned (np.array): binned image_rbc2gas
         image_rbc2gas_hb_cor (np.array): image_rbc2gas corrected for hemoglobin
         image_rbc2gas_hb_cor_binned (np.array): binned image_rbc2gas_hb_cor
+        rbc_hb_cor_factor (float): rbc hb correction scaling factor
         mask (np.array): thoracic cavity mask
         mask_vent (np.ndarray): thoracic cavity mask without ventilation defects
         rbc_m_ratio (float): RBC to M ratio
@@ -89,12 +91,14 @@ class Subject(object):
         self.image_membrane2gas_binned = np.array([0.0])
         self.image_membrane2gas_hb_cor = np.array([0.0])
         self.image_membrane2gas_hb_cor_binned = np.array([0.0])
+        self.m_hb_cor_factor = 0.0
         self.image_proton = np.array([0.0])
         self.image_rbc = np.array([0.0])
         self.image_rbc2gas = np.array([0.0])
         self.image_rbc2gas_binned = np.array([0.0])
         self.image_rbc2gas_hb_cor = np.array([0.0])
         self.image_rbc2gas_hb_cor_binned = np.array([0.0])
+        self.rbc_hb_cor_factor = 0.0
         self.mask = np.array([0.0])
         self.mask_vent = np.array([0.0])
         self.rbc_m_ratio = 0.0
@@ -485,6 +489,21 @@ class Subject(object):
             mask=self.mask_vent,
             thresholds=self.config.params.threshold_membrane,
         )
+
+    def apply_hb_correction(self):
+        """Apply hemoglobin correction."""
+
+        # get hb correction scaling factors
+        self.rbc_hb_cor_factor, self.m_hb_cor_factor = signal_utils.get_hb_correction(
+            self.config.hb
+        )
+
+        # scale dissolved phase signals by hb correction scaling factors
+        self.image_rbc2gas_hb_cor = self.image_rbc2gas * self.rbc_hb_cor_factor
+        if self.config.hb_cor_key == constants.HbCorrectionKey.RBC_AND_M:
+            self.image_membrane2gas_hb_cor = (
+                self.image_membrane2gas * self.m_hb_cor_factor
+            )
 
     def get_statistics(self) -> Dict[str, Any]:
         """Calculate image statistics.

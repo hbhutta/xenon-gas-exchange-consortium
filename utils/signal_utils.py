@@ -434,6 +434,10 @@ def get_hb_correction(hb: float) -> Tuple[float, float]:
 
     Args:
         hb (float): subject hb
+
+    Returns:
+        rbc_hb_cor_factor (float): rbc hb correction factor
+        m_hb_cor_factor (float): membrane hb correction factor
     """
 
     rbc_hb_cor_factor = constants.HbCorEqs.R1 + (

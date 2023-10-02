@@ -7,6 +7,7 @@ from ml_collections import config_flags
 
 from config import base_config
 from subject_classmap import Subject
+from utils import constants
 
 FLAGS = flags.FLAGS
 
@@ -47,6 +48,9 @@ def gx_mapping_reconstruction(config: base_config.Config):
     subject.save_subject_to_mat()
     subject.dixon_decomposition()
     subject.dissolved_analysis()
+    if config.hb_cor_key != constants.HbCorrectionKey.NONE:
+        logging.info("Applying Hemoglobin Correction")
+        subject.apply_hb_correction()
     subject.dissolved_binning()
     subject.get_statistics()
     subject.get_info()
