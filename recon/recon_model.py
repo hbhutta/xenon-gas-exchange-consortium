@@ -120,7 +120,9 @@ class LSQgridded(GriddedReconModel):
             deapVol = self.grid(
                 np.expand_dims((~np.any(traj > 0, axis=1)).astype(np.float32), -1)
             )
-            deapVol = np.reshape(deapVol, np.ceil(self.system_obj.full_size))
+            deapVol = np.reshape(
+                deapVol, np.ceil(self.system_obj.full_size).astype(int)
+            )
             if self.verbosity:
                 logging.info("-- Calculating image-space deapodization function")
             deapVol = np.fft.ifftn(deapVol)
