@@ -51,6 +51,7 @@ class Subject(object):
         image_membrane (np.array): membrane image
         image_membrane2gas (np.array): membrane image normalized by gas-phase image
         image_membrane2gas_binned (np.array): binned image_membrane2gas
+        image_membrane_hb_cor (np.array): image_membrane corrected for hb
         image_membrane2gas_hb_cor (np.array): image_membrane2gas corrected for hemoglobin
         image_membrane2gas_hb_cor_binned (np.array): binned image_membrane2gas_hb_cor
         m_hb_cor_factor (float): membrane hb correction scaling factor
@@ -58,6 +59,7 @@ class Subject(object):
         image_rbc (np.array): RBC image
         image_rbc2gas (np.array): RBC image normalized by gas-phase image
         image_rbc2gas_binned (np.array): binned image_rbc2gas
+        image_rbc_hb_cor (np.array): image_rbc corrected for hb
         image_rbc2gas_hb_cor (np.array): image_rbc2gas corrected for hemoglobin
         image_rbc2gas_hb_cor_binned (np.array): binned image_rbc2gas_hb_cor
         rbc_hb_cor_factor (float): rbc hb correction scaling factor
@@ -91,6 +93,7 @@ class Subject(object):
         self.image_membrane2gas_binned = np.array([0.0])
         self.image_membrane2gas_hb_cor = np.array([0.0])
         self.image_membrane2gas_hb_cor_binned = np.array([0.0])
+        self.image_membrane_hb_cor = np.array([0.0])
         self.m_hb_cor_factor = 0.0
         self.image_proton = np.array([0.0])
         self.image_rbc = np.array([0.0])
@@ -98,6 +101,7 @@ class Subject(object):
         self.image_rbc2gas_binned = np.array([0.0])
         self.image_rbc2gas_hb_cor = np.array([0.0])
         self.image_rbc2gas_hb_cor_binned = np.array([0.0])
+        self.image_rbc_hb_cor = np.array([0.0])
         self.rbc_hb_cor_factor = 0.0
         self.mask = np.array([0.0])
         self.mask_vent = np.array([0.0])
@@ -511,14 +515,15 @@ class Subject(object):
             self.config.hb
         )
 
+        # if only applying correction to rbc signal, set membrane factor to 1
+        if self.config.hb_cor_key == constants.HbCorrectionKey.RBC_ONLY:
+            self.m_hb_cor_factor = 1.0
+
         # scale dissolved phase signals by hb correction scaling factors
+        self.image_rbc_hb_cor = self.image_rbc * self.rbc_hb_cor_factor
         self.image_rbc2gas_hb_cor = self.image_rbc2gas * self.rbc_hb_cor_factor
-        if self.config.hb_cor_key == constants.HbCorrectionKey.RBC_AND_M:
-            self.image_membrane2gas_hb_cor = (
-                self.image_membrane2gas * self.m_hb_cor_factor
-            )
-        elif self.config.hb_cor_key == constants.HbCorrectionKey.RBC_ONLY:
-            self.image_membrane2gas_hb_cor = self.image_membrane2gas
+        self.image_membrane_hb_cor = self.image_membrane * self.m_hb_cor_factor
+        self.image_membrane2gas_hb_cor = self.image_membrane2gas * self.m_hb_cor_factor
 
     def get_statistics(self) -> Dict[str, Any]:
         """Calculate image statistics.
@@ -619,6 +624,75 @@ class Subject(object):
                 self.config.params.mean_rbc,
             ),
         }
+
+        # if applying hb correction, get hb-corrected stats
+        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE:
+            dict_stats_hb_cor = {
+                constants.StatsIOFields.RBC_M_RATIO_HB_COR: self.rbc_m_ratio_hb_cor,
+                constants.StatsIOFields.SNR_RBC_HB_COR: metrics.snr(
+                    self.image_rbc_hb_cor, self.mask
+                )[0],
+                constants.StatsIOFields.SNR_MEMBRANE_HB_COR: metrics.snr(
+                    self.image_membrane_hb_cor, self.mask
+                )[0],
+                constants.StatsIOFields.PCT_RBC_DEFECT_HB_COR: metrics.bin_percentage(
+                    self.image_rbc2gas_hb_cor_binned, np.array([1]), self.mask
+                ),
+                constants.StatsIOFields.PCT_RBC_LOW_HB_COR: metrics.bin_percentage(
+                    self.image_rbc2gas_binned, np.array([2]), self.mask
+                ),
+                constants.StatsIOFields.PCT_RBC_HIGH_HB_COR: metrics.bin_percentage(
+                    self.image_rbc2gas_hb_cor_binned, np.array([5, 6]), self.mask
+                ),
+                constants.StatsIOFields.PCT_MEMBRANE_DEFECT_HB_COR: metrics.bin_percentage(
+                    self.image_membrane2gas_hb_cor_binned, np.array([1]), self.mask
+                ),
+                constants.StatsIOFields.PCT_MEMBRANE_LOW_HB_COR: metrics.bin_percentage(
+                    self.image_membrane2gas_hb_cor_binned, np.array([2]), self.mask
+                ),
+                constants.StatsIOFields.PCT_MEMBRANE_HIGH_HB_COR: metrics.bin_percentage(
+                    self.image_membrane2gas_hb_cor_binned,
+                    np.array([6, 7, 8]),
+                    self.mask,
+                ),
+                constants.StatsIOFields.MEAN_RBC_HB_COR: metrics.mean(
+                    self.image_rbc2gas_hb_cor, self.mask_vent
+                ),
+                constants.StatsIOFields.MEAN_MEMBRANE_HB_COR: metrics.mean(
+                    self.image_membrane2gas_hb_cor, self.mask_vent
+                ),
+                constants.StatsIOFields.MEDIAN_RBC_HB_COR: metrics.median(
+                    self.image_rbc2gas_hb_cor, self.mask_vent
+                ),
+                constants.StatsIOFields.MEDIAN_MEMBRANE_HB_COR: metrics.median(
+                    self.image_membrane2gas_hb_cor, self.mask_vent
+                ),
+                constants.StatsIOFields.STDDEV_RBC_HB_COR: metrics.std(
+                    self.image_rbc2gas_hb_cor, self.mask_vent
+                ),
+                constants.StatsIOFields.STDDEV_MEMBRANE_HB_COR: metrics.std(
+                    self.image_membrane2gas_hb_cor, self.mask_vent
+                ),
+                constants.StatsIOFields.KCO_HB_COR: metrics.kco(
+                    self.image_membrane2gas_hb_cor,
+                    self.image_rbc2gas_hb_cor,
+                    self.mask_vent,
+                    self.config.params.mean_membrane,
+                    self.config.params.mean_rbc,
+                ),
+                constants.StatsIOFields.DLCO_HB_COR: metrics.dlco(
+                    self.image_gas_binned,
+                    self.image_membrane2gas_hb_cor,
+                    self.image_rbc2gas_hb_cor,
+                    self.mask,
+                    self.mask_vent,
+                    self.dict_dis[constants.IOFields.FOV],
+                    self.config.params.mean_membrane,
+                    self.config.params.mean_rbc,
+                ),
+            }
+            self.dict_stats.update(dict_stats_hb_cor)
+
         return self.dict_stats
 
     def get_info(self) -> Dict[str, Any]:
