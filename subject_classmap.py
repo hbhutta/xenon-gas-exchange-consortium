@@ -495,7 +495,7 @@ class Subject(object):
         )
 
         # if hb correction applied, bin hb-corrected maps
-        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE:
+        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE.value:
             self.image_rbc2gas_hb_cor_binned = binning.linear_bin(
                 image=self.image_rbc2gas_hb_cor,
                 mask=self.mask_vent,
@@ -516,7 +516,7 @@ class Subject(object):
         )
 
         # if only applying correction to rbc signal, set membrane factor to 1
-        if self.config.hb_cor_key == constants.HbCorrectionKey.RBC_ONLY:
+        if self.config.hb_cor_key == constants.HbCorrectionKey.RBC_ONLY.value:
             self.m_hb_cor_factor = 1.0
 
         # scale dissolved phase signals by hb correction scaling factors
@@ -629,7 +629,7 @@ class Subject(object):
         }
 
         # if applying hb correction, get hb-corrected stats
-        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE:
+        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE.value:
             dict_stats_hb_cor = {
                 constants.StatsIOFields.RBC_M_RATIO_HB_COR: self.rbc_m_ratio_hb_cor,
                 constants.StatsIOFields.SNR_RBC_HB_COR: metrics.snr(
@@ -880,7 +880,7 @@ class Subject(object):
         )
 
         # if applying hb correction, generate hb-corrected figures
-        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE:
+        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE.value:
             plot.plot_montage_color(
                 image=plot.map_and_overlay_to_rgb(
                     self.image_rbc2gas_hb_cor_binned,
@@ -952,7 +952,7 @@ class Subject(object):
         report.qa({**self.dict_stats, **self.config.params.reference_stats}, path=path)
 
         # if applying hb correction, generate hb-corrected pdf reports
-        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE:
+        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE.value:
             path = os.path.join(
                 self.config.data_dir,
                 "report_clinical_hb_cor_{}.pdf".format(self.config.subject_id),
@@ -1044,7 +1044,7 @@ class Subject(object):
         )
 
         # if applying hb correction, save hb-corrected images
-        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE:
+        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE.value:
             io_utils.export_nii(
                 self.image_rbc2gas_hb_cor_binned,
                 "tmp/rbc_hb_cor_binned.nii",

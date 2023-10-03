@@ -47,7 +47,7 @@ def gx_mapping_reconstruction(config: base_config.Config):
     subject.gas_binning()
     subject.dixon_decomposition()
     subject.dissolved_analysis()
-    if config.hb_cor_key != constants.HbCorrectionKey.NONE:
+    if config.hb_cor_key != constants.HbCorrectionKey.NONE.value:
         logging.info("Applying Hemoglobin Correction")
         subject.apply_hb_correction()
     subject.dissolved_binning()
