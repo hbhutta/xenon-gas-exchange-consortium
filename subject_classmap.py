@@ -1027,3 +1027,42 @@ class Subject(object):
             ),
             "tmp/gas_rgb.nii",
         )
+
+        # if applying hb correction, save hb-corrected images
+        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE:
+            io_utils.export_nii(
+                self.image_rbc2gas_hb_cor_binned,
+                "tmp/rbc_hb_cor_binned.nii",
+                self.dict_dis[constants.IOFields.FOV],
+            )
+            io_utils.export_nii(
+                np.abs(self.image_rbc_hb_cor),
+                "tmp/rbc_hb_cor.nii",
+                self.dict_dis[constants.IOFields.FOV],
+            )
+            io_utils.export_nii(
+                np.abs(self.image_membrane_hb_cor),
+                "tmp/membrane_hb_cor.nii",
+                self.dict_dis[constants.IOFields.FOV],
+            )
+            io_utils.export_nii(
+                np.abs(self.image_membrane2gas_hb_cor),
+                "tmp/membrane2gas_hb_cor.nii",
+                self.dict_dis[constants.IOFields.FOV],
+            )
+            io_utils.export_nii_4d(
+                plot.map_and_overlay_to_rgb(
+                    self.image_rbc2gas_hb_cor_binned,
+                    proton_reg,
+                    constants.CMAP.RBC_BIN2COLOR,
+                ),
+                "tmp/rbc2gas_hb_cor_rgb.nii",
+            )
+            io_utils.export_nii_4d(
+                plot.map_and_overlay_to_rgb(
+                    self.image_membrane2gas_hb_cor_binned,
+                    proton_reg,
+                    constants.CMAP.MEMBRANE_BIN2COLOR,
+                ),
+                "tmp/membrane2gas_hb_cor_rgb.nii",
+            )
