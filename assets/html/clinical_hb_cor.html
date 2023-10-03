@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="description"
+      content="Gas exchange Imaging Report with 129Xe MRI-technical report"
+    />
+    <meta name="author" content="Junlan Lu" />
+    <link href="../assets/css/report_reset.css" rel="stylesheet" />
+    <link href="../assets/css/report_clinical.css" rel="stylesheet" />
+    <title>Gas exchange Imaging Report</title>
+  </head>
+  <body>
+    <div class="title-container">
+      <h1 id="big-title">Summary of {subject_id}</h1>
+      <h5 id="date-title">scan: {scan_date}; processed: {process_date}</h5>
+    </div>
+    <div class="hist-container">
+      <div class="hist-tile" align="right">
+        <img src="../tmp/hist_vent.png" style="width: 100%" />
+        <div class="top-right">
+          <h2>Ventilation histogram</h2>
+          <p>SNR: {snr_vent}</p>
+          <p>Mean: {mean_vent}</p>
+          <p>Median: {median_vent}</p>
+          <p>SD: {stddev_vent}</p>
+        </div>
+      </div>
+      <div class="hist-tile" align="right">
+        <img src="../tmp/hist_membrane_hb_cor.png" style="width: 100%" />
+        <div class="top-right">
+          <h2>Membrane histogram</h2>
+          <p>SNR: {snr_membrane_hb_cor}</p>
+          <p>Mean: {mean_membrane_hb_cor}</p>
+          <p>Median: {median_membrane_hb_cor}</p>
+          <p>SD: {stddev_membrane_hb_cor}</p>
+        </div>
+      </div>
+      <div class="hist-tile" align="right">
+        <img src="../tmp/hist_rbc_hb_cor.png" style="width: 100%" />
+        <div class="top-right">
+          <h2>RBC histogram</h2>
+          <p>SNR: {snr_rbc_hb_cor}</p>
+          <p>Mean: {mean_rbc_hb_cor}</p>
+          <p>Median: {median_rbc_hb_cor}</p>
+          <p>SD: {stddev_rbc_hb_cor}</p>
+        </div>
+      </div>
+    </div>
+    <div class="map-container">
+      <div class="map-tile">
+        <img
+          style="border: 10px solid black"
+          src="../tmp/montage_gas_binned.png"
+          width="680"
+          height="170px"
+        />
+        <img
+          style="border: 10px solid black"
+          src="../tmp/montage_membrane_hb_cor_binned.png"
+          width="680"
+          height="170px"
+        />
+        <img
+          style="border: 10px solid black"
+          src="../tmp/montage_rbc_hb_cor_binned.png"
+          width="680"
+          height="170px"
+        />
+      </div>
+      <div class="colorbar-tile">
+        <img src=../assets/img/colorbin_short.png height=150px>
+        <div class="space"></div>
+        <img src=../assets/img/colorbin_long.png height=200px>
+        <div class="space"></div>
+        <img src=../assets/img/colorbin_short.png height=150px>
+      </div>
+      <div class="predict-values">
+        <p>Estimated KCO:{kco} ---- VA:{alveolar_volume} ---- DLCO:{dlco}</p>
+      </div>
+    </div>
+    <div class="table-container">
+      <table>
+        <tr class="title">
+          <th>Subject</th>
+          <th>{subject_id}</th>
+          <th>Ref</th>
+        </tr>
+        <tr class="basic">
+          <td>RBC:M.</td>
+          <td>{rbc_m_ratio_hb_cor}</td>
+          <td>{rbc_m_ratio_avg}&#177;{rbc_m_ratio_std}</td>
+        </tr>
+        <tr class="basic">
+          <td>Inflation</td>
+          <td>{inflation}L</td>
+          <td>{inflation_avg}&#177;{inflation_std}</td>
+        </tr>
+        <tr class="ven">
+          <td>Defect</td>
+          <td>{pct_vent_defect}%</td>
+          <td>{vent_defect_avg}&#177;{vent_defect_std}%</td>
+        </tr>
+        <tr class="ven">
+          <td>Low</td>
+          <td>{pct_vent_low}%</td>
+          <td>{vent_low_avg}&#177;{vent_low_std}%</td>
+        </tr>
+        <tr class="ven">
+          <td>High</td>
+          <td>{pct_vent_high}%</td>
+          <td>{vent_high_avg}&#177;{vent_high_std}%</td>
+        </tr>
+        <tr class="membrane">
+          <td>Defect</td>
+          <td>{pct_membrane_defect_hb_cor}%</td>
+          <td>{membrane_defect_avg}&#177;{membrane_defect_std}%</td>
+        </tr>
+        <tr class="membrane">
+          <td>Low</td>
+          <td>{pct_membrane_low_hb_cor}%</td>
+          <td>{membrane_low_avg}&#177;{membrane_low_std}%</td>
+        </tr>
+        <tr class="membrane">
+          <td>High</td>
+          <td>{pct_membrane_high_hb_cor}%</td>
+          <td>{membrane_high_avg}&#177;{membrane_high_std}%</td>
+        </tr>
+        <tr class="rbc">
+          <td>Defect</td>
+          <td>{pct_rbc_defect_hb_cor}%</td>
+          <td>{rbc_defect_avg}&#177;{rbc_defect_std}%</td>
+        </tr>
+        <tr class="rbc">
+          <td>Low</td>
+          <td>{pct_rbc_low_hb_cor}%</td>
+          <td>{rbc_low_avg}&#177;{rbc_low_std}%</td>
+        </tr>
+        <tr class="rbc">
+          <td>High</td>
+          <td>{pct_rbc_high_hb_cor}%</td>
+          <td>{rbc_high_avg}&#177;{rbc_high_std}%</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

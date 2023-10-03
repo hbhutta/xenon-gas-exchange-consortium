@@ -951,6 +951,18 @@ class Subject(object):
         )
         report.qa({**self.dict_stats, **self.config.params.reference_stats}, path=path)
 
+        # if applying hb correction, generate hb-corrected pdf reports
+        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE:
+            path = os.path.join(
+                self.config.data_dir,
+                "report_clinical_hb_cor_{}.pdf".format(self.config.subject_id),
+            )
+            report.clinical(
+                {**self.dict_stats, **self.config.params.reference_stats},
+                path=path,
+                hb_cor=True,
+            )
+
     def write_stats_to_csv(self):
         """Write statistics to file."""
         io_utils.export_subject_csv(self.dict_stats, path="data/stats_all.csv")
