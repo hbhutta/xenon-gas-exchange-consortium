@@ -45,7 +45,7 @@ def gx_mapping_reconstruction(config: base_config.Config):
     subject.registration()
     subject.biasfield_correction()
     subject.gas_binning()
-    subject.save_subject_to_mat()
+    # subject.save_subject_to_mat()
     subject.dixon_decomposition()
     subject.dissolved_analysis()
     if config.hb_cor_key != constants.HbCorrectionKey.NONE:
@@ -54,6 +54,7 @@ def gx_mapping_reconstruction(config: base_config.Config):
     subject.dissolved_binning()
     subject.get_statistics()
     subject.get_info()
+    subject.save_subject_to_mat()
     subject.write_stats_to_csv()
     subject.generate_figures()
     # subject.generate_pdf()

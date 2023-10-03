@@ -520,6 +520,9 @@ class Subject(object):
             self.m_hb_cor_factor = 1.0
 
         # scale dissolved phase signals by hb correction scaling factors
+        self.rbc_m_ratio_hb_cor = (
+            self.rbc_m_ratio * self.rbc_hb_cor_factor / self.m_hb_cor_factor
+        )
         self.image_rbc_hb_cor = self.image_rbc * self.rbc_hb_cor_factor
         self.image_rbc2gas_hb_cor = self.image_rbc2gas * self.rbc_hb_cor_factor
         self.image_membrane_hb_cor = self.image_membrane * self.m_hb_cor_factor
