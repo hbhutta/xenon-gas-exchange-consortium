@@ -94,7 +94,7 @@ class Subject(object):
         self.image_membrane2gas_hb_cor = np.array([0.0])
         self.image_membrane2gas_hb_cor_binned = np.array([0.0])
         self.image_membrane_hb_cor = np.array([0.0])
-        self.m_hb_cor_factor = 0.0
+        self.m_hb_cor_factor = 1.0
         self.image_proton = np.array([0.0])
         self.image_rbc = np.array([0.0])
         self.image_rbc2gas = np.array([0.0])
@@ -102,7 +102,7 @@ class Subject(object):
         self.image_rbc2gas_hb_cor = np.array([0.0])
         self.image_rbc2gas_hb_cor_binned = np.array([0.0])
         self.image_rbc_hb_cor = np.array([0.0])
-        self.rbc_hb_cor_factor = 0.0
+        self.rbc_hb_cor_factor = 1.0
         self.mask = np.array([0.0])
         self.mask_vent = np.array([0.0])
         self.rbc_m_ratio = 0.0
