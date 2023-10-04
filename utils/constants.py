@@ -415,8 +415,11 @@ class CMAP(object):
     }
 
 
-class HbCorEqs(object):
-    """Equations to define hb correction."""
+class HbCorrection(object):
+    """Coefficients for hb correction scaling factor equations.
+
+    Reference: https://onlinelibrary.wiley.com/doi/10.1002/mrm.29712
+    """
 
     HB_REF = 14.0  # reference hb value in g/dL
     R1 = 0.288  # coefficient of rbc hb correction equation
