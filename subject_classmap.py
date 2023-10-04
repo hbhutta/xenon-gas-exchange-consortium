@@ -451,17 +451,19 @@ class Subject(object):
         # get hb correction scaling factors
         (
             self.rbc_hb_correction_factor,
-            self.m_hb_correction_factor,
+            self.membrane_hb_correction_factor,
         ) = signal_utils.get_hb_correction(self.config.hb)
 
         # if only applying correction to rbc signal, set membrane factor to 1
         if self.config.hb_correction_key == constants.HbCorrectionKey.RBC_ONLY.value:
-            self.m_hb_cor_factor = 1.0
+            self.membrane_hb_correction_factor = 1.0
 
         # scale dissolved phase signals by hb correction scaling factors
-        self.rbc_m_ratio *= self.rbc_hb_correction_factor / self.m_hb_cor_factor
+        self.rbc_m_ratio *= (
+            self.rbc_hb_correction_factor / self.membrane_hb_correction_factor
+        )
         self.image_rbc *= self.rbc_hb_correction_factor
-        self.image_membrane *= self.m_hb_cor_factor
+        self.image_membrane *= self.membrane_hb_correction_factor
 
     def dissolved_analysis(self):
         """Calculate the dissolved-phase images relative to gas image."""

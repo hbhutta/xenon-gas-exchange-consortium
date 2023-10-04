@@ -41,7 +41,7 @@ class IOFields(object):
     GRAD_DELAY_Z = "grad_delay_z"
     HB_CORRECTION_KEY = "hb_correction_key"
     HB = "hb"
-    RBC_HB_CORRECTION_FACTOR = "rbc_hb_cor_factor"
+    RBC_HB_CORRECTION_FACTOR = "rbc_hb_correction_factor"
     MEMBRANE_HB_CORRECTION_FACTOR = "membrane_hb_correction_factor"
     IMAGE = "image"
     INFLATION = "inflation"
