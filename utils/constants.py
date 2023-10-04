@@ -186,12 +186,12 @@ class HbCorrectionKey(enum.Enum):
 
     Defines what level of Hb correction to apply to dissolved-phase signal. Options:
     NONE: Apply no hb correction
-    RBC_AND_M: Apply Hb correction to both RBC and membrane signals
+    RBC_AND_MEMBRANE: Apply Hb correction to both RBC and membrane signals
     RBC_ONLY: Apply Hb correction only to RBC signal
     """
 
     NONE = "none"
-    RBC_AND_M = "rbc_and_m"
+    RBC_AND_MEMBRANE = "rbc_and_membrane"
     RBC_ONLY = "rbc_only"
 
 
