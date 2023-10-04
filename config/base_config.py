@@ -24,8 +24,8 @@ class Config(config_dict.ConfigDict):
         params: Params, the important parameters
         platform: Platform, the scanner vendor platform
         segmentation_key: str, the segmentation key
-        hb_cor_key: str, hemoglobin correction key
-        hb: float, subject hb value
+        hb_correction_key: str, hemoglobin correction key
+        hb: float, subject hb value in g/dL
         site: str, the scan site
         subject_id: str, the subject id
         rbc_m_ratio: float, the RBC to M ratio
