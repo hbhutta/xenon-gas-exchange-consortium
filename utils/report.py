@@ -54,26 +54,20 @@ def format_dict(dict_stats: Dict[str, Any]) -> Dict[str, Any]:
     return dict_stats
 
 
-def clinical(dict_stats: Dict[str, Any], path: str, hb_cor=False):
+def clinical(dict_stats: Dict[str, Any], path: str):
     """Make clinical report with colormap images.
 
     First converts dictionary to html format. Then saves to path.
     Args:
         dict_stats (Dict[str, Any]): dictionary of statistics
         path (str): path to save report
-        hb_cor (bool): if True, generate hb-corrected report
     """
-    # define which html template to use
-    if hb_cor:
-        html_temp_file = "clinical_hb_cor.html"
-    else:
-        html_temp_file = "clinical.html"
     dict_stats = format_dict(dict_stats)
     current_path = os.path.dirname(__file__)
     path_clinical = os.path.abspath(
-        os.path.join(current_path, os.pardir, "assets", "html", html_temp_file)
+        os.path.join(current_path, os.pardir, "assets", "html", "clinical.html")
     )
-    path_html = os.path.join("tmp", html_temp_file)
+    path_html = os.path.join("tmp", "clinical.html")
     # write report to html
     with open(path_clinical, "r") as f:
         file = f.read()

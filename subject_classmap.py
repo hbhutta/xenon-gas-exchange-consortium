@@ -51,22 +51,15 @@ class Subject(object):
         image_membrane (np.array): membrane image
         image_membrane2gas (np.array): membrane image normalized by gas-phase image
         image_membrane2gas_binned (np.array): binned image_membrane2gas
-        image_membrane_hb_cor (np.array): image_membrane corrected for hb
-        image_membrane2gas_hb_cor (np.array): image_membrane2gas corrected for hemoglobin
-        image_membrane2gas_hb_cor_binned (np.array): binned image_membrane2gas_hb_cor
-        m_hb_cor_factor (float): membrane hb correction scaling factor
         image_proton (np.array): UTE proton image
         image_rbc (np.array): RBC image
         image_rbc2gas (np.array): RBC image normalized by gas-phase image
         image_rbc2gas_binned (np.array): binned image_rbc2gas
-        image_rbc_hb_cor (np.array): image_rbc corrected for hb
-        image_rbc2gas_hb_cor (np.array): image_rbc2gas corrected for hemoglobin
-        image_rbc2gas_hb_cor_binned (np.array): binned image_rbc2gas_hb_cor
-        rbc_hb_cor_factor (float): rbc hb correction scaling factor
         mask (np.array): thoracic cavity mask
         mask_vent (np.ndarray): thoracic cavity mask without ventilation defects
+        membrane_hb_correction_factor (float): membrane hb correction scaling factor
+        rbc_hb_correction_factor (float): rbc hb correction scaling factor
         rbc_m_ratio (float): RBC to M ratio
-        rbc_m_ratio_hb_cor (float): RBC to M ratio corrected for hb
         traj_dissolved (np.array): dissolved-phase trajectory of shape
             (n_projections, n_points, 3)
         traj_gas (np.array): gas-phase trajectory of shape (n_projections, n_points, 3)
@@ -91,22 +84,15 @@ class Subject(object):
         self.image_membrane = np.array([0.0])
         self.image_membrane2gas = np.array([0.0])
         self.image_membrane2gas_binned = np.array([0.0])
-        self.image_membrane2gas_hb_cor = np.array([0.0])
-        self.image_membrane2gas_hb_cor_binned = np.array([0.0])
-        self.image_membrane_hb_cor = np.array([0.0])
-        self.m_hb_cor_factor = 1.0
+        self.membrane_hb_correction_factor = 1.0
         self.image_proton = np.array([0.0])
         self.image_rbc = np.array([0.0])
         self.image_rbc2gas = np.array([0.0])
         self.image_rbc2gas_binned = np.array([0.0])
-        self.image_rbc2gas_hb_cor = np.array([0.0])
-        self.image_rbc2gas_hb_cor_binned = np.array([0.0])
-        self.image_rbc_hb_cor = np.array([0.0])
-        self.rbc_hb_cor_factor = 1.0
+        self.rbc_hb_correction_factor = 1.0
         self.mask = np.array([0.0])
         self.mask_vent = np.array([0.0])
         self.rbc_m_ratio = 0.0
-        self.rbc_m_ratio_hb_cor = 0.0
         self.dict_stats = {}
         self.dict_info = {}
         self.traj_scaling_factor = 1.0
@@ -463,17 +449,18 @@ class Subject(object):
         """Apply hemoglobin correction."""
 
         # get hb correction scaling factors
-        self.rbc_hb_cor_factor, self.m_hb_cor_factor = signal_utils.get_hb_correction(
-            self.config.hb
-        )
+        (
+            self.rbc_hb_correction_factor,
+            self.m_hb_correction_factor,
+        ) = signal_utils.get_hb_correction(self.config.hb)
 
         # if only applying correction to rbc signal, set membrane factor to 1
-        if self.config.hb_cor_key == constants.HbCorrectionKey.RBC_ONLY.value:
+        if self.config.hb_correction_key == constants.HbCorrectionKey.RBC_ONLY.value:
             self.m_hb_cor_factor = 1.0
 
         # scale dissolved phase signals by hb correction scaling factors
-        self.rbc_m_ratio *= self.rbc_hb_cor_factor / self.m_hb_cor_factor
-        self.image_rbc *= self.rbc_hb_cor_factor
+        self.rbc_m_ratio *= self.rbc_hb_correction_factor / self.m_hb_cor_factor
+        self.image_rbc *= self.rbc_hb_correction_factor
         self.image_membrane *= self.m_hb_cor_factor
 
     def dissolved_analysis(self):
@@ -649,8 +636,8 @@ class Subject(object):
             ],
             constants.IOFields.HB_CORRECTION_KEY: self.config.hb_correction_key,
             constants.IOFields.HB: self.config.hb,
-            constants.IOFields.RBC_HB_COR_FACTOR: self.rbc_hb_cor_factor,
-            constants.IOFields.M_HB_COR_FACTOR: self.m_hb_cor_factor,
+            constants.IOFields.RBC_HB_CORRECTION_FACTOR: self.rbc_hb_correction_factor,
+            constants.IOFields.MEMBRANE_HB_CORRECTION_FACTOR: self.membrane_hb_correction_factor,
             constants.IOFields.KERNEL_SHARPNESS: self.config.recon.kernel_sharpness_hr,
             constants.IOFields.N_SKIP_START: self.config.recon.n_skip_start,
             constants.IOFields.N_DIS_REMOVED: len(
