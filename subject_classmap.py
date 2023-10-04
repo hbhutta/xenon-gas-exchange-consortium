@@ -459,6 +459,23 @@ class Subject(object):
             rbc_m_ratio=self.rbc_m_ratio,
         )
 
+    def apply_hb_correction(self):
+        """Apply hemoglobin correction."""
+
+        # get hb correction scaling factors
+        self.rbc_hb_cor_factor, self.m_hb_cor_factor = signal_utils.get_hb_correction(
+            self.config.hb
+        )
+
+        # if only applying correction to rbc signal, set membrane factor to 1
+        if self.config.hb_cor_key == constants.HbCorrectionKey.RBC_ONLY.value:
+            self.m_hb_cor_factor = 1.0
+
+        # scale dissolved phase signals by hb correction scaling factors
+        self.rbc_m_ratio *= self.rbc_hb_cor_factor / self.m_hb_cor_factor
+        self.image_rbc *= self.rbc_hb_cor_factor
+        self.image_membrane *= self.m_hb_cor_factor
+
     def dissolved_analysis(self):
         """Calculate the dissolved-phase images relative to gas image."""
         self.image_rbc2gas = img_utils.divide_images(
@@ -493,40 +510,6 @@ class Subject(object):
             mask=self.mask_vent,
             thresholds=self.config.params.threshold_membrane,
         )
-
-        # if hb correction applied, bin hb-corrected maps
-        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE.value:
-            self.image_rbc2gas_hb_cor_binned = binning.linear_bin(
-                image=self.image_rbc2gas_hb_cor,
-                mask=self.mask_vent,
-                thresholds=self.config.params.threshold_rbc,
-            )
-            self.image_membrane2gas_hb_cor_binned = binning.linear_bin(
-                image=self.image_membrane2gas_hb_cor,
-                mask=self.mask_vent,
-                thresholds=self.config.params.threshold_membrane,
-            )
-
-    def apply_hb_correction(self):
-        """Apply hemoglobin correction."""
-
-        # get hb correction scaling factors
-        self.rbc_hb_cor_factor, self.m_hb_cor_factor = signal_utils.get_hb_correction(
-            self.config.hb
-        )
-
-        # if only applying correction to rbc signal, set membrane factor to 1
-        if self.config.hb_cor_key == constants.HbCorrectionKey.RBC_ONLY.value:
-            self.m_hb_cor_factor = 1.0
-
-        # scale dissolved phase signals by hb correction scaling factors
-        self.rbc_m_ratio_hb_cor = (
-            self.rbc_m_ratio * self.rbc_hb_cor_factor / self.m_hb_cor_factor
-        )
-        self.image_rbc_hb_cor = self.image_rbc * self.rbc_hb_cor_factor
-        self.image_rbc2gas_hb_cor = self.image_rbc2gas * self.rbc_hb_cor_factor
-        self.image_membrane_hb_cor = self.image_membrane * self.m_hb_cor_factor
-        self.image_membrane2gas_hb_cor = self.image_membrane2gas * self.m_hb_cor_factor
 
     def get_statistics(self) -> Dict[str, Any]:
         """Calculate image statistics.
@@ -627,74 +610,6 @@ class Subject(object):
                 self.config.params.mean_rbc,
             ),
         }
-
-        # if applying hb correction, get hb-corrected stats
-        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE.value:
-            dict_stats_hb_cor = {
-                constants.StatsIOFields.RBC_M_RATIO_HB_COR: self.rbc_m_ratio_hb_cor,
-                constants.StatsIOFields.SNR_RBC_HB_COR: metrics.snr(
-                    self.image_rbc_hb_cor, self.mask
-                )[0],
-                constants.StatsIOFields.SNR_MEMBRANE_HB_COR: metrics.snr(
-                    self.image_membrane_hb_cor, self.mask
-                )[0],
-                constants.StatsIOFields.PCT_RBC_DEFECT_HB_COR: metrics.bin_percentage(
-                    self.image_rbc2gas_hb_cor_binned, np.array([1]), self.mask
-                ),
-                constants.StatsIOFields.PCT_RBC_LOW_HB_COR: metrics.bin_percentage(
-                    self.image_rbc2gas_binned, np.array([2]), self.mask
-                ),
-                constants.StatsIOFields.PCT_RBC_HIGH_HB_COR: metrics.bin_percentage(
-                    self.image_rbc2gas_hb_cor_binned, np.array([5, 6]), self.mask
-                ),
-                constants.StatsIOFields.PCT_MEMBRANE_DEFECT_HB_COR: metrics.bin_percentage(
-                    self.image_membrane2gas_hb_cor_binned, np.array([1]), self.mask
-                ),
-                constants.StatsIOFields.PCT_MEMBRANE_LOW_HB_COR: metrics.bin_percentage(
-                    self.image_membrane2gas_hb_cor_binned, np.array([2]), self.mask
-                ),
-                constants.StatsIOFields.PCT_MEMBRANE_HIGH_HB_COR: metrics.bin_percentage(
-                    self.image_membrane2gas_hb_cor_binned,
-                    np.array([6, 7, 8]),
-                    self.mask,
-                ),
-                constants.StatsIOFields.MEAN_RBC_HB_COR: metrics.mean(
-                    self.image_rbc2gas_hb_cor, self.mask_vent
-                ),
-                constants.StatsIOFields.MEAN_MEMBRANE_HB_COR: metrics.mean(
-                    self.image_membrane2gas_hb_cor, self.mask_vent
-                ),
-                constants.StatsIOFields.MEDIAN_RBC_HB_COR: metrics.median(
-                    self.image_rbc2gas_hb_cor, self.mask_vent
-                ),
-                constants.StatsIOFields.MEDIAN_MEMBRANE_HB_COR: metrics.median(
-                    self.image_membrane2gas_hb_cor, self.mask_vent
-                ),
-                constants.StatsIOFields.STDDEV_RBC_HB_COR: metrics.std(
-                    self.image_rbc2gas_hb_cor, self.mask_vent
-                ),
-                constants.StatsIOFields.STDDEV_MEMBRANE_HB_COR: metrics.std(
-                    self.image_membrane2gas_hb_cor, self.mask_vent
-                ),
-                constants.StatsIOFields.KCO_HB_COR: metrics.kco(
-                    self.image_membrane2gas_hb_cor,
-                    self.image_rbc2gas_hb_cor,
-                    self.mask_vent,
-                    self.config.params.mean_membrane,
-                    self.config.params.mean_rbc,
-                ),
-                constants.StatsIOFields.DLCO_HB_COR: metrics.dlco(
-                    self.image_gas_binned,
-                    self.image_membrane2gas_hb_cor,
-                    self.image_rbc2gas_hb_cor,
-                    self.mask,
-                    self.mask_vent,
-                    self.dict_dis[constants.IOFields.FOV],
-                    self.config.params.mean_membrane,
-                    self.config.params.mean_rbc,
-                ),
-            }
-            self.dict_stats.update(dict_stats_hb_cor)
 
         return self.dict_stats
 
@@ -879,51 +794,6 @@ class Subject(object):
             refer_fit=constants.MEMBRANEHISTOGRAMFields.REFERENCE_FIT,
         )
 
-        # if applying hb correction, generate hb-corrected figures
-        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE.value:
-            plot.plot_montage_color(
-                image=plot.map_and_overlay_to_rgb(
-                    self.image_rbc2gas_hb_cor_binned,
-                    proton_reg,
-                    constants.CMAP.RBC_BIN2COLOR,
-                ),
-                path="tmp/montage_rbc_hb_cor_binned.png",
-                index_start=index_start,
-                index_skip=index_skip,
-            )
-            plot.plot_montage_color(
-                image=plot.map_and_overlay_to_rgb(
-                    self.image_membrane2gas_hb_cor_binned,
-                    proton_reg,
-                    constants.CMAP.MEMBRANE_BIN2COLOR,
-                ),
-                path="tmp/montage_membrane_hb_cor_binned.png",
-                index_start=index_start,
-                index_skip=index_skip,
-            )
-            plot.plot_histogram(
-                data=np.abs(self.image_rbc2gas_hb_cor)[
-                    np.array(self.mask, dtype=bool)
-                ].flatten(),
-                path="tmp/hist_rbc_hb_cor.png",
-                color=constants.RBCHISTOGRAMFields.COLOR,
-                xlim=constants.RBCHISTOGRAMFields.XLIM,
-                ylim=constants.RBCHISTOGRAMFields.YLIM,
-                num_bins=constants.RBCHISTOGRAMFields.NUMBINS,
-                refer_fit=constants.RBCHISTOGRAMFields.REFERENCE_FIT,
-            )
-            plot.plot_histogram(
-                data=np.abs(self.image_membrane2gas_hb_cor)[
-                    np.array(self.mask, dtype=bool)
-                ].flatten(),
-                path="tmp/hist_membrane_hb_cor.png",
-                color=constants.MEMBRANEHISTOGRAMFields.COLOR,
-                xlim=constants.MEMBRANEHISTOGRAMFields.XLIM,
-                ylim=constants.MEMBRANEHISTOGRAMFields.YLIM,
-                num_bins=constants.MEMBRANEHISTOGRAMFields.NUMBINS,
-                refer_fit=constants.MEMBRANEHISTOGRAMFields.REFERENCE_FIT,
-            )
-
     def generate_pdf(self):
         """Generate HTML and PDF files."""
         path = os.path.join(
@@ -950,18 +820,6 @@ class Subject(object):
             "report_qa_{}.pdf".format(self.config.subject_id),
         )
         report.qa({**self.dict_stats, **self.config.params.reference_stats}, path=path)
-
-        # if applying hb correction, generate hb-corrected pdf reports
-        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE.value:
-            path = os.path.join(
-                self.config.data_dir,
-                "report_clinical_hb_cor_{}.pdf".format(self.config.subject_id),
-            )
-            report.clinical(
-                {**self.dict_stats, **self.config.params.reference_stats},
-                path=path,
-                hb_cor=True,
-            )
 
     def write_stats_to_csv(self):
         """Write statistics to file."""
@@ -1042,42 +900,3 @@ class Subject(object):
             ),
             "tmp/gas_rgb.nii",
         )
-
-        # if applying hb correction, save hb-corrected images
-        if self.config.hb_cor_key != constants.HbCorrectionKey.NONE.value:
-            io_utils.export_nii(
-                self.image_rbc2gas_hb_cor_binned,
-                "tmp/rbc_hb_cor_binned.nii",
-                self.dict_dis[constants.IOFields.FOV],
-            )
-            io_utils.export_nii(
-                np.abs(self.image_rbc_hb_cor),
-                "tmp/rbc_hb_cor.nii",
-                self.dict_dis[constants.IOFields.FOV],
-            )
-            io_utils.export_nii(
-                np.abs(self.image_membrane_hb_cor),
-                "tmp/membrane_hb_cor.nii",
-                self.dict_dis[constants.IOFields.FOV],
-            )
-            io_utils.export_nii(
-                np.abs(self.image_membrane2gas_hb_cor),
-                "tmp/membrane2gas_hb_cor.nii",
-                self.dict_dis[constants.IOFields.FOV],
-            )
-            io_utils.export_nii_4d(
-                plot.map_and_overlay_to_rgb(
-                    self.image_rbc2gas_hb_cor_binned,
-                    proton_reg,
-                    constants.CMAP.RBC_BIN2COLOR,
-                ),
-                "tmp/rbc2gas_hb_cor_rgb.nii",
-            )
-            io_utils.export_nii_4d(
-                plot.map_and_overlay_to_rgb(
-                    self.image_membrane2gas_hb_cor_binned,
-                    proton_reg,
-                    constants.CMAP.MEMBRANE_BIN2COLOR,
-                ),
-                "tmp/membrane2gas_hb_cor_rgb.nii",
-            )

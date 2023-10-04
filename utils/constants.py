@@ -298,24 +298,6 @@ class StatsIOFields(object):
     KCO = "kco"
     ALVEOLAR_VOLUME = "alveolar_volume"
 
-    RBC_M_RATIO_HB_COR = "rbc_m_ratio_hb_cor"
-    SNR_RBC_HB_COR = "snr_rbc_hb_cor"
-    SNR_MEMBRANE_HB_COR = "snr_membrane_hb_cor"
-    PCT_RBC_HIGH_HB_COR = "pct_rbc_high_hb_cor"
-    PCT_RBC_LOW_HB_COR = "pct_rbc_low_hb_cor"
-    PCT_RBC_DEFECT_HB_COR = "pct_rbc_defect_hb_cor"
-    PCT_MEMBRANE_HIGH_HB_COR = "pct_membrane_high_hb_cor"
-    PCT_MEMBRANE_LOW_HB_COR = "pct_membrane_low_hb_cor"
-    PCT_MEMBRANE_DEFECT_HB_COR = "pct_membrane_defect_hb_cor"
-    MEAN_RBC_HB_COR = "mean_rbc_hb_cor"
-    MEAN_MEMBRANE_HB_COR = "mean_membrane_hb_cor"
-    MEDIAN_RBC_HB_COR = "median_rbc_hb_cor"
-    MEDIAN_MEMBRANE_HB_COR = "median_membrane_hb_cor"
-    STDDEV_RBC_HB_COR = "stddev_rbc_hb_cor"
-    STDDEV_MEMBRANE_HB_COR = "stddev_membrane_hb_cor"
-    DLCO_HB_COR = "dlco_hb_cor"
-    KCO_HB_COR = "kco_hb_cor"
-
 
 class MatIOFields(object):
     """Mat file IO Fields."""
