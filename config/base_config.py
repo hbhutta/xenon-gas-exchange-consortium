@@ -44,7 +44,7 @@ class Config(config_dict.ConfigDict):
         self.segmentation_key = constants.SegmentationKey.CNN_VENT.value
         self.registration_key = constants.RegistrationKey.SKIP.value
         self.bias_key = constants.BiasfieldKey.N4ITK.value
-        self.hb_cor_key = constants.HbCorrectionKey.NONE.value
+        self.hb_correction_key = constants.HbCorrectionKey.NONE.value
         self.hb = constants.HbCorEqs.HB_REF
         self.site = constants.Site.DUKE.value
         self.subject_id = "test"

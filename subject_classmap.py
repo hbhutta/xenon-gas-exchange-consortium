@@ -732,7 +732,7 @@ class Subject(object):
             constants.IOFields.GRAD_DELAY_Z: self.dict_dis[
                 constants.IOFields.GRAD_DELAY_Z
             ],
-            constants.IOFields.HB_COR_KEY: self.config.hb_cor_key,
+            constants.IOFields.HB_CORRECTION_KEY: self.config.hb_correction_key,
             constants.IOFields.HB: self.config.hb,
             constants.IOFields.RBC_HB_COR_FACTOR: self.rbc_hb_cor_factor,
             constants.IOFields.M_HB_COR_FACTOR: self.m_hb_cor_factor,
