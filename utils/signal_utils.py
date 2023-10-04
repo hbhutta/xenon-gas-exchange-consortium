@@ -440,13 +440,13 @@ def get_hb_correction(hb: float) -> Tuple[float, float]:
         m_hb_cor_factor (float): membrane hb correction factor
     """
 
-    rbc_hb_cor_factor = constants.HbCorEqs.R1 + (
-        constants.HbCorEqs.HB_REF * (1 - constants.HbCorEqs.R1) / hb
+    rbc_hb_cor_factor = constants.HbCorrection.R1 + (
+        constants.HbCorrection.HB_REF * (1 - constants.HbCorrection.R1) / hb
     )
-    m_hb_cor_factor = (1 + constants.HbCorEqs.M1 * hb) / (
+    m_hb_cor_factor = (1 + constants.HbCorrection.M1 * hb) / (
         1
-        + constants.HbCorEqs.M1 * constants.HbCorEqs.HB_REF
-        - constants.HbCorEqs.M2 * (constants.HbCorEqs.HB_REF - hb)
+        + constants.HbCorrection.M1 * constants.HbCorrection.HB_REF
+        - constants.HbCorrection.M2 * (constants.HbCorrection.HB_REF - hb)
     )
 
     return rbc_hb_cor_factor, m_hb_cor_factor
