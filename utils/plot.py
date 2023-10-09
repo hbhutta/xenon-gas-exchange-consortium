@@ -7,11 +7,12 @@ from typing import Dict, List, Optional, Tuple
 import skimage
 
 sys.path.append("..")
+import cv2
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as stats
-import cv2
+
 from utils import constants, io_utils
 
 
@@ -413,8 +414,8 @@ def plot_histogram(
     try:
         xticklabels = ["{:.1f}".format(x) for x in xticks]
         yticklabels = ["{:.2f}".format(x) for x in yticks]
-        plt.xticks(xticks, xticklabels, fontsize=40)
-        plt.yticks(yticks, yticklabels, fontsize=40)
+        plt.xticks(xticks, xticklabels, fontsize=35)
+        plt.yticks(yticks, yticklabels, fontsize=35)
     except TypeError:
         plt.xticks(fontsize=40)
         plt.yticks(fontsize=40)

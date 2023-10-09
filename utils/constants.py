@@ -1,6 +1,8 @@
 """Define important constants used throughout the pipeline."""
 import enum
 
+import numpy as np
+
 FOVINFLATIONSCALE3D = 1000.0
 
 _DEFAULT_SLICE_THICKNESS = 3.125
@@ -318,6 +320,8 @@ class VENTHISTOGRAMFields(object):
     YLIM = 0.07
     NUMBINS = 50
     REFERENCE_FIT = (0.04074, 0.619, 0.196)
+    XTICKS = np.linspace(0, XLIM, 4)
+    YTICKS = np.linspace(0, YLIM, 5)
 
 
 class RBCHISTOGRAMFields(object):
@@ -328,6 +332,8 @@ class RBCHISTOGRAMFields(object):
     YLIM = 0.1
     NUMBINS = 50
     REFERENCE_FIT = (0.06106, 0.471, 0.259)
+    XTICKS = np.linspace(0, XLIM, 4)
+    YTICKS = np.linspace(0, YLIM, 5)
 
 
 class MEMBRANEHISTOGRAMFields(object):
@@ -338,6 +344,8 @@ class MEMBRANEHISTOGRAMFields(object):
     YLIM = 0.18
     NUMBINS = 70
     REFERENCE_FIT = (0.0700, 0.736, 0.278)
+    XTICKS = np.linspace(0, XLIM, 4)
+    YTICKS = np.linspace(0, YLIM, 5)
 
 
 class PDFOPTIONS(object):

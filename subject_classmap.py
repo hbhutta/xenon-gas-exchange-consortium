@@ -765,6 +765,8 @@ class Subject(object):
             ylim=constants.VENTHISTOGRAMFields.YLIM,
             num_bins=constants.VENTHISTOGRAMFields.NUMBINS,
             refer_fit=constants.VENTHISTOGRAMFields.REFERENCE_FIT,
+            xticks=constants.VENTHISTOGRAMFields.XTICKS,
+            yticks=constants.VENTHISTOGRAMFields.YTICKS,
         )
         plot.plot_histogram(
             data=np.abs(self.image_rbc2gas)[np.array(self.mask, dtype=bool)].flatten(),
@@ -774,6 +776,8 @@ class Subject(object):
             ylim=constants.RBCHISTOGRAMFields.YLIM,
             num_bins=constants.RBCHISTOGRAMFields.NUMBINS,
             refer_fit=constants.RBCHISTOGRAMFields.REFERENCE_FIT,
+            xticks=constants.RBCHISTOGRAMFields.XTICKS,
+            yticks=constants.RBCHISTOGRAMFields.YTICKS,
         )
         plot.plot_histogram(
             data=np.abs(self.image_membrane2gas)[
@@ -785,6 +789,8 @@ class Subject(object):
             ylim=constants.MEMBRANEHISTOGRAMFields.YLIM,
             num_bins=constants.MEMBRANEHISTOGRAMFields.NUMBINS,
             refer_fit=constants.MEMBRANEHISTOGRAMFields.REFERENCE_FIT,
+            xticks=constants.MEMBRANEHISTOGRAMFields.XTICKS,
+            yticks=constants.MEMBRANEHISTOGRAMFields.YTICKS,
         )
 
     def generate_pdf(self):
