@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 import numpy as np
 import pdfkit
+import PyPDF2
 from git.repo import Repo
 
 sys.path.append("..")
@@ -148,3 +149,16 @@ def qa(dict_stats: Dict[str, Any], path: str):
         o.write(rendered)
     # write clinical report to pdf
     pdfkit.from_file(path_html, path, options=PDF_OPTIONS)
+
+
+def combine_pdfs(pdf_list: list, path: str):
+    pdf_writer = PyPDF2.PdfWriter()
+
+    for pdf in pdf_list:
+        pdf_reader = PyPDF2.PdfReader(pdf)
+        for page_num in range(len(pdf_reader.pages)):
+            page = pdf_reader.pages[page_num]
+            pdf_writer.add_page(page)
+
+    with open(path, "wb") as output_file:
+        pdf_writer.write(output_file)

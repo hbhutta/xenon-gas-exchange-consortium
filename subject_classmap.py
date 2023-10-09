@@ -789,30 +789,33 @@ class Subject(object):
 
     def generate_pdf(self):
         """Generate HTML and PDF files."""
-        path = os.path.join(
-            self.config.data_dir,
-            "report_intro_{}.pdf".format(self.config.subject_id),
-        )
-        report.intro(self.dict_info, path=path)
-        path = os.path.join(
-            self.config.data_dir,
-            "report_grayscale_{}.pdf".format(self.config.subject_id),
-        )
+
+        # generate individual PDFs
+        pdf_list = [
+            os.path.join(self.config.data_dir, pdf)
+            for pdf in ["intro.pdf", "grayscale.pdf", "clinical.pdf", "qa"]
+        ]
+        report.intro(self.dict_info, path=pdf_list[0])
         report.grayscale(
-            {**self.dict_stats, **self.config.params.reference_stats}, path=path
-        )
-        path = os.path.join(
-            self.config.data_dir,
-            "report_clinical_{}.pdf".format(self.config.subject_id),
+            {**self.dict_stats, **self.config.params.reference_stats}, path=pdf_list[1]
         )
         report.clinical(
-            {**self.dict_stats, **self.config.params.reference_stats}, path=path
+            {**self.dict_stats, **self.config.params.reference_stats}, path=pdf_list[2]
         )
+        report.qa(
+            {**self.dict_stats, **self.config.params.reference_stats}, path=pdf_list[3]
+        )
+
+        # combine PDFs into one
         path = os.path.join(
             self.config.data_dir,
-            "report_qa_{}.pdf".format(self.config.subject_id),
+            "report_{}.pdf".format(self.config.subject_id),
         )
-        report.qa({**self.dict_stats, **self.config.params.reference_stats}, path=path)
+        report.combine_pdfs(pdf_list, path)
+
+        # remove indvidual PDFs
+        for pdf in pdf_list:
+            os.remove(pdf)
 
     def write_stats_to_csv(self):
         """Write statistics to file."""
