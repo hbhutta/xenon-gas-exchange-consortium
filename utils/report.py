@@ -152,13 +152,23 @@ def qa(dict_stats: Dict[str, Any], path: str):
 
 
 def combine_pdfs(pdf_list: list, path: str):
+    """Combine PDFs into one.
+
+    Args:
+        pdf_list (list): list of file paths for PDFs to combine
+        path (str): output path to save combined PDF to
+    """
+
+    # initialize PdfWriter object
     pdf_writer = PyPDF2.PdfWriter()
 
+    # loop over each PDF and add it to combined PDF
     for pdf in pdf_list:
         pdf_reader = PyPDF2.PdfReader(pdf)
         for page_num in range(len(pdf_reader.pages)):
             page = pdf_reader.pages[page_num]
             pdf_writer.add_page(page)
 
+    # save combined PDF
     with open(path, "wb") as output_file:
         pdf_writer.write(output_file)
