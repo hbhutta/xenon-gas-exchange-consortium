@@ -427,3 +427,28 @@ def awgn(sig: np.ndarray, SNR: float) -> np.ndarray:
             np.random.randn(len(sig)) + 1j * np.random.randn(len(sig))
         )
     return sig + noise
+
+
+def get_hb_correction(hb: float) -> Tuple[float, float]:
+    """Get scaling factors for hb correction.
+
+    Args:
+        hb (float): subject hb in g/dL
+
+    Returns:
+        rbc_hb_correction_factor (float): rbc hb correction factor
+        membrane_hb_correction_factor (float): membrane hb correction factor
+
+    Reference: https://onlinelibrary.wiley.com/doi/10.1002/mrm.29712
+    """
+
+    rbc_hb_correction_factor = constants.HbCorrection.R1 + (
+        constants.HbCorrection.HB_REF * (1 - constants.HbCorrection.R1) / hb
+    )
+    membrane_hb_correction_factor = (1 + constants.HbCorrection.M1 * hb) / (
+        1
+        + constants.HbCorrection.M1 * constants.HbCorrection.HB_REF
+        - constants.HbCorrection.M2 * (constants.HbCorrection.HB_REF - hb)
+    )
+
+    return rbc_hb_correction_factor, membrane_hb_correction_factor

@@ -39,6 +39,10 @@ class IOFields(object):
     GRAD_DELAY_X = "grad_delay_x"
     GRAD_DELAY_Y = "grad_delay_y"
     GRAD_DELAY_Z = "grad_delay_z"
+    HB_CORRECTION_KEY = "hb_correction_key"
+    HB = "hb"
+    RBC_HB_CORRECTION_FACTOR = "rbc_hb_correction_factor"
+    MEMBRANE_HB_CORRECTION_FACTOR = "membrane_hb_correction_factor"
     IMAGE = "image"
     INFLATION = "inflation"
     KERNEL_SHARPNESS = "kernel_sharpness"
@@ -177,6 +181,20 @@ class ReconKey(enum.Enum):
     PLUMMER = "plummer"
 
 
+class HbCorrectionKey(enum.Enum):
+    """Hb correction flags.
+
+    Defines what level of Hb correction to apply to dissolved-phase signal. Options:
+    NONE: Apply no hb correction
+    RBC_AND_MEMBRANE: Apply Hb correction to both RBC and membrane signals
+    RBC_ONLY: Apply Hb correction only to RBC signal
+    """
+
+    NONE = "none"
+    RBC_AND_MEMBRANE = "rbc_and_membrane"
+    RBC_ONLY = "rbc_only"
+
+
 class ScanType(enum.Enum):
     """Scan type."""
 
@@ -250,6 +268,10 @@ class StatsIOFields(object):
     """Statistic IO Fields."""
 
     SUBJECT_ID = "subject_id"
+    HB_CORRECTION_KEY = "hb_correction_key"
+    HB = "hb"
+    RBC_HB_CORRECTION_FACTOR = "rbc_hb_correction_factor"
+    MEMBRANE_HB_CORRECTION_FACTOR = "membrane_hb_correction_factor"
     INFLATION = "inflation"
     RBC_M_RATIO = "rbc_m_ratio"
     SCAN_DATE = "scan_date"
@@ -377,3 +399,15 @@ class CMAP(object):
         7: [225.0 / 255.0, 129.0 / 255.0, 162.0 / 255.0],
         8: [197.0 / 255.0, 27.0 / 255.0, 125.0 / 255.0],
     }
+
+
+class HbCorrection(object):
+    """Coefficients for hb correction scaling factor equations.
+
+    Reference: https://onlinelibrary.wiley.com/doi/10.1002/mrm.29712
+    """
+
+    HB_REF = 14.0  # reference hb value in g/dL
+    R1 = 0.288  # coefficient of rbc hb correction equation
+    M1 = 0.029  # first coefficient of membrane hb correction equation
+    M2 = 0.011  # second coefficient of membrane hb correction equation

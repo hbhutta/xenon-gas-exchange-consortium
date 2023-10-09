@@ -3,9 +3,10 @@ import os
 import pdb
 import sys
 from typing import Any, Dict
-from git.repo import Repo
+
 import numpy as np
 import pdfkit
+from git.repo import Repo
 
 sys.path.append("..")
 from utils import constants

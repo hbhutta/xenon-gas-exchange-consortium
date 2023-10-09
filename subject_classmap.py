@@ -57,6 +57,8 @@ class Subject(object):
         image_rbc2gas_binned (np.array): binned image_rbc2gas
         mask (np.array): thoracic cavity mask
         mask_vent (np.ndarray): thoracic cavity mask without ventilation defects
+        membrane_hb_correction_factor (float): membrane hb correction scaling factor
+        rbc_hb_correction_factor (float): rbc hb correction scaling factor
         rbc_m_ratio (float): RBC to M ratio
         traj_dissolved (np.array): dissolved-phase trajectory of shape
             (n_projections, n_points, 3)
@@ -82,10 +84,12 @@ class Subject(object):
         self.image_membrane = np.array([0.0])
         self.image_membrane2gas = np.array([0.0])
         self.image_membrane2gas_binned = np.array([0.0])
+        self.membrane_hb_correction_factor = 1.0
         self.image_proton = np.array([0.0])
         self.image_rbc = np.array([0.0])
         self.image_rbc2gas = np.array([0.0])
         self.image_rbc2gas_binned = np.array([0.0])
+        self.rbc_hb_correction_factor = 1.0
         self.mask = np.array([0.0])
         self.mask_vent = np.array([0.0])
         self.rbc_m_ratio = 0.0
@@ -441,6 +445,26 @@ class Subject(object):
             rbc_m_ratio=self.rbc_m_ratio,
         )
 
+    def apply_hb_correction(self):
+        """Apply hemoglobin correction."""
+
+        # get hb correction scaling factors
+        (
+            self.rbc_hb_correction_factor,
+            self.membrane_hb_correction_factor,
+        ) = signal_utils.get_hb_correction(self.config.hb)
+
+        # if only applying correction to rbc signal, set membrane factor to 1
+        if self.config.hb_correction_key == constants.HbCorrectionKey.RBC_ONLY.value:
+            self.membrane_hb_correction_factor = 1.0
+
+        # scale dissolved phase signals by hb correction scaling factors
+        self.rbc_m_ratio *= (
+            self.rbc_hb_correction_factor / self.membrane_hb_correction_factor
+        )
+        self.image_rbc *= self.rbc_hb_correction_factor
+        self.image_membrane *= self.membrane_hb_correction_factor
+
     def dissolved_analysis(self):
         """Calculate the dissolved-phase images relative to gas image."""
         self.image_rbc2gas = img_utils.divide_images(
@@ -484,6 +508,10 @@ class Subject(object):
         """
         self.dict_stats = {
             constants.StatsIOFields.SUBJECT_ID: self.config.subject_id,
+            constants.StatsIOFields.HB_CORRECTION_KEY: self.config.hb_correction_key,
+            constants.StatsIOFields.HB: self.config.hb,
+            constants.StatsIOFields.RBC_HB_CORRECTION_FACTOR: self.rbc_hb_correction_factor,
+            constants.StatsIOFields.MEMBRANE_HB_CORRECTION_FACTOR: self.membrane_hb_correction_factor,
             constants.StatsIOFields.INFLATION: metrics.inflation_volume(
                 self.mask, self.dict_dis[constants.IOFields.FOV]
             ),
@@ -575,6 +603,7 @@ class Subject(object):
                 self.config.params.mean_rbc,
             ),
         }
+
         return self.dict_stats
 
     def get_info(self) -> Dict[str, Any]:
@@ -611,6 +640,10 @@ class Subject(object):
             constants.IOFields.GRAD_DELAY_Z: self.dict_dis[
                 constants.IOFields.GRAD_DELAY_Z
             ],
+            constants.IOFields.HB_CORRECTION_KEY: self.config.hb_correction_key,
+            constants.IOFields.HB: self.config.hb,
+            constants.IOFields.RBC_HB_CORRECTION_FACTOR: self.rbc_hb_correction_factor,
+            constants.IOFields.MEMBRANE_HB_CORRECTION_FACTOR: self.membrane_hb_correction_factor,
             constants.IOFields.KERNEL_SHARPNESS: self.config.recon.kernel_sharpness_hr,
             constants.IOFields.N_SKIP_START: self.config.recon.n_skip_start,
             constants.IOFields.N_DIS_REMOVED: len(
