@@ -136,8 +136,8 @@ class Params(object):
             "rbc_low_std": "6",
             "rbc_high_avg": "15",
             "rbc_high_std": "10",
-            "rbc_m_ratio_avg": "0.57",
-            "rbc_m_ratio_std": "0.07",
+            "rbc_m_ratio_avg": "0.589",
+            "rbc_m_ratio_std": "0.083",
             "inflation_avg": "3.4",
             "inflation_std": "0.33",
         }
