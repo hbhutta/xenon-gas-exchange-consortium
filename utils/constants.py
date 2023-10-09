@@ -268,6 +268,10 @@ class StatsIOFields(object):
     """Statistic IO Fields."""
 
     SUBJECT_ID = "subject_id"
+    HB_CORRECTION_KEY = "hb_correction_key"
+    HB = "hb"
+    RBC_HB_CORRECTION_FACTOR = "rbc_hb_correction_factor"
+    MEMBRANE_HB_CORRECTION_FACTOR = "membrane_hb_correction_factor"
     INFLATION = "inflation"
     RBC_M_RATIO = "rbc_m_ratio"
     SCAN_DATE = "scan_date"

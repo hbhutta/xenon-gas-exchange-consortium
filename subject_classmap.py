@@ -508,6 +508,10 @@ class Subject(object):
         """
         self.dict_stats = {
             constants.StatsIOFields.SUBJECT_ID: self.config.subject_id,
+            constants.StatsIOFields.HB_CORRECTION_KEY: self.config.hb_correction_key,
+            constants.StatsIOFields.HB: self.config.hb,
+            constants.StatsIOFields.RBC_HB_CORRECTION_FACTOR: self.rbc_hb_correction_factor,
+            constants.StatsIOFields.MEMBRANE_HB_CORRECTION_FACTOR: self.membrane_hb_correction_factor,
             constants.StatsIOFields.INFLATION: metrics.inflation_volume(
                 self.mask, self.dict_dis[constants.IOFields.FOV]
             ),
