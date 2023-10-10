@@ -130,9 +130,12 @@ class Subject(object):
         Read in the dynamic spectroscopy (if it exists) and the dissolved-phase image
         data.
         """
-        self.dict_dyn = io_utils.read_dyn_mrd(
-            io_utils.get_dyn_mrd_files(str(self.config.data_dir))
-        )
+        try:
+            self.dict_dyn = io_utils.read_dyn_mrd(
+                io_utils.get_dyn_mrd_files(str(self.config.data_dir))
+            )
+        except:
+            logging.info("No dynamic spectroscopy MRD file found")   
         self.dict_dis = io_utils.read_dis_mrd(
             io_utils.get_dis_mrd_files(str(self.config.data_dir))
         )
