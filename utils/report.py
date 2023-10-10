@@ -40,17 +40,34 @@ def get_git_branch() -> str:
 def format_dict(dict_stats: Dict[str, Any]) -> Dict[str, Any]:
     """Format dictionary for report.
 
-    Rounds values to 2 decimal places.
+    Rounds values to specified decimal places. If unspecified, rounds to 2 places.
     Args:
         dict_stats (Dict[str, Any]): dictionary of statistics
     Returns:
         Dict[str, Any]: formatted dictionary
     """
+    # list of variables to round to 0 decimal places
+    list_round_0 = [
+        constants.StatsIOFields.PCT_VENT_DEFECT,
+        constants.StatsIOFields.PCT_VENT_LOW,
+        constants.StatsIOFields.PCT_VENT_HIGH,
+        constants.StatsIOFields.PCT_RBC_DEFECT,
+        constants.StatsIOFields.PCT_RBC_LOW,
+        constants.StatsIOFields.PCT_RBC_HIGH,
+        constants.StatsIOFields.PCT_MEMBRANE_DEFECT,
+        constants.StatsIOFields.PCT_MEMBRANE_LOW,
+        constants.StatsIOFields.PCT_MEMBRANE_HIGH,
+    ]
+    # list of variables to round to 3 decimal places
     list_round_3 = [constants.StatsIOFields.RBC_M_RATIO]
     for key in dict_stats.keys():
-        if isinstance(dict_stats[key], float) and key in list_round_3:
+        if isinstance(dict_stats[key], float) and key in list_round_0:
+            dict_stats[key] = int(np.round(dict_stats[key], 0))
+        elif isinstance(dict_stats[key], float) and key in list_round_3:
             dict_stats[key] = np.round(dict_stats[key], 3)
-        elif isinstance(dict_stats[key], float) and key not in list_round_3:
+        elif isinstance(dict_stats[key], float) and (
+            key not in list_round_3 or key not in list_round_0
+        ):
             dict_stats[key] = np.round(dict_stats[key], 2)
     return dict_stats
 
