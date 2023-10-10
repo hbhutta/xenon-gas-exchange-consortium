@@ -496,19 +496,20 @@ def export_np(arr: np.ndarray, path: str):
     np.save(path, arr)
 
 
-def export_subject_csv(dict_stats: Dict[str, Any], path: str):
+def export_subject_csv(dict_stats: Dict[str, Any], path: str, overwrite=False):
     """Export statistics to running csv file.
 
     Uses the csv.DictWriter class to write a csv file. First, checks if the csv
     file exists and the header has been written. If not, writes the header. Then,
-    writes to a new row of data.
+    writes to a new file or new row of data in existing file.
 
     Args:
-        dict_stats: dictionary containing statistics to be exported
-        path: str file path of csv file
+        dict_stats (dict): dictionary containing statistics to be exported
+        path (str): file path of csv file
+        overwrite (bool): if True, overwrite existing csv file
     """
     header = dict_stats.keys()
-    if not os.path.exists(path):
+    if overwrite or (not os.path.exists(path)):
         with open(path, "w", newline="") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=header)
             writer.writeheader()
