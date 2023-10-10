@@ -109,12 +109,16 @@ class Subject(object):
         Read in the dynamic spectroscopy (if it exists) and the dissolved-phase image
         data.
         """
-        self.dict_dyn = io_utils.read_dyn_twix(
-            io_utils.get_dyn_twix_files(str(self.config.data_dir))
-        )
+
         self.dict_dis = io_utils.read_dis_twix(
             io_utils.get_dis_twix_files(str(self.config.data_dir))
         )
+        try:
+            self.dict_dyn = io_utils.read_dyn_twix(
+                io_utils.get_dyn_twix_files(str(self.config.data_dir))
+            )
+        except:
+            logging.info("No dynamic spectroscopy twix file found")
         if self.config.recon.recon_proton:
             self.dict_ute = io_utils.read_ute_twix(
                 io_utils.get_ute_twix_files(str(self.config.data_dir))
