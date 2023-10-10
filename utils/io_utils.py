@@ -501,8 +501,7 @@ def export_subject_csv(dict_stats: Dict[str, Any], path: str):
 
     Uses the csv.DictWriter class to write a csv file. First, checks if the csv
     file exists and the header has been written. If not, writes the header. Then,
-    writes the row of data. If the subject ID is repeated, the data will be
-    overwritten.
+    writes to a new row of data.
 
     Args:
         dict_stats: dictionary containing statistics to be exported

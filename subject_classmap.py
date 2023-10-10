@@ -825,7 +825,16 @@ class Subject(object):
 
     def write_stats_to_csv(self):
         """Write statistics to file."""
+        # write to combined csv of recently processed subjects
         io_utils.export_subject_csv(self.dict_stats, path="data/stats_all.csv")
+
+        # write to individual subject csv
+        io_utils.export_subject_csv(
+            self.dict_stats,
+            path=os.path.join(
+                self.config.data_dir, "stats_{}.csv".format(self.config.subject_id)
+            ),
+        )
 
     def save_subject_to_mat(self):
         """Save the instance variables into a mat file."""
