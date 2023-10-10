@@ -99,6 +99,9 @@ class Subject(object):
         self.traj_dissolved = np.array([])
         self.traj_gas = np.array([])
         self.traj_ute = np.array([])
+        io_utils.export_config_to_json(
+            self.config, os.path.join(self.config.data_dir, "config.json")
+        )
 
     def read_twix_files(self):
         """Read in twix files to dictionary.

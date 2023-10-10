@@ -17,6 +17,7 @@ import nibabel as nib
 import numpy as np
 import pandas as pd
 import scipy.io as sio
+from ml_collections import config_dict
 
 from utils import constants, mrd_utils, twix_utils
 
@@ -518,3 +519,18 @@ def export_subject_csv(dict_stats: Dict[str, Any], path: str, overwrite=False):
         with open(path, "a", newline="") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=header)
             writer.writerow(dict_stats)
+
+
+def export_config_to_json(config: config_dict, path: str) -> None:
+    """
+    Save a dictionary to a JSON file.
+
+    Args:
+    - data (ml_collections.ConfigDict): The config dictionary to save.
+    - path (str): The name of the file to save the dictionary to.
+
+    Returns:
+    - None
+    """
+    with open(path, "w") as f:
+        f.write(config.to_json_best_effort(indent=4))
