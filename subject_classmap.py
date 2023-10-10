@@ -375,7 +375,7 @@ class Subject(object):
         """
         if self.config.registration_key == constants.RegistrationKey.MASK2GAS.value:
             logging.info("Run registration algorithm, vent is fixed, mask is moving")
-            _, self.image_proton_reg = np.abs(
+            self.mask, self.image_proton_reg = np.abs(
                 registration.register_ants(
                     abs(self.image_gas_highreso), self.mask, self.image_proton
                 )
