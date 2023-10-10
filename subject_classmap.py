@@ -447,7 +447,7 @@ class Subject(object):
 
     def apply_hb_correction(self):
         """Apply hemoglobin correction."""
-
+        logging.info("Applying hemoglobin correction")
         # get hb correction scaling factors
         (
             self.rbc_hb_correction_factor,
@@ -846,7 +846,7 @@ class Subject(object):
         )
         io_utils.export_nii(
             np.abs(self.image_gas_highreso),
-            "tmp/gas_highreso.nii",
+            os.path.join(self.config.data_dir, "gas_highreso.nii"),
             self.dict_dis[constants.IOFields.FOV],
         )
         io_utils.export_nii(
@@ -869,7 +869,7 @@ class Subject(object):
         )
         io_utils.export_nii(
             self.mask.astype(float),
-            "tmp/mask.nii",
+            os.path.join(self.config.data_dir, "mask_reg.nii"),
             self.dict_dis[constants.IOFields.FOV],
         )
         io_utils.export_nii(
@@ -881,12 +881,18 @@ class Subject(object):
             io_utils.export_nii(
                 np.abs(self.image_proton),
                 "tmp/proton.nii",
+                self.dict_dis[constants.IOFields.FOV],
             )
+            io_utils.export_nii(
+                np.abs(self.image_proton_reg),
+                os.path.join(self.config.data_dir, "proton_reg.nii"),
+                self.dict_dis[constants.IOFields.FOV],
+            ),
         io_utils.export_nii_4d(
             plot.map_and_overlay_to_rgb(
                 self.image_rbc2gas_binned, proton_reg, constants.CMAP.RBC_BIN2COLOR
             ),
-            "tmp/rbc2gas_rgb.nii",
+            os.path.join(self.config.data_dir, "rbc2gas_rgb.nii"),
         )
         io_utils.export_nii_4d(
             plot.map_and_overlay_to_rgb(
@@ -894,11 +900,11 @@ class Subject(object):
                 proton_reg,
                 constants.CMAP.MEMBRANE_BIN2COLOR,
             ),
-            "tmp/membrane2gas_rgb.nii",
+            os.path.join(self.config.data_dir, "membrane2gas_rgb.nii"),
         )
         io_utils.export_nii_4d(
             plot.map_and_overlay_to_rgb(
                 self.image_gas_binned, proton_reg, constants.CMAP.VENT_BIN2COLOR
             ),
-            "tmp/gas_rgb.nii",
+            os.path.join(self.config.data_dir, "gas_rgb.nii"),
         )
