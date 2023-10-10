@@ -447,23 +447,29 @@ class Subject(object):
 
     def apply_hb_correction(self):
         """Apply hemoglobin correction."""
-        logging.info("Applying hemoglobin correction")
-        # get hb correction scaling factors
-        (
-            self.rbc_hb_correction_factor,
-            self.membrane_hb_correction_factor,
-        ) = signal_utils.get_hb_correction(self.config.hb)
+        if self.config.hb > 0:
+            logging.info("Applying hemoglobin correction")
+            # get hb correction scaling factors
+            (
+                self.rbc_hb_correction_factor,
+                self.membrane_hb_correction_factor,
+            ) = signal_utils.get_hb_correction(self.config.hb)
 
-        # if only applying correction to rbc signal, set membrane factor to 1
-        if self.config.hb_correction_key == constants.HbCorrectionKey.RBC_ONLY.value:
-            self.membrane_hb_correction_factor = 1.0
+            # if only applying correction to rbc signal, set membrane factor to 1
+            if (
+                self.config.hb_correction_key
+                == constants.HbCorrectionKey.RBC_ONLY.value
+            ):
+                self.membrane_hb_correction_factor = 1.0
 
-        # scale dissolved phase signals by hb correction scaling factors
-        self.rbc_m_ratio *= (
-            self.rbc_hb_correction_factor / self.membrane_hb_correction_factor
-        )
-        self.image_rbc *= self.rbc_hb_correction_factor
-        self.image_membrane *= self.membrane_hb_correction_factor
+            # scale dissolved phase signals by hb correction scaling factors
+            self.rbc_m_ratio *= (
+                self.rbc_hb_correction_factor / self.membrane_hb_correction_factor
+            )
+            self.image_rbc *= self.rbc_hb_correction_factor
+            self.image_membrane *= self.membrane_hb_correction_factor
+        else:
+            raise ValueError("Invalid hemoglobin value")
 
     def dissolved_analysis(self):
         """Calculate the dissolved-phase images relative to gas image."""
