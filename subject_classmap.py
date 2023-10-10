@@ -799,13 +799,13 @@ class Subject(object):
         # generate individual PDFs
         pdf_list = [
             os.path.join(self.config.data_dir, pdf)
-            for pdf in ["intro.pdf", "grayscale.pdf", "clinical.pdf", "qa"]
+            for pdf in ["intro.pdf", "clinical.pdf", "grayscale.pdf", "qa"]
         ]
         report.intro(self.dict_info, path=pdf_list[0])
-        report.grayscale(
+        report.clinical(
             {**self.dict_stats, **self.config.params.reference_stats}, path=pdf_list[1]
         )
-        report.clinical(
+        report.grayscale(
             {**self.dict_stats, **self.config.params.reference_stats}, path=pdf_list[2]
         )
         report.qa(
