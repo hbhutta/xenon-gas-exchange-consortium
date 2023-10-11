@@ -135,7 +135,7 @@ class Subject(object):
                 io_utils.get_dyn_mrd_files(str(self.config.data_dir))
             )
         except:
-            logging.info("No dynamic spectroscopy MRD file found")   
+            logging.info("No dynamic spectroscopy MRD file found")
         self.dict_dis = io_utils.read_dis_mrd(
             io_utils.get_dis_mrd_files(str(self.config.data_dir))
         )
@@ -605,8 +605,8 @@ class Subject(object):
                 self.image_membrane2gas,
                 self.image_rbc2gas,
                 self.mask_vent,
-                self.config.reference_data.mean_membrane,
-                self.config.reference_data.mean_rbc,
+                self.config.reference_data.reference_fit_membrane[1],
+                self.config.reference_data.reference_fit_rbc[1],
             ),
             constants.StatsIOFields.DLCO: metrics.dlco(
                 self.image_gas_binned,
@@ -615,8 +615,8 @@ class Subject(object):
                 self.mask,
                 self.mask_vent,
                 self.dict_dis[constants.IOFields.FOV],
-                self.config.reference_data.mean_membrane,
-                self.config.reference_data.mean_rbc,
+                self.config.reference_data.reference_fit_membrane[1],
+                self.config.reference_data.reference_fit_rbc[1],
             ),
         }
 
@@ -780,7 +780,7 @@ class Subject(object):
             xlim=constants.VENTHISTOGRAMFields.XLIM,
             ylim=constants.VENTHISTOGRAMFields.YLIM,
             num_bins=constants.VENTHISTOGRAMFields.NUMBINS,
-            refer_fit=constants.VENTHISTOGRAMFields.REFERENCE_FIT,
+            refer_fit=self.config.reference_data.reference_fit_vent,
             xticks=constants.VENTHISTOGRAMFields.XTICKS,
             yticks=constants.VENTHISTOGRAMFields.YTICKS,
         )
@@ -791,7 +791,7 @@ class Subject(object):
             xlim=constants.RBCHISTOGRAMFields.XLIM,
             ylim=constants.RBCHISTOGRAMFields.YLIM,
             num_bins=constants.RBCHISTOGRAMFields.NUMBINS,
-            refer_fit=constants.RBCHISTOGRAMFields.REFERENCE_FIT,
+            refer_fit=self.config.reference_data.reference_fit_rbc,
             xticks=constants.RBCHISTOGRAMFields.XTICKS,
             yticks=constants.RBCHISTOGRAMFields.YTICKS,
         )
@@ -804,7 +804,7 @@ class Subject(object):
             xlim=constants.MEMBRANEHISTOGRAMFields.XLIM,
             ylim=constants.MEMBRANEHISTOGRAMFields.YLIM,
             num_bins=constants.MEMBRANEHISTOGRAMFields.NUMBINS,
-            refer_fit=constants.MEMBRANEHISTOGRAMFields.REFERENCE_FIT,
+            refer_fit=self.config.reference_data.reference_fit_membrane,
             xticks=constants.MEMBRANEHISTOGRAMFields.XTICKS,
             yticks=constants.MEMBRANEHISTOGRAMFields.YTICKS,
         )
@@ -819,13 +819,16 @@ class Subject(object):
         ]
         report.intro(self.dict_info, path=pdf_list[0])
         report.clinical(
-            {**self.dict_stats, **self.config.reference_data.reference_stats}, path=pdf_list[1]
+            {**self.dict_stats, **self.config.reference_data.reference_stats},
+            path=pdf_list[1],
         )
         report.grayscale(
-            {**self.dict_stats, **self.config.reference_data.reference_stats}, path=pdf_list[2]
+            {**self.dict_stats, **self.config.reference_data.reference_stats},
+            path=pdf_list[2],
         )
         report.qa(
-            {**self.dict_stats, **self.config.reference_data.reference_stats}, path=pdf_list[3]
+            {**self.dict_stats, **self.config.reference_data.reference_stats},
+            path=pdf_list[3],
         )
 
         # combine PDFs into one

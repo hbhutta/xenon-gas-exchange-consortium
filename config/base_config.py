@@ -107,10 +107,9 @@ class ReferenceData(object):
         threshold_vent (np.array): ventilation thresholds for binning
         threshold_rbc (np.array): rbc thresholds for binning
         threshold_membrane (np.array): membrane thresholds for binning
-        mean_membrane (float): mean of membrane reference distribution
-        std_membrane (float): standard deviation of membrane reference distribution
-        mean_rbc (float): mean of rbc reference distribution
-        std_rbc (float): standard deviation of rbc reference distribution
+        reference_fit_vent (tuple): scaling factor, mean, and std of reference ventilation distribution
+        reference_fit_rbc (tuple): scaling factor, mean, and std of reference rbc distribution
+        reference_fit_membrane (tuple): scaling factor, mean, and std of reference membrane distribution
         reference_stats (dict): mean and std of defect, low, and high percentage of ventilation,
                                 membrane, and rbc reference data
     """
@@ -125,10 +124,9 @@ class ReferenceData(object):
             self.threshold_membrane = np.array(
                 [0.180, 0.458, 0.736, 1.014, 1.292, 1.57, 1.848]
             )
-            self.mean_membrane = 0.736
-            self.std_membrane = 0.278
-            self.mean_rbc = 0.471
-            self.std_rbc = 0.259
+            self.reference_fit_vent = (0.04074, 0.619, 0.196)
+            self.reference_fit_rbc = (0.06106, 0.471, 0.259)
+            self.reference_fit_membrane = (0.0700, 0.736, 0.278)
             self.reference_stats = {
                 "vent_defect_avg": "5",
                 "vent_defect_std": "3",
