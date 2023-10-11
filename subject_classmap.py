@@ -530,31 +530,9 @@ class Subject(object):
                 self.mask, self.dict_dis[constants.IOFields.FOV]
             ),
             constants.StatsIOFields.RBC_M_RATIO: self.rbc_m_ratio,
-            constants.StatsIOFields.SNR_RBC: metrics.snr(self.image_rbc, self.mask)[0],
-            constants.StatsIOFields.SNR_MEMBRANE: metrics.snr(
-                self.image_membrane, self.mask
-            )[0],
             constants.StatsIOFields.SNR_VENT: metrics.snr(
                 np.abs(self.image_gas_highreso), self.mask
             )[1],
-            constants.StatsIOFields.PCT_RBC_DEFECT: metrics.bin_percentage(
-                self.image_rbc2gas_binned, np.array([1]), self.mask
-            ),
-            constants.StatsIOFields.PCT_RBC_LOW: metrics.bin_percentage(
-                self.image_rbc2gas_binned, np.array([2]), self.mask
-            ),
-            constants.StatsIOFields.PCT_RBC_HIGH: metrics.bin_percentage(
-                self.image_rbc2gas_binned, np.array([5, 6]), self.mask
-            ),
-            constants.StatsIOFields.PCT_MEMBRANE_DEFECT: metrics.bin_percentage(
-                self.image_membrane2gas_binned, np.array([1]), self.mask
-            ),
-            constants.StatsIOFields.PCT_MEMBRANE_LOW: metrics.bin_percentage(
-                self.image_membrane2gas_binned, np.array([2]), self.mask
-            ),
-            constants.StatsIOFields.PCT_MEMBRANE_HIGH: metrics.bin_percentage(
-                self.image_membrane2gas_binned, np.array([6, 7, 8]), self.mask
-            ),
             constants.StatsIOFields.PCT_VENT_DEFECT: metrics.bin_percentage(
                 self.image_gas_binned, np.array([1]), self.mask
             ),
@@ -567,26 +545,48 @@ class Subject(object):
             constants.StatsIOFields.MEAN_VENT: metrics.mean(
                 img_utils.normalize(np.abs(self.image_gas_cor), self.mask), self.mask
             ),
-            constants.StatsIOFields.MEAN_RBC: metrics.mean(
-                self.image_rbc2gas, self.mask_vent
-            ),
-            constants.StatsIOFields.MEAN_MEMBRANE: metrics.mean(
-                self.image_membrane2gas, self.mask_vent
-            ),
             constants.StatsIOFields.MEDIAN_VENT: metrics.median(
                 img_utils.normalize(np.abs(self.image_gas_cor), self.mask), self.mask
-            ),
-            constants.StatsIOFields.MEDIAN_RBC: metrics.median(
-                self.image_rbc2gas, self.mask_vent
-            ),
-            constants.StatsIOFields.MEDIAN_MEMBRANE: metrics.median(
-                self.image_membrane2gas, self.mask_vent
             ),
             constants.StatsIOFields.STDDEV_VENT: metrics.std(
                 img_utils.normalize(np.abs(self.image_gas_cor), self.mask), self.mask
             ),
+            constants.StatsIOFields.SNR_RBC: metrics.snr(self.image_rbc, self.mask)[0],
+            constants.StatsIOFields.PCT_RBC_DEFECT: metrics.bin_percentage(
+                self.image_rbc2gas_binned, np.array([1]), self.mask
+            ),
+            constants.StatsIOFields.PCT_RBC_LOW: metrics.bin_percentage(
+                self.image_rbc2gas_binned, np.array([2]), self.mask
+            ),
+            constants.StatsIOFields.PCT_RBC_HIGH: metrics.bin_percentage(
+                self.image_rbc2gas_binned, np.array([5, 6]), self.mask
+            ),
+            constants.StatsIOFields.MEAN_RBC: metrics.mean(
+                self.image_rbc2gas, self.mask_vent
+            ),
+            constants.StatsIOFields.MEDIAN_RBC: metrics.median(
+                self.image_rbc2gas, self.mask_vent
+            ),
             constants.StatsIOFields.STDDEV_RBC: metrics.std(
                 self.image_rbc2gas, self.mask_vent
+            ),
+            constants.StatsIOFields.SNR_MEMBRANE: metrics.snr(
+                self.image_membrane, self.mask
+            )[0],
+            constants.StatsIOFields.PCT_MEMBRANE_DEFECT: metrics.bin_percentage(
+                self.image_membrane2gas_binned, np.array([1]), self.mask
+            ),
+            constants.StatsIOFields.PCT_MEMBRANE_LOW: metrics.bin_percentage(
+                self.image_membrane2gas_binned, np.array([2]), self.mask
+            ),
+            constants.StatsIOFields.PCT_MEMBRANE_HIGH: metrics.bin_percentage(
+                self.image_membrane2gas_binned, np.array([6, 7, 8]), self.mask
+            ),
+            constants.StatsIOFields.MEAN_MEMBRANE: metrics.mean(
+                self.image_membrane2gas, self.mask_vent
+            ),
+            constants.StatsIOFields.MEDIAN_MEMBRANE: metrics.median(
+                self.image_membrane2gas, self.mask_vent
             ),
             constants.StatsIOFields.STDDEV_MEMBRANE: metrics.std(
                 self.image_membrane2gas, self.mask_vent
