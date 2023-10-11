@@ -197,6 +197,18 @@ class HbCorrectionKey(enum.Enum):
     RBC_ONLY = "rbc_only"
 
 
+class ReferenceDataKey(enum.Enum):
+    """Reference data flags.
+
+    Defines which reference data to use. Options:
+    REFERENCE_218_PPM_01: Reference data for 218 ppm dissolved-phase rf excitation
+    MANUAL: Use when manualy adjusting default reference data
+    """
+
+    REFERENCE_218_PPM_01 = "reference_218_ppm_01"
+    MANUAL = "manual"
+
+
 class ScanType(enum.Enum):
     """Scan type."""
 

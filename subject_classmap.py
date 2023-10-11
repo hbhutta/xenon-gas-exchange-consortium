@@ -442,7 +442,7 @@ class Subject(object):
         self.image_gas_binned = binning.linear_bin(
             image=img_utils.normalize(self.image_gas_cor, self.mask),
             mask=self.mask,
-            thresholds=self.config.params.threshold_vent,
+            thresholds=self.config.reference_data.threshold_vent,
         )
         self.mask_vent = np.logical_and(self.image_gas_binned > 1, self.mask)
 
@@ -508,12 +508,12 @@ class Subject(object):
         self.image_rbc2gas_binned = binning.linear_bin(
             image=self.image_rbc2gas,
             mask=self.mask_vent,
-            thresholds=self.config.params.threshold_rbc,
+            thresholds=self.config.reference_data.threshold_rbc,
         )
         self.image_membrane2gas_binned = binning.linear_bin(
             image=self.image_membrane2gas,
             mask=self.mask_vent,
-            thresholds=self.config.params.threshold_membrane,
+            thresholds=self.config.reference_data.threshold_membrane,
         )
 
     def get_statistics(self) -> Dict[str, Any]:
@@ -605,8 +605,8 @@ class Subject(object):
                 self.image_membrane2gas,
                 self.image_rbc2gas,
                 self.mask_vent,
-                self.config.params.mean_membrane,
-                self.config.params.mean_rbc,
+                self.config.reference_data.mean_membrane,
+                self.config.reference_data.mean_rbc,
             ),
             constants.StatsIOFields.DLCO: metrics.dlco(
                 self.image_gas_binned,
@@ -615,8 +615,8 @@ class Subject(object):
                 self.mask,
                 self.mask_vent,
                 self.dict_dis[constants.IOFields.FOV],
-                self.config.params.mean_membrane,
-                self.config.params.mean_rbc,
+                self.config.reference_data.mean_membrane,
+                self.config.reference_data.mean_rbc,
             ),
         }
 
@@ -819,13 +819,13 @@ class Subject(object):
         ]
         report.intro(self.dict_info, path=pdf_list[0])
         report.clinical(
-            {**self.dict_stats, **self.config.params.reference_stats}, path=pdf_list[1]
+            {**self.dict_stats, **self.config.reference_data.reference_stats}, path=pdf_list[1]
         )
         report.grayscale(
-            {**self.dict_stats, **self.config.params.reference_stats}, path=pdf_list[2]
+            {**self.dict_stats, **self.config.reference_data.reference_stats}, path=pdf_list[2]
         )
         report.qa(
-            {**self.dict_stats, **self.config.params.reference_stats}, path=pdf_list[3]
+            {**self.dict_stats, **self.config.reference_data.reference_stats}, path=pdf_list[3]
         )
 
         # combine PDFs into one
