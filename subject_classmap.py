@@ -626,6 +626,7 @@ class Subject(object):
             constants.IOFields.SCAN_DATE: self.dict_dis[constants.IOFields.SCAN_DATE],
             constants.IOFields.PROCESS_DATE: metrics.process_date(),
             constants.IOFields.SCAN_TYPE: self.config.recon.scan_type,
+            constants.IOFields.PIPELINE_VERSION: constants.PipelineVersion.VERSION_NUMBER,
             constants.IOFields.SOFTWARE_VERSION: self.dict_dis[
                 constants.IOFields.SOFTWARE_VERSION
             ],

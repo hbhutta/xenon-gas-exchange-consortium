@@ -56,6 +56,7 @@ class IOFields(object):
     N_POINTS = "n_points"
     ORIENTATION = "orientation"
     OUTPUT_PATH = "output_path"
+    PIPELINE_VERSION = "pipeline_version"
     PIXEL_SIZE = "pixel_size"
     PROCESS_DATE = "process_date"
     PROTOCOL_NAME = "protocol_name"
@@ -404,3 +405,9 @@ class HbCorrection(object):
     R1 = 0.288  # coefficient of rbc hb correction equation
     M1 = 0.029  # first coefficient of membrane hb correction equation
     M2 = 0.011  # second coefficient of membrane hb correction equation
+
+
+class PipelineVersion(object):
+    """Pipeline version."""
+
+    VERSION_NUMBER = 4
