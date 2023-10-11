@@ -64,6 +64,7 @@ class IOFields(object):
     PROTON_REG_NII = "proton_reg_nii"
     RAMP_TIME = "ramp_time"
     RAW_PROTON_MONTAGE = "raw_proton_montage"
+    REFERENCE_DATA_KEY = "reference_data_key"
     REGISTRATION_KEY = "registration_key"
     REMOVEOS = "removeos"
     REMOVE_NOISE = "remove_noise"

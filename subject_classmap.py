@@ -679,6 +679,7 @@ class Subject(object):
                 )
             ),
             constants.IOFields.PROCESS_DATE: metrics.process_date(),
+            constants.IOFields.REFERENCE_DATA_KEY: self.config.reference_data_key,
             constants.IOFields.REMOVE_NOISE: self.config.recon.remove_noisy_projections,
             constants.IOFields.SCAN_DATE: self.dict_dis[constants.IOFields.SCAN_DATE],
             constants.IOFields.SCAN_TYPE: self.config.recon.scan_type,
