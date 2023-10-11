@@ -523,19 +523,13 @@ class Subject(object):
             dict_stats: Dictionary of statistics for reporting
         """
         self.dict_stats = {
-            constants.StatsIOFields.SUBJECT_ID: self.config.subject_id,
-            constants.StatsIOFields.HB_CORRECTION_KEY: self.config.hb_correction_key,
-            constants.StatsIOFields.HB: self.config.hb,
-            constants.StatsIOFields.RBC_HB_CORRECTION_FACTOR: self.rbc_hb_correction_factor,
-            constants.StatsIOFields.MEMBRANE_HB_CORRECTION_FACTOR: self.membrane_hb_correction_factor,
+            constants.IOFields.SUBJECT_ID: self.config.subject_id,
+            constants.IOFields.SCAN_DATE: self.dict_dis[constants.IOFields.SCAN_DATE],
+            constants.IOFields.PROCESS_DATE: metrics.process_date(),
             constants.StatsIOFields.INFLATION: metrics.inflation_volume(
                 self.mask, self.dict_dis[constants.IOFields.FOV]
             ),
             constants.StatsIOFields.RBC_M_RATIO: self.rbc_m_ratio,
-            constants.StatsIOFields.SCAN_DATE: self.dict_dis[
-                constants.IOFields.SCAN_DATE
-            ],
-            constants.StatsIOFields.PROCESS_DATE: metrics.process_date(),
             constants.StatsIOFields.SNR_RBC: metrics.snr(self.image_rbc, self.mask)[0],
             constants.StatsIOFields.SNR_MEMBRANE: metrics.snr(
                 self.image_membrane, self.mask
@@ -543,7 +537,6 @@ class Subject(object):
             constants.StatsIOFields.SNR_VENT: metrics.snr(
                 np.abs(self.image_gas_highreso), self.mask
             )[1],
-            constants.StatsIOFields.N_POINTS: self.data_gas.shape[1],
             constants.StatsIOFields.PCT_RBC_DEFECT: metrics.bin_percentage(
                 self.image_rbc2gas_binned, np.array([1]), self.mask
             ),
@@ -601,14 +594,14 @@ class Subject(object):
             constants.StatsIOFields.ALVEOLAR_VOLUME: metrics.alveolar_volume(
                 self.image_gas_binned, self.mask, self.dict_dis[constants.IOFields.FOV]
             ),
-            constants.StatsIOFields.KCO: metrics.kco(
+            constants.StatsIOFields.KCO_EST: metrics.kco(
                 self.image_membrane2gas,
                 self.image_rbc2gas,
                 self.mask_vent,
                 self.config.reference_data.reference_fit_membrane[1],
                 self.config.reference_data.reference_fit_rbc[1],
             ),
-            constants.StatsIOFields.DLCO: metrics.dlco(
+            constants.StatsIOFields.DLCO_EST: metrics.dlco(
                 self.image_gas_binned,
                 self.image_membrane2gas,
                 self.image_rbc2gas,
@@ -629,6 +622,15 @@ class Subject(object):
             dict_info: Dictionary of information.
         """
         self.dict_info = {
+            constants.IOFields.SUBJECT_ID: self.config.subject_id,
+            constants.IOFields.SCAN_DATE: self.dict_dis[constants.IOFields.SCAN_DATE],
+            constants.IOFields.PROCESS_DATE: metrics.process_date(),
+            constants.IOFields.SCAN_TYPE: self.config.recon.scan_type,
+            constants.IOFields.SOFTWARE_VERSION: self.dict_dis[
+                constants.IOFields.SOFTWARE_VERSION
+            ],
+            constants.IOFields.GIT_BRANCH: report.get_git_branch(),
+            constants.IOFields.REFERENCE_DATA_KEY: self.config.reference_data_key,
             constants.IOFields.BANDWIDTH: self.dict_dis[constants.IOFields.BANDWIDTH],
             constants.IOFields.DWELL_TIME: (
                 1e6 * self.dict_dis[constants.IOFields.DWELL_TIME]
@@ -646,7 +648,6 @@ class Subject(object):
             constants.IOFields.FREQ_EXCITATION: self.dict_dis[
                 constants.IOFields.FREQ_EXCITATION
             ],
-            constants.IOFields.GIT_BRANCH: report.get_git_branch(),
             constants.IOFields.GRAD_DELAY_X: self.dict_dis[
                 constants.IOFields.GRAD_DELAY_X
             ],
@@ -678,17 +679,9 @@ class Subject(object):
                     data=self.dict_dis[constants.IOFields.FIDS_GAS]
                 )
             ),
-            constants.IOFields.PROCESS_DATE: metrics.process_date(),
-            constants.IOFields.REFERENCE_DATA_KEY: self.config.reference_data_key,
             constants.IOFields.REMOVE_NOISE: self.config.recon.remove_noisy_projections,
-            constants.IOFields.SCAN_DATE: self.dict_dis[constants.IOFields.SCAN_DATE],
-            constants.IOFields.SCAN_TYPE: self.config.recon.scan_type,
             constants.IOFields.SHAPE_FIDS: self.dict_dis[constants.IOFields.FIDS].shape,
             constants.IOFields.SHAPE_IMAGE: self.image_gas_highreso.shape,
-            constants.IOFields.SOFTWARE_VERSION: self.dict_dis[
-                constants.IOFields.SOFTWARE_VERSION
-            ],
-            constants.IOFields.SUBJECT_ID: self.config.subject_id,
             constants.IOFields.T2_CORRECTION_FACTOR: signal_utils.calculate_t2star_correction(
                 self.dict_dis[constants.IOFields.TE90],
             ),
@@ -846,11 +839,13 @@ class Subject(object):
     def write_stats_to_csv(self):
         """Write statistics to file."""
         # write to combined csv of recently processed subjects
-        io_utils.export_subject_csv(self.dict_stats, path="data/stats_all.csv")
+        io_utils.export_subject_csv(
+            {**self.dict_info, **self.dict_stats}, path="data/stats_all.csv"
+        )
 
         # write to individual subject csv
         io_utils.export_subject_csv(
-            self.dict_stats,
+            {**self.dict_info, **self.dict_stats},
             path=os.path.join(
                 self.config.data_dir,
                 "stats_{}.csv".format(self.config.subject_id),
