@@ -21,30 +21,30 @@
         <img src="../tmp/hist_vent.png" style="width: 100%" />
         <div class="top-right">
           <h2>Ventilation</h2>
-          <p>SNR: {snr_vent}</p>
-          <p>Mean: {mean_vent}</p>
-          <p>Median: {median_vent}</p>
-          <p>SD: {stddev_vent}</p>
+          <p>SNR: {vent_snr}</p>
+          <p>Mean: {vent_mean}</p>
+          <p>Median: {vent_median}</p>
+          <p>SD: {vent_stddev}</p>
         </div>
       </div>
       <div class="hist-tile" align="right">
         <img src="../tmp/hist_membrane.png" style="width: 100%" />
         <div class="top-right">
           <h2>Membrane:gas</h2>
-          <p>SNR: {snr_membrane}</p>
-          <p>Mean: {mean_membrane}</p>
-          <p>Median: {median_membrane}</p>
-          <p>SD: {stddev_membrane}</p>
+          <p>SNR: {membrane_snr}</p>
+          <p>Mean: {membrane_mean}</p>
+          <p>Median: {membrane_median}</p>
+          <p>SD: {membrane_stddev}</p>
         </div>
       </div>
       <div class="hist-tile" align="right">
         <img src="../tmp/hist_rbc.png" style="width: 100%" />
         <div class="top-right">
           <h2>RBC:gas</h2>
-          <p>SNR: {snr_rbc}</p>
-          <p>Mean: {mean_rbc}</p>
-          <p>Median: {median_rbc}</p>
-          <p>SD: {stddev_rbc}</p>
+          <p>SNR: {rbc_snr}</p>
+          <p>Mean: {rbc_mean}</p>
+          <p>Median: {rbc_median}</p>
+          <p>SD: {rbc_stddev}</p>
         </div>
       </div>
     </div>
@@ -99,47 +99,47 @@
         </tr>
         <tr class="ven">
           <td>Defect</td>
-          <td>{pct_vent_defect}%</td>
+          <td>{vent_defect_pct}%</td>
           <td>{vent_defect_avg}&#177;{vent_defect_std}%</td>
         </tr>
         <tr class="ven">
           <td>Low</td>
-          <td>{pct_vent_low}%</td>
+          <td>{vent_low_pct}%</td>
           <td>{vent_low_avg}&#177;{vent_low_std}%</td>
         </tr>
         <tr class="ven">
           <td>High</td>
-          <td>{pct_vent_high}%</td>
+          <td>{vent_high_pct}%</td>
           <td>{vent_high_avg}&#177;{vent_high_std}%</td>
         </tr>
         <tr class="membrane">
           <td>Defect</td>
-          <td>{pct_membrane_defect}%</td>
+          <td>{membrane_defect_pct}%</td>
           <td>{membrane_defect_avg}&#177;{membrane_defect_std}%</td>
         </tr>
         <tr class="membrane">
           <td>Low</td>
-          <td>{pct_membrane_low}%</td>
+          <td>{membrane_low_pct}%</td>
           <td>{membrane_low_avg}&#177;{membrane_low_std}%</td>
         </tr>
         <tr class="membrane">
           <td>High</td>
-          <td>{pct_membrane_high}%</td>
+          <td>{membrane_high_pct}%</td>
           <td>{membrane_high_avg}&#177;{membrane_high_std}%</td>
         </tr>
         <tr class="rbc">
           <td>Defect</td>
-          <td>{pct_rbc_defect}%</td>
+          <td>{rbc_defect_pct}%</td>
           <td>{rbc_defect_avg}&#177;{rbc_defect_std}%</td>
         </tr>
         <tr class="rbc">
           <td>Low</td>
-          <td>{pct_rbc_low}%</td>
+          <td>{rbc_low_pct}%</td>
           <td>{rbc_low_avg}&#177;{rbc_low_std}%</td>
         </tr>
         <tr class="rbc">
           <td>High</td>
-          <td>{pct_rbc_high}%</td>
+          <td>{rbc_high_pct}%</td>
           <td>{rbc_high_avg}&#177;{rbc_high_std}%</td>
         </tr>
       </table>

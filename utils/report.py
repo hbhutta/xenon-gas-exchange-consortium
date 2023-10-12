@@ -48,15 +48,15 @@ def format_dict(dict_stats: Dict[str, Any]) -> Dict[str, Any]:
     """
     # list of variables to round to 0 decimal places
     list_round_0 = [
-        constants.StatsIOFields.PCT_VENT_DEFECT,
-        constants.StatsIOFields.PCT_VENT_LOW,
-        constants.StatsIOFields.PCT_VENT_HIGH,
-        constants.StatsIOFields.PCT_RBC_DEFECT,
-        constants.StatsIOFields.PCT_RBC_LOW,
-        constants.StatsIOFields.PCT_RBC_HIGH,
-        constants.StatsIOFields.PCT_MEMBRANE_DEFECT,
-        constants.StatsIOFields.PCT_MEMBRANE_LOW,
-        constants.StatsIOFields.PCT_MEMBRANE_HIGH,
+        constants.StatsIOFields.VENT_DEFECT_PCT,
+        constants.StatsIOFields.VENT_LOW_PCT,
+        constants.StatsIOFields.VENT_HIGH_PCT,
+        constants.StatsIOFields.RBC_DEFECT_PCT,
+        constants.StatsIOFields.RBC_LOW_PCT,
+        constants.StatsIOFields.RBC_HIGH_PCT,
+        constants.StatsIOFields.MEMBRANE_DEFECT_PCT,
+        constants.StatsIOFields.MEMBRANE_LOW_PCT,
+        constants.StatsIOFields.MEMBRANE_HIGH_PCT,
     ]
     # list of variables to round to 3 decimal places
     list_round_3 = [constants.StatsIOFields.RBC_M_RATIO]

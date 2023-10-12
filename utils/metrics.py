@@ -1,6 +1,6 @@
 """Metrics for evaluating images."""
-import pdb
 import math
+import pdb
 import sys
 from datetime import datetime
 
@@ -161,8 +161,8 @@ def dlco(
     mask: np.ndarray,
     mask_vent: np.ndarray,
     fov: float,
-    mean_membrane: float = 0.736,
-    mean_rbc: float = 0.471,
+    membrane_mean: float = 0.736,
+    rbc_mean: float = 0.471,
 ) -> float:
     """Get the DLCO of the image.
 
@@ -174,11 +174,11 @@ def dlco(
         mask: np.ndarray. thoracic cavity mask.
         mask_vent: np.ndarray. mask of the non-VDP region.
         fov: float. field of view in cm.
-        mean_membrane: float. The mean membrane in healthy subjects.
-        mean_rbc: float. The mean RBC in healthy subjects.
+        membrane_mean: float. The mean membrane in healthy subjects.
+        rbc_mean: float. The mean RBC in healthy subjects.
     """
     return kco(
-        image_membrane, image_rbc, mask_vent, mean_membrane, mean_rbc
+        image_membrane, image_rbc, mask_vent, membrane_mean, rbc_mean
     ) * alveolar_volume(image_gas, mask, fov)
 
 
@@ -204,8 +204,8 @@ def kco(
     image_membrane: np.ndarray,
     image_rbc: np.ndarray,
     mask: np.ndarray,
-    mean_membrane: float = 0.736,
-    mean_rbc: float = 0.471,
+    membrane_mean: float = 0.736,
+    rbc_mean: float = 0.471,
 ) -> float:
     """Get the KCO of the image.
 
@@ -214,11 +214,11 @@ def kco(
         image_membrane: np.ndarray. The membrane image.
         img_rbc: np.ndarray. The RBC image.
         mask: np.ndarray. mask of non-VDP region.
-        mean_membrane: float. The mean membrane in healthy subjects.
-        mean_rbc: float. The mean RBC in healthy subjects.
+        membrane_mean: float. The mean membrane in healthy subjects.
+        rbc_mean: float. The mean RBC in healthy subjects.
     """
-    membrane_rel = mean(image_membrane, mask) / mean_membrane
-    rbc_rel = mean(image_rbc, mask) / mean_rbc
+    membrane_rel = mean(image_membrane, mask) / membrane_mean
+    rbc_rel = mean(image_rbc, mask) / rbc_mean
     membrane_rel = 1.0 / membrane_rel if membrane_rel > 1 else membrane_rel
     return 1 / (
         1 / (constants.KCO_ALPHA * membrane_rel) + 1 / (constants.KCO_BETA * rbc_rel)
