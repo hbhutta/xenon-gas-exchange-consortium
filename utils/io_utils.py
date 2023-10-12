@@ -8,6 +8,7 @@ sys.path.append("..")
 import csv
 import glob
 import logging
+import shutil
 from typing import Any, Dict, List, Optional, Tuple
 
 import ismrmrd
@@ -534,3 +535,21 @@ def export_config_to_json(config: config_dict, path: str) -> None:
     """
     with open(path, "w") as f:
         f.write(config.to_json_best_effort(indent=4))
+
+
+def move_files(source_paths: list, destination_path: str) -> None:
+    """Move files to a new directory.
+
+    If target directory does not exist, it is created.
+    Args:
+        source_paths (list): list of paths of files to move
+        destination_path (str): path to move files to
+    """
+    # if target directory doesn't exist, create it
+    if not os.path.exists(destination_path):
+        os.makedirs(destination_path)
+    # move files to target directory
+    for path in source_paths:
+        fname = os.path.basename(path)
+        if os.path.isfile(path):
+            shutil.move(path, os.path.join(destination_path, fname))

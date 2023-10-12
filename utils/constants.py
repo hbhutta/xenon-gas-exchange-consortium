@@ -55,7 +55,6 @@ class IOFields(object):
     N_GAS_REMOVED = "n_gas_removed"
     N_POINTS = "n_points"
     ORIENTATION = "orientation"
-    OUTPUT_PATH = "output_path"
     PIPELINE_VERSION = "pipeline_version"
     PIXEL_SIZE = "pixel_size"
     PROCESS_DATE = "process_date"

@@ -100,7 +100,10 @@ class Subject(object):
         self.traj_gas = np.array([])
         self.traj_ute = np.array([])
         io_utils.export_config_to_json(
-            self.config, os.path.join(self.config.data_dir, "config.json")
+            self.config,
+            os.path.join(
+                self.config.data_dir, "config_{}.json".format(self.config.subject_id)
+            ),
         )
 
     def read_twix_files(self):
@@ -935,3 +938,21 @@ class Subject(object):
             ),
             os.path.join(self.config.data_dir, "gas_rgb.nii"),
         )
+
+    def move_output_files(self):
+        """Move output files into dedicated directory."""
+        # define output path
+        output_path = os.path.join(self.config.data_dir, "Gas_Exchange")
+
+        # define files to move
+        output_files = (
+            glob.glob(os.path.join(self.config.data_dir, "*.mat"))
+            + glob.glob(os.path.join(self.config.data_dir, "*.nii"))
+            + glob.glob(os.path.join(self.config.data_dir, "*.pdf"))
+            + glob.glob(os.path.join(self.config.data_dir, "*.csv"))
+            + glob.glob(os.path.join(self.config.data_dir, "*.py"))
+            + glob.glob(os.path.join(self.config.data_dir, "*.json"))
+        )
+
+        # move files
+        io_utils.move_files(output_files, output_path)

@@ -57,6 +57,7 @@ def gx_mapping_reconstruction(config: base_config.Config):
     subject.generate_figures()
     subject.generate_pdf()
     subject.save_files()
+    subject.move_output_files()
     logging.info("Complete")
 
 
