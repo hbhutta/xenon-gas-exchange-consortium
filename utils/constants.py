@@ -82,25 +82,6 @@ class IOFields(object):
     TRAJ = "traj"
 
 
-class OutputPaths(object):
-    """Output file names."""
-
-    GRE_MASK_NII = "GRE_mask.nii"
-    GRE_REG_PROTON_NII = "GRE_regproton.nii"
-    GRE_VENT_RAW_NII = "GRE_ventraw.nii"
-    GRE_VENT_COR_NII = "GRE_ventcor.nii"
-    GRE_VENT_BINNING_NII = "GRE_ventbinning.nii"
-    VEN_RAW_MONTAGE_PNG = "raw_ven_montage.png"
-    PROTON_REG_MONTAGE_PNG = "raw_proton_montage.png"
-    VEN_COR_MONTAGE_PNG = "bias_cor_ven_montage.png"
-    VEN_COLOR_MONTAGE_PNG = "ven_montage.png"
-    VEN_HIST_PNG = "ven_hist.png"
-    REPORT_CLINICAL_HTML = "report_clinical.html"
-    TEMP_GRE_CLINICAL_HTML = "temp_clinical_gre.html"
-    HTML_TMP = "html_tmp"
-    REPORT_CLINICAL = "report_clinical"
-
-
 class CNNPaths(object):
     """Paths to saved model files."""
 
