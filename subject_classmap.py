@@ -98,12 +98,6 @@ class Subject(object):
         self.traj_dissolved = np.array([])
         self.traj_gas = np.array([])
         self.traj_ute = np.array([])
-        io_utils.export_config_to_json(
-            self.config,
-            os.path.join(
-                self.config.data_dir, "config_{}.json".format(self.config.subject_id)
-            ),
-        )
 
     def read_twix_files(self):
         """Read in twix files to dictionary.
@@ -457,31 +451,38 @@ class Subject(object):
             rbc_m_ratio=self.rbc_m_ratio,
         )
 
-    def apply_hb_correction(self):
+    def hb_correction(self):
         """Apply hemoglobin correction."""
-        if self.config.hb > 0:
-            logging.info("Applying hemoglobin correction")
-            # get hb correction scaling factors
-            (
-                self.rbc_hb_correction_factor,
-                self.membrane_hb_correction_factor,
-            ) = signal_utils.get_hb_correction(self.config.hb)
+        if self.config.hb_correction_key != constants.HbCorrectionKey.NONE.value:
+            if self.config.hb > 0:
+                # get hb correction scaling factors
+                (
+                    self.rbc_hb_correction_factor,
+                    self.membrane_hb_correction_factor,
+                ) = signal_utils.get_hb_correction(self.config.hb)
 
-            # if only applying correction to rbc signal, set membrane factor to 1
-            if (
-                self.config.hb_correction_key
-                == constants.HbCorrectionKey.RBC_ONLY.value
-            ):
-                self.membrane_hb_correction_factor = 1.0
+                # if only applying correction to rbc signal, set membrane factor to 1
+                if (
+                    self.config.hb_correction_key
+                    == constants.HbCorrectionKey.RBC_ONLY.value
+                ):
+                    logging.info("Applying hemoglobin correction to RBC signal only")
+                    self.membrane_hb_correction_factor = 1.0
+                else:
+                    logging.info(
+                        "Applying hemoglobin correction to RBC and membrane signal"
+                    )
 
-            # scale dissolved phase signals by hb correction scaling factors
-            self.rbc_m_ratio *= (
-                self.rbc_hb_correction_factor / self.membrane_hb_correction_factor
-            )
-            self.image_rbc *= self.rbc_hb_correction_factor
-            self.image_membrane *= self.membrane_hb_correction_factor
+                # scale dissolved phase signals by hb correction scaling factors
+                self.rbc_m_ratio *= (
+                    self.rbc_hb_correction_factor / self.membrane_hb_correction_factor
+                )
+                self.image_rbc *= self.rbc_hb_correction_factor
+                self.image_membrane *= self.membrane_hb_correction_factor
+            else:
+                raise ValueError("Invalid hemoglobin value")
         else:
-            raise ValueError("Invalid hemoglobin value")
+            logging.info("Skipping hemoglobin correction")
 
     def dissolved_analysis(self):
         """Calculate the dissolved-phase images relative to gas image."""
@@ -936,6 +937,15 @@ class Subject(object):
                 self.image_gas_binned, proton_reg, constants.CMAP.VENT_BIN2COLOR
             ),
             os.path.join(self.config.data_dir, "gas_rgb.nii"),
+        )
+
+    def save_config_as_json(self):
+        """Save subject config .py file as json."""
+        io_utils.export_config_to_json(
+            self.config,
+            os.path.join(
+                self.config.data_dir, "config_{}.json".format(self.config.subject_id)
+            ),
         )
 
     def move_output_files(self):

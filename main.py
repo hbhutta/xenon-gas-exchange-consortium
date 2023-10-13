@@ -6,7 +6,6 @@ from ml_collections import config_flags
 
 from config import base_config
 from subject_classmap import Subject
-from utils import constants
 
 FLAGS = flags.FLAGS
 
@@ -45,8 +44,7 @@ def gx_mapping_reconstruction(config: base_config.Config):
     subject.biasfield_correction()
     subject.gas_binning()
     subject.dixon_decomposition()
-    if config.hb_correction_key != constants.HbCorrectionKey.NONE.value:
-        subject.apply_hb_correction()
+    subject.hb_correction()
     subject.dissolved_analysis()
     subject.dissolved_binning()
     subject.get_statistics()
@@ -56,6 +54,7 @@ def gx_mapping_reconstruction(config: base_config.Config):
     subject.generate_figures()
     subject.generate_pdf()
     subject.save_files()
+    subject.save_config_as_json()
     subject.move_output_files()
     logging.info("Complete")
 
