@@ -1,7 +1,6 @@
 """Miscellaneous util functions mostly image processing."""
 
 import os
-import pdb
 import sys
 
 import cv2
@@ -12,11 +11,9 @@ from typing import Any, List, Optional, Tuple
 import matplotlib
 
 matplotlib.use("TkAgg")
-import matplotlib.pyplot as plt
 import numpy as np
-import scipy
 import skimage
-from scipy import interpolate, ndimage
+from scipy import ndimage
 
 from utils import constants, io_utils
 

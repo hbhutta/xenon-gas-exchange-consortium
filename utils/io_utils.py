@@ -1,22 +1,21 @@
 """Import and export util functions."""
 
 import os
-import pdb
 import sys
 
 sys.path.append("..")
 import csv
 import glob
-import logging
+import shutil
 from typing import Any, Dict, List, Optional, Tuple
 
 import ismrmrd
 import mapvbvd
-import matplotlib
 import nibabel as nib
 import numpy as np
 import pandas as pd
 import scipy.io as sio
+from ml_collections import config_dict
 
 from utils import constants, mrd_utils, twix_utils
 
@@ -496,20 +495,20 @@ def export_np(arr: np.ndarray, path: str):
     np.save(path, arr)
 
 
-def export_subject_csv(dict_stats: Dict[str, Any], path: str):
+def export_subject_csv(dict_stats: Dict[str, Any], path: str, overwrite=False):
     """Export statistics to running csv file.
 
     Uses the csv.DictWriter class to write a csv file. First, checks if the csv
     file exists and the header has been written. If not, writes the header. Then,
-    writes the row of data. If the subject ID is repeated, the data will be
-    overwritten.
+    writes to a new file or new row of data in existing file.
 
     Args:
-        dict_stats: dictionary containing statistics to be exported
-        path: str file path of csv file
+        dict_stats (dict): dictionary containing statistics to be exported
+        path (str): file path of csv file
+        overwrite (bool): if True, overwrite existing csv file
     """
     header = dict_stats.keys()
-    if not os.path.exists(path):
+    if overwrite or (not os.path.exists(path)):
         with open(path, "w", newline="") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=header)
             writer.writeheader()
@@ -518,3 +517,36 @@ def export_subject_csv(dict_stats: Dict[str, Any], path: str):
         with open(path, "a", newline="") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=header)
             writer.writerow(dict_stats)
+
+
+def export_config_to_json(config: config_dict, path: str) -> None:
+    """
+    Save a dictionary to a JSON file.
+
+    Args:
+    - data (ml_collections.ConfigDict): The config dictionary to save.
+    - path (str): The name of the file to save the dictionary to.
+
+    Returns:
+    - None
+    """
+    with open(path, "w") as f:
+        f.write(config.to_json_best_effort(indent=4))
+
+
+def move_files(source_paths: list, destination_path: str) -> None:
+    """Move files to a new directory.
+
+    If target directory does not exist, it is created.
+    Args:
+        source_paths (list): list of paths of files to move
+        destination_path (str): path to move files to
+    """
+    # if target directory doesn't exist, create it
+    if not os.path.exists(destination_path):
+        os.makedirs(destination_path)
+    # move files to target directory
+    for path in source_paths:
+        fname = os.path.basename(path)
+        if os.path.isfile(path):
+            shutil.move(path, os.path.join(destination_path, fname))

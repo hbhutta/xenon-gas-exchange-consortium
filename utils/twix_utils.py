@@ -1,7 +1,6 @@
 """Twix file util functions."""
 
 import logging
-import pdb
 import sys
 
 sys.path.append("..")

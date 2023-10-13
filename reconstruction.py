@@ -1,11 +1,8 @@
 """Reconstruct 3D image from k-space data and trajectory."""
 
-
-import pdb
 import time
 
 import numpy as np
-import sigpy as sp
 from absl import app, logging
 
 from recon import dcf, kernel, proximity, recon_model, system_model

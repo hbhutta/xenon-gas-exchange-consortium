@@ -1,8 +1,7 @@
 """MRD util functions."""
 import logging
-import pdb
 import sys
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict
 
 import ismrmrd
 import numpy as np

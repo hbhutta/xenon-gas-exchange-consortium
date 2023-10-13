@@ -1,13 +1,11 @@
 """Scripts to run gas exchange mapping pipeline."""
 import logging
-import pdb
 
 from absl import app, flags
 from ml_collections import config_flags
 
 from config import base_config
 from subject_classmap import Subject
-from utils import constants
 
 FLAGS = flags.FLAGS
 
@@ -32,7 +30,6 @@ def gx_mapping_reconstruction(config: base_config.Config):
             subject.read_mrd_files()
         except:
             raise ValueError("Cannot read in raw data files.")
-    logging.info("Getting RBC:M ratio from static spectroscopy.")
     subject.calculate_rbc_m_ratio()
     logging.info("Reconstructing images")
     subject.preprocess()
@@ -40,15 +37,12 @@ def gx_mapping_reconstruction(config: base_config.Config):
     subject.reconstruction_dissolved()
     if config.recon.recon_proton:
         subject.reconstruction_ute()
-    logging.info("Segmenting Proton Mask")
     subject.segmentation()
     subject.registration()
     subject.biasfield_correction()
     subject.gas_binning()
     subject.dixon_decomposition()
-    if config.hb_correction_key != constants.HbCorrectionKey.NONE.value:
-        logging.info("Applying Hemoglobin Correction")
-        subject.apply_hb_correction()
+    subject.hb_correction()
     subject.dissolved_analysis()
     subject.dissolved_binning()
     subject.get_statistics()
@@ -58,6 +52,8 @@ def gx_mapping_reconstruction(config: base_config.Config):
     subject.generate_figures()
     subject.generate_pdf()
     subject.save_files()
+    subject.save_config_as_json()
+    subject.move_output_files()
     logging.info("Complete")
 
 
@@ -70,19 +66,21 @@ def gx_mapping_readin(config: base_config.Config):
     subject = Subject(config=config)
     subject.read_mat_file()
     if FLAGS.force_segmentation:
-        logging.info("Segmenting Proton Mask")
         subject.segmentation()
     subject.gas_binning()
-    subject.save_subject_to_mat()
     subject.dixon_decomposition()
+    subject.hb_correction()
     subject.dissolved_analysis()
     subject.dissolved_binning()
     subject.get_statistics()
     subject.get_info()
+    subject.save_subject_to_mat()
     subject.write_stats_to_csv()
     subject.generate_figures()
     subject.generate_pdf()
     subject.save_files()
+    subject.save_config_as_json()
+    subject.move_output_files()
     logging.info("Complete")
 
 

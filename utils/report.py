@@ -1,11 +1,11 @@
 """Make reports."""
 import os
-import pdb
 import sys
 from typing import Any, Dict
 
 import numpy as np
 import pdfkit
+import PyPDF2
 from git.repo import Repo
 
 sys.path.append("..")
@@ -39,17 +39,34 @@ def get_git_branch() -> str:
 def format_dict(dict_stats: Dict[str, Any]) -> Dict[str, Any]:
     """Format dictionary for report.
 
-    Rounds values to 2 decimal places.
+    Rounds values to specified decimal places. If unspecified, rounds to 2 places.
     Args:
         dict_stats (Dict[str, Any]): dictionary of statistics
     Returns:
         Dict[str, Any]: formatted dictionary
     """
+    # list of variables to round to 0 decimal places
+    list_round_0 = [
+        constants.StatsIOFields.VENT_DEFECT_PCT,
+        constants.StatsIOFields.VENT_LOW_PCT,
+        constants.StatsIOFields.VENT_HIGH_PCT,
+        constants.StatsIOFields.RBC_DEFECT_PCT,
+        constants.StatsIOFields.RBC_LOW_PCT,
+        constants.StatsIOFields.RBC_HIGH_PCT,
+        constants.StatsIOFields.MEMBRANE_DEFECT_PCT,
+        constants.StatsIOFields.MEMBRANE_LOW_PCT,
+        constants.StatsIOFields.MEMBRANE_HIGH_PCT,
+    ]
+    # list of variables to round to 3 decimal places
     list_round_3 = [constants.StatsIOFields.RBC_M_RATIO]
     for key in dict_stats.keys():
-        if isinstance(dict_stats[key], float) and key in list_round_3:
+        if isinstance(dict_stats[key], float) and key in list_round_0:
+            dict_stats[key] = int(np.round(dict_stats[key], 0))
+        elif isinstance(dict_stats[key], float) and key in list_round_3:
             dict_stats[key] = np.round(dict_stats[key], 3)
-        elif isinstance(dict_stats[key], float) and key not in list_round_3:
+        elif isinstance(dict_stats[key], float) and (
+            key not in list_round_3 or key not in list_round_0
+        ):
             dict_stats[key] = np.round(dict_stats[key], 2)
     return dict_stats
 
@@ -148,3 +165,26 @@ def qa(dict_stats: Dict[str, Any], path: str):
         o.write(rendered)
     # write clinical report to pdf
     pdfkit.from_file(path_html, path, options=PDF_OPTIONS)
+
+
+def combine_pdfs(pdf_list: list, path: str):
+    """Combine PDFs into one.
+
+    Args:
+        pdf_list (list): list of file paths for PDFs to combine
+        path (str): output path to save combined PDF to
+    """
+
+    # initialize PdfWriter object
+    pdf_writer = PyPDF2.PdfWriter()
+
+    # loop over each PDF and add it to combined PDF
+    for pdf in pdf_list:
+        pdf_reader = PyPDF2.PdfReader(pdf)
+        for page_num in range(len(pdf_reader.pages)):
+            page = pdf_reader.pages[page_num]
+            pdf_writer.add_page(page)
+
+    # save combined PDF
+    with open(path, "wb") as output_file:
+        pdf_writer.write(output_file)

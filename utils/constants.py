@@ -1,6 +1,8 @@
 """Define important constants used throughout the pipeline."""
 import enum
 
+import numpy as np
+
 FOVINFLATIONSCALE3D = 1000.0
 
 _DEFAULT_SLICE_THICKNESS = 3.125
@@ -32,7 +34,6 @@ class IOFields(object):
     FIELD_STRENGTH = "field_strength"
     FLIP_ANGLE_FACTOR = "flip_angle_factor"
     FOV = "fov"
-    FOV = "fov"
     FREQ_CENTER = "freq_center"
     FREQ_EXCITATION = "freq_excitation"
     GIT_BRANCH = "git_branch"
@@ -43,25 +44,19 @@ class IOFields(object):
     HB = "hb"
     RBC_HB_CORRECTION_FACTOR = "rbc_hb_correction_factor"
     MEMBRANE_HB_CORRECTION_FACTOR = "membrane_hb_correction_factor"
-    IMAGE = "image"
-    INFLATION = "inflation"
     KERNEL_SHARPNESS = "kernel_sharpness"
-    MASK_REG_NII = "mask_reg_nii"
     N_FRAMES = "n_frames"
     N_SKIP_END = "n_skip_end"
     N_SKIP_START = "n_skip_start"
     N_DIS_REMOVED = "n_dis_removed"
     N_GAS_REMOVED = "n_gas_removed"
-    NPTS = "npts"
+    N_POINTS = "n_points"
     ORIENTATION = "orientation"
-    OUTPUT_PATH = "output_path"
-    PIXEL_SIZE = "pixel_size"
+    PIPELINE_VERSION = "pipeline_version"
     PROCESS_DATE = "process_date"
     PROTOCOL_NAME = "protocol_name"
-    PROTON_DICOM_DIR = "proton_dicom_dir"
-    PROTON_REG_NII = "proton_reg_nii"
     RAMP_TIME = "ramp_time"
-    RAW_PROTON_MONTAGE = "raw_proton_montage"
+    REFERENCE_DATA_KEY = "reference_data_key"
     REGISTRATION_KEY = "registration_key"
     REMOVEOS = "removeos"
     REMOVE_NOISE = "remove_noise"
@@ -70,7 +65,6 @@ class IOFields(object):
     SEGMENTATION_KEY = "segmentation_key"
     SHAPE_FIDS = "shape_fids"
     SHAPE_IMAGE = "shape_image"
-    SITE = "site"
     SLICE_THICKNESS = "slice_thickness"
     SOFTWARE_VERSION = "software_version"
     SUBJECT_ID = "subject_id"
@@ -79,40 +73,6 @@ class IOFields(object):
     TR = "tr"
     TR_DIS = "tr_dis"
     TRAJ = "traj"
-    TRAJ_DIS = "traj_dis"
-    TRAJ_GAS = "traj_gas"
-    VEN_COR_MONTAGE = "bias_cor_ven_montage"
-    VEN_CV = "ven_cv"
-    VEN_DEFECT = "ven_defect"
-    VEN_HIGH = "ven_high"
-    VEN_HIST = "ven_hist"
-    VEN_LOW = "ven_low"
-    VEN_MEAN = "ven_mean"
-    VEN_MEDIAN = "ven_median"
-    VEN_MONTAGE = "ven_montage"
-    VEN_SKEW = "ven_skewness"
-    VEN_SNR = "ven_snr"
-    VEN_STD = "ven_std"
-    VENT_DICOM_DIR = "vent_dicom_dir"
-
-
-class OutputPaths(object):
-    """Output file names."""
-
-    GRE_MASK_NII = "GRE_mask.nii"
-    GRE_REG_PROTON_NII = "GRE_regproton.nii"
-    GRE_VENT_RAW_NII = "GRE_ventraw.nii"
-    GRE_VENT_COR_NII = "GRE_ventcor.nii"
-    GRE_VENT_BINNING_NII = "GRE_ventbinning.nii"
-    VEN_RAW_MONTAGE_PNG = "raw_ven_montage.png"
-    PROTON_REG_MONTAGE_PNG = "raw_proton_montage.png"
-    VEN_COR_MONTAGE_PNG = "bias_cor_ven_montage.png"
-    VEN_COLOR_MONTAGE_PNG = "ven_montage.png"
-    VEN_HIST_PNG = "ven_hist.png"
-    REPORT_CLINICAL_HTML = "report_clinical.html"
-    TEMP_GRE_CLINICAL_HTML = "temp_clinical_gre.html"
-    HTML_TMP = "html_tmp"
-    REPORT_CLINICAL = "report_clinical"
 
 
 class CNNPaths(object):
@@ -195,6 +155,18 @@ class HbCorrectionKey(enum.Enum):
     RBC_ONLY = "rbc_only"
 
 
+class ReferenceDataKey(enum.Enum):
+    """Reference data flags.
+
+    Defines which reference data to use. Options:
+    REFERENCE_218_PPM_01: Reference data for 218 ppm dissolved-phase rf excitation
+    MANUAL: Use when manualy adjusting default reference data
+    """
+
+    REFERENCE_218_PPM_01 = "reference_218_ppm_01"
+    MANUAL = "manual"
+
+
 class ScanType(enum.Enum):
     """Scan type."""
 
@@ -267,47 +239,32 @@ class BinningMethods(object):
 class StatsIOFields(object):
     """Statistic IO Fields."""
 
-    SUBJECT_ID = "subject_id"
-    HB_CORRECTION_KEY = "hb_correction_key"
-    HB = "hb"
-    RBC_HB_CORRECTION_FACTOR = "rbc_hb_correction_factor"
-    MEMBRANE_HB_CORRECTION_FACTOR = "membrane_hb_correction_factor"
     INFLATION = "inflation"
     RBC_M_RATIO = "rbc_m_ratio"
-    SCAN_DATE = "scan_date"
-    PROCESS_DATE = "process_date"
-    SNR_RBC = "snr_rbc"
-    SNR_MEMBRANE = "snr_membrane"
-    SNR_VENT = "snr_vent"
-    PCT_RBC_HIGH = "pct_rbc_high"
-    PCT_RBC_LOW = "pct_rbc_low"
-    PCT_RBC_DEFECT = "pct_rbc_defect"
-    PCT_MEMBRANE_HIGH = "pct_membrane_high"
-    PCT_MEMBRANE_LOW = "pct_membrane_low"
-    PCT_MEMBRANE_DEFECT = "pct_membrane_defect"
-    PCT_VENT_HIGH = "pct_vent_high"
-    PCT_VENT_LOW = "pct_vent_low"
-    PCT_VENT_DEFECT = "pct_vent_defect"
-    MEAN_RBC = "mean_rbc"
-    MEAN_MEMBRANE = "mean_membrane"
-    MEAN_VENT = "mean_vent"
-    MEDIAN_RBC = "median_rbc"
-    MEDIAN_MEMBRANE = "median_membrane"
-    MEDIAN_VENT = "median_vent"
-    STDDEV_RBC = "stddev_rbc"
-    STDDEV_MEMBRANE = "stddev_membrane"
-    STDDEV_VENT = "stddev_vent"
-    N_POINTS = "n_points"
-    DLCO = "dlco"
-    KCO = "kco"
+    RBC_SNR = "rbc_snr"
+    MEMBRANE_SNR = "membrane_snr"
+    VENT_SNR = "vent_snr"
+    RBC_HIGH_PCT = "rbc_high_pct"
+    RBC_LOW_PCT = "rbc_low_pct"
+    RBC_DEFECT_PCT = "rbc_defect_pct"
+    MEMBRANE_HIGH_PCT = "membrane_high_pct"
+    MEMBRANE_LOW_PCT = "membrane_low_pct"
+    MEMBRANE_DEFECT_PCT = "membrane_defect_pct"
+    VENT_HIGH_PCT = "vent_high_pct"
+    VENT_LOW_PCT = "vent_low_pct"
+    VENT_DEFECT_PCT = "vent_defect_pct"
+    RBC_MEAN = "rbc_mean"
+    MEMBRANE_MEAN = "membrane_mean"
+    VENT_MEAN = "vent_mean"
+    RBC_MEDIAN = "rbc_median"
+    MEMBRANE_MEDIAN = "membrane_median"
+    VENT_MEDIAN = "vent_median"
+    RBC_STDDEV = "rbc_stddev"
+    MEMBRANE_STDDEV = "membrane_stddev"
+    VENT_STDDEV = "vent_stddev"
+    DLCO_EST = "dlco_est"
+    KCO_EST = "kco_est"
     ALVEOLAR_VOLUME = "alveolar_volume"
-
-
-class MatIOFields(object):
-    """Mat file IO Fields."""
-
-    SUBJECT_ID = "subject_id"
-    IMAGE_RBC_OSC = "image_rbc_osc"
 
 
 class VENTHISTOGRAMFields(object):
@@ -317,7 +274,8 @@ class VENTHISTOGRAMFields(object):
     XLIM = 1.0
     YLIM = 0.07
     NUMBINS = 50
-    REFERENCE_FIT = (0.04074, 0.619, 0.196)
+    XTICKS = np.linspace(0, XLIM, 4)
+    YTICKS = np.linspace(0, YLIM, 5)
 
 
 class RBCHISTOGRAMFields(object):
@@ -327,7 +285,8 @@ class RBCHISTOGRAMFields(object):
     XLIM = 1.2
     YLIM = 0.1
     NUMBINS = 50
-    REFERENCE_FIT = (0.06106, 0.471, 0.259)
+    XTICKS = np.linspace(0, XLIM, 4)
+    YTICKS = np.linspace(0, YLIM, 5)
 
 
 class MEMBRANEHISTOGRAMFields(object):
@@ -337,7 +296,8 @@ class MEMBRANEHISTOGRAMFields(object):
     XLIM = 2.5
     YLIM = 0.18
     NUMBINS = 70
-    REFERENCE_FIT = (0.0700, 0.736, 0.278)
+    XTICKS = np.linspace(0, XLIM, 4)
+    YTICKS = np.linspace(0, YLIM, 5)
 
 
 class PDFOPTIONS(object):
@@ -411,3 +371,9 @@ class HbCorrection(object):
     R1 = 0.288  # coefficient of rbc hb correction equation
     M1 = 0.029  # first coefficient of membrane hb correction equation
     M2 = 0.011  # second coefficient of membrane hb correction equation
+
+
+class PipelineVersion(object):
+    """Pipeline version."""
+
+    VERSION_NUMBER = 4

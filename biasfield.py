@@ -3,13 +3,10 @@
 Currently supports N4ITK bias field correction.
 """
 import os
-import pdb
-import platform
-from typing import Tuple, Union
+from typing import Tuple
 
 import nibabel as nib
 import numpy as np
-import scipy.ndimage as ndimage
 from absl import app, flags
 from scipy import signal
 

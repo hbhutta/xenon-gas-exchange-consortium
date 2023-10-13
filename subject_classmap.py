@@ -2,7 +2,6 @@
 import glob
 import logging
 import os
-import pdb
 from typing import Any, Dict
 
 import nibabel as nib
@@ -52,6 +51,7 @@ class Subject(object):
         image_membrane2gas (np.array): membrane image normalized by gas-phase image
         image_membrane2gas_binned (np.array): binned image_membrane2gas
         image_proton (np.array): UTE proton image
+        image_proton_reg (np.array): registered UTE proton image
         image_rbc (np.array): RBC image
         image_rbc2gas (np.array): RBC image normalized by gas-phase image
         image_rbc2gas_binned (np.array): binned image_rbc2gas
@@ -86,6 +86,7 @@ class Subject(object):
         self.image_membrane2gas_binned = np.array([0.0])
         self.membrane_hb_correction_factor = 1.0
         self.image_proton = np.array([0.0])
+        self.image_proton_reg = np.array([0.0])
         self.image_rbc = np.array([0.0])
         self.image_rbc2gas = np.array([0.0])
         self.image_rbc2gas_binned = np.array([0.0])
@@ -106,12 +107,16 @@ class Subject(object):
         Read in the dynamic spectroscopy (if it exists) and the dissolved-phase image
         data.
         """
-        self.dict_dyn = io_utils.read_dyn_twix(
-            io_utils.get_dyn_twix_files(str(self.config.data_dir))
-        )
+
         self.dict_dis = io_utils.read_dis_twix(
             io_utils.get_dis_twix_files(str(self.config.data_dir))
         )
+        try:
+            self.dict_dyn = io_utils.read_dyn_twix(
+                io_utils.get_dyn_twix_files(str(self.config.data_dir))
+            )
+        except:
+            logging.info("No dynamic spectroscopy twix file found")
         if self.config.recon.recon_proton:
             self.dict_ute = io_utils.read_ute_twix(
                 io_utils.get_ute_twix_files(str(self.config.data_dir))
@@ -123,9 +128,12 @@ class Subject(object):
         Read in the dynamic spectroscopy (if it exists) and the dissolved-phase image
         data.
         """
-        self.dict_dyn = io_utils.read_dyn_mrd(
-            io_utils.get_dyn_mrd_files(str(self.config.data_dir))
-        )
+        try:
+            self.dict_dyn = io_utils.read_dyn_mrd(
+                io_utils.get_dyn_mrd_files(str(self.config.data_dir))
+            )
+        except:
+            logging.info("No dynamic spectroscopy MRD file found")
         self.dict_dis = io_utils.read_dis_mrd(
             io_utils.get_dis_mrd_files(str(self.config.data_dir))
         )
@@ -149,12 +157,16 @@ class Subject(object):
         self.image_gas_highsnr = mdict["image_gas_highsnr"]
         self.image_gas_cor = mdict["image_gas_cor"]
         self.image_proton = mdict["image_proton"]
+        self.image_proton_reg = mdict["image_proton_reg"]
         self.image_biasfield = mdict["image_biasfield"]
         self.mask = mdict["mask"].astype(bool)
         self.mask_vent = mdict["mask_vent"].astype(bool)
-        self.rbc_m_ratio = float(mdict["rbc_m_ratio"])
         self.traj_dissolved = mdict["traj_dissolved"]
         self.traj_gas = mdict["traj_gas"]
+        if self.config.rbc_m_ratio > 0:
+            self.rbc_m_ratio = float(self.config.rbc_m_ratio)
+        else:
+            self.rbc_m_ratio = float(mdict["rbc_m_ratio"])
 
     def calculate_rbc_m_ratio(self):
         """Calculate RBC:M ratio using static spectroscopy.
@@ -358,7 +370,7 @@ class Subject(object):
         elif (
             self.config.segmentation_key == constants.SegmentationKey.MANUAL_VENT.value
         ):
-            logging.info("loading mask file specified by the user.")
+            logging.info("Loading mask file specified by the user.")
             try:
                 self.mask = np.squeeze(
                     np.array(nib.load(self.config.manual_seg_filepath).get_fdata())
@@ -375,7 +387,7 @@ class Subject(object):
         """
         if self.config.registration_key == constants.RegistrationKey.MASK2GAS.value:
             logging.info("Run registration algorithm, vent is fixed, mask is moving")
-            _, self.image_proton_reg = np.abs(
+            self.mask, self.image_proton_reg = np.abs(
                 registration.register_ants(
                     abs(self.image_gas_highreso), self.mask, self.image_proton
                 )
@@ -432,7 +444,7 @@ class Subject(object):
         self.image_gas_binned = binning.linear_bin(
             image=img_utils.normalize(self.image_gas_cor, self.mask),
             mask=self.mask,
-            thresholds=self.config.params.threshold_vent,
+            thresholds=self.config.reference_data.threshold_vent,
         )
         self.mask_vent = np.logical_and(self.image_gas_binned > 1, self.mask)
 
@@ -445,25 +457,38 @@ class Subject(object):
             rbc_m_ratio=self.rbc_m_ratio,
         )
 
-    def apply_hb_correction(self):
+    def hb_correction(self):
         """Apply hemoglobin correction."""
+        if self.config.hb_correction_key != constants.HbCorrectionKey.NONE.value:
+            if self.config.hb > 0:
+                # get hb correction scaling factors
+                (
+                    self.rbc_hb_correction_factor,
+                    self.membrane_hb_correction_factor,
+                ) = signal_utils.get_hb_correction(self.config.hb)
 
-        # get hb correction scaling factors
-        (
-            self.rbc_hb_correction_factor,
-            self.membrane_hb_correction_factor,
-        ) = signal_utils.get_hb_correction(self.config.hb)
+                # if only applying correction to rbc signal, set membrane factor to 1
+                if (
+                    self.config.hb_correction_key
+                    == constants.HbCorrectionKey.RBC_ONLY.value
+                ):
+                    logging.info("Applying hemoglobin correction to RBC signal only")
+                    self.membrane_hb_correction_factor = 1.0
+                else:
+                    logging.info(
+                        "Applying hemoglobin correction to RBC and membrane signal"
+                    )
 
-        # if only applying correction to rbc signal, set membrane factor to 1
-        if self.config.hb_correction_key == constants.HbCorrectionKey.RBC_ONLY.value:
-            self.membrane_hb_correction_factor = 1.0
-
-        # scale dissolved phase signals by hb correction scaling factors
-        self.rbc_m_ratio *= (
-            self.rbc_hb_correction_factor / self.membrane_hb_correction_factor
-        )
-        self.image_rbc *= self.rbc_hb_correction_factor
-        self.image_membrane *= self.membrane_hb_correction_factor
+                # scale dissolved phase signals by hb correction scaling factors
+                self.rbc_m_ratio *= (
+                    self.rbc_hb_correction_factor / self.membrane_hb_correction_factor
+                )
+                self.image_rbc *= self.rbc_hb_correction_factor
+                self.image_membrane *= self.membrane_hb_correction_factor
+            else:
+                raise ValueError("Invalid hemoglobin value")
+        else:
+            logging.info("Skipping hemoglobin correction")
 
     def dissolved_analysis(self):
         """Calculate the dissolved-phase images relative to gas image."""
@@ -492,12 +517,12 @@ class Subject(object):
         self.image_rbc2gas_binned = binning.linear_bin(
             image=self.image_rbc2gas,
             mask=self.mask_vent,
-            thresholds=self.config.params.threshold_rbc,
+            thresholds=self.config.reference_data.threshold_rbc,
         )
         self.image_membrane2gas_binned = binning.linear_bin(
             image=self.image_membrane2gas,
             mask=self.mask_vent,
-            thresholds=self.config.params.threshold_membrane,
+            thresholds=self.config.reference_data.threshold_membrane,
         )
 
     def get_statistics(self) -> Dict[str, Any]:
@@ -507,100 +532,93 @@ class Subject(object):
             dict_stats: Dictionary of statistics for reporting
         """
         self.dict_stats = {
-            constants.StatsIOFields.SUBJECT_ID: self.config.subject_id,
-            constants.StatsIOFields.HB_CORRECTION_KEY: self.config.hb_correction_key,
-            constants.StatsIOFields.HB: self.config.hb,
-            constants.StatsIOFields.RBC_HB_CORRECTION_FACTOR: self.rbc_hb_correction_factor,
-            constants.StatsIOFields.MEMBRANE_HB_CORRECTION_FACTOR: self.membrane_hb_correction_factor,
+            constants.IOFields.SUBJECT_ID: self.config.subject_id,
+            constants.IOFields.SCAN_DATE: self.dict_dis[constants.IOFields.SCAN_DATE],
+            constants.IOFields.PROCESS_DATE: metrics.process_date(),
             constants.StatsIOFields.INFLATION: metrics.inflation_volume(
                 self.mask, self.dict_dis[constants.IOFields.FOV]
             ),
             constants.StatsIOFields.RBC_M_RATIO: self.rbc_m_ratio,
-            constants.StatsIOFields.SCAN_DATE: self.dict_dis[
-                constants.IOFields.SCAN_DATE
-            ],
-            constants.StatsIOFields.PROCESS_DATE: metrics.process_date(),
-            constants.StatsIOFields.SNR_RBC: metrics.snr(self.image_rbc, self.mask)[0],
-            constants.StatsIOFields.SNR_MEMBRANE: metrics.snr(
-                self.image_membrane, self.mask
-            )[0],
-            constants.StatsIOFields.SNR_VENT: metrics.snr(
+            constants.StatsIOFields.VENT_SNR: metrics.snr(
                 np.abs(self.image_gas_highreso), self.mask
             )[1],
-            constants.StatsIOFields.N_POINTS: self.data_gas.shape[1],
-            constants.StatsIOFields.PCT_RBC_DEFECT: metrics.bin_percentage(
-                self.image_rbc2gas_binned, np.array([1]), self.mask
-            ),
-            constants.StatsIOFields.PCT_RBC_LOW: metrics.bin_percentage(
-                self.image_rbc2gas_binned, np.array([2]), self.mask
-            ),
-            constants.StatsIOFields.PCT_RBC_HIGH: metrics.bin_percentage(
-                self.image_rbc2gas_binned, np.array([5, 6]), self.mask
-            ),
-            constants.StatsIOFields.PCT_MEMBRANE_DEFECT: metrics.bin_percentage(
-                self.image_membrane2gas_binned, np.array([1]), self.mask
-            ),
-            constants.StatsIOFields.PCT_MEMBRANE_LOW: metrics.bin_percentage(
-                self.image_membrane2gas_binned, np.array([2]), self.mask
-            ),
-            constants.StatsIOFields.PCT_MEMBRANE_HIGH: metrics.bin_percentage(
-                self.image_membrane2gas_binned, np.array([6, 7, 8]), self.mask
-            ),
-            constants.StatsIOFields.PCT_VENT_DEFECT: metrics.bin_percentage(
+            constants.StatsIOFields.VENT_DEFECT_PCT: metrics.bin_percentage(
                 self.image_gas_binned, np.array([1]), self.mask
             ),
-            constants.StatsIOFields.PCT_VENT_LOW: metrics.bin_percentage(
+            constants.StatsIOFields.VENT_LOW_PCT: metrics.bin_percentage(
                 self.image_gas_binned, np.array([2]), self.mask
             ),
-            constants.StatsIOFields.PCT_VENT_HIGH: metrics.bin_percentage(
+            constants.StatsIOFields.VENT_HIGH_PCT: metrics.bin_percentage(
                 self.image_gas_binned, np.array([5, 6]), self.mask
             ),
-            constants.StatsIOFields.MEAN_VENT: metrics.mean(
+            constants.StatsIOFields.VENT_MEAN: metrics.mean(
                 img_utils.normalize(np.abs(self.image_gas_cor), self.mask), self.mask
             ),
-            constants.StatsIOFields.MEAN_RBC: metrics.mean(
+            constants.StatsIOFields.VENT_MEDIAN: metrics.median(
+                img_utils.normalize(np.abs(self.image_gas_cor), self.mask), self.mask
+            ),
+            constants.StatsIOFields.VENT_STDDEV: metrics.std(
+                img_utils.normalize(np.abs(self.image_gas_cor), self.mask), self.mask
+            ),
+            constants.StatsIOFields.RBC_SNR: metrics.snr(self.image_rbc, self.mask)[0],
+            constants.StatsIOFields.RBC_DEFECT_PCT: metrics.bin_percentage(
+                self.image_rbc2gas_binned, np.array([1]), self.mask
+            ),
+            constants.StatsIOFields.RBC_LOW_PCT: metrics.bin_percentage(
+                self.image_rbc2gas_binned, np.array([2]), self.mask
+            ),
+            constants.StatsIOFields.RBC_HIGH_PCT: metrics.bin_percentage(
+                self.image_rbc2gas_binned, np.array([5, 6]), self.mask
+            ),
+            constants.StatsIOFields.RBC_MEAN: metrics.mean(
                 self.image_rbc2gas, self.mask_vent
             ),
-            constants.StatsIOFields.MEAN_MEMBRANE: metrics.mean(
+            constants.StatsIOFields.RBC_MEDIAN: metrics.median(
+                self.image_rbc2gas, self.mask_vent
+            ),
+            constants.StatsIOFields.RBC_STDDEV: metrics.std(
+                self.image_rbc2gas, self.mask_vent
+            ),
+            constants.StatsIOFields.MEMBRANE_SNR: metrics.snr(
+                self.image_membrane, self.mask
+            )[0],
+            constants.StatsIOFields.MEMBRANE_DEFECT_PCT: metrics.bin_percentage(
+                self.image_membrane2gas_binned, np.array([1]), self.mask
+            ),
+            constants.StatsIOFields.MEMBRANE_LOW_PCT: metrics.bin_percentage(
+                self.image_membrane2gas_binned, np.array([2]), self.mask
+            ),
+            constants.StatsIOFields.MEMBRANE_HIGH_PCT: metrics.bin_percentage(
+                self.image_membrane2gas_binned, np.array([6, 7, 8]), self.mask
+            ),
+            constants.StatsIOFields.MEMBRANE_MEAN: metrics.mean(
                 self.image_membrane2gas, self.mask_vent
             ),
-            constants.StatsIOFields.MEDIAN_VENT: metrics.median(
-                img_utils.normalize(np.abs(self.image_gas_cor), self.mask), self.mask
-            ),
-            constants.StatsIOFields.MEDIAN_RBC: metrics.median(
-                self.image_rbc2gas, self.mask_vent
-            ),
-            constants.StatsIOFields.MEDIAN_MEMBRANE: metrics.median(
+            constants.StatsIOFields.MEMBRANE_MEDIAN: metrics.median(
                 self.image_membrane2gas, self.mask_vent
             ),
-            constants.StatsIOFields.STDDEV_VENT: metrics.std(
-                img_utils.normalize(np.abs(self.image_gas_cor), self.mask), self.mask
-            ),
-            constants.StatsIOFields.STDDEV_RBC: metrics.std(
-                self.image_rbc2gas, self.mask_vent
-            ),
-            constants.StatsIOFields.STDDEV_MEMBRANE: metrics.std(
+            constants.StatsIOFields.MEMBRANE_STDDEV: metrics.std(
                 self.image_membrane2gas, self.mask_vent
             ),
             constants.StatsIOFields.ALVEOLAR_VOLUME: metrics.alveolar_volume(
                 self.image_gas_binned, self.mask, self.dict_dis[constants.IOFields.FOV]
             ),
-            constants.StatsIOFields.KCO: metrics.kco(
+            constants.StatsIOFields.KCO_EST: metrics.kco(
                 self.image_membrane2gas,
                 self.image_rbc2gas,
                 self.mask_vent,
-                self.config.params.mean_membrane,
-                self.config.params.mean_rbc,
+                self.config.reference_data.reference_fit_membrane[1],
+                self.config.reference_data.reference_fit_rbc[1],
             ),
-            constants.StatsIOFields.DLCO: metrics.dlco(
+            constants.StatsIOFields.DLCO_EST: metrics.dlco(
                 self.image_gas_binned,
                 self.image_membrane2gas,
                 self.image_rbc2gas,
                 self.mask,
                 self.mask_vent,
                 self.dict_dis[constants.IOFields.FOV],
-                self.config.params.mean_membrane,
-                self.config.params.mean_rbc,
+                self.config.reference_data.reference_fit_membrane[1],
+                self.config.reference_data.reference_fit_rbc[1],
             ),
         }
 
@@ -613,6 +631,16 @@ class Subject(object):
             dict_info: Dictionary of information.
         """
         self.dict_info = {
+            constants.IOFields.SUBJECT_ID: self.config.subject_id,
+            constants.IOFields.SCAN_DATE: self.dict_dis[constants.IOFields.SCAN_DATE],
+            constants.IOFields.PROCESS_DATE: metrics.process_date(),
+            constants.IOFields.SCAN_TYPE: self.config.recon.scan_type,
+            constants.IOFields.PIPELINE_VERSION: constants.PipelineVersion.VERSION_NUMBER,
+            constants.IOFields.SOFTWARE_VERSION: self.dict_dis[
+                constants.IOFields.SOFTWARE_VERSION
+            ],
+            constants.IOFields.GIT_BRANCH: report.get_git_branch(),
+            constants.IOFields.REFERENCE_DATA_KEY: self.config.reference_data_key,
             constants.IOFields.BANDWIDTH: self.dict_dis[constants.IOFields.BANDWIDTH],
             constants.IOFields.DWELL_TIME: (
                 1e6 * self.dict_dis[constants.IOFields.DWELL_TIME]
@@ -630,7 +658,6 @@ class Subject(object):
             constants.IOFields.FREQ_EXCITATION: self.dict_dis[
                 constants.IOFields.FREQ_EXCITATION
             ],
-            constants.IOFields.GIT_BRANCH: report.get_git_branch(),
             constants.IOFields.GRAD_DELAY_X: self.dict_dis[
                 constants.IOFields.GRAD_DELAY_X
             ],
@@ -662,16 +689,9 @@ class Subject(object):
                     data=self.dict_dis[constants.IOFields.FIDS_GAS]
                 )
             ),
-            constants.IOFields.PROCESS_DATE: metrics.process_date(),
             constants.IOFields.REMOVE_NOISE: self.config.recon.remove_noisy_projections,
-            constants.IOFields.SCAN_DATE: self.dict_dis[constants.IOFields.SCAN_DATE],
-            constants.IOFields.SCAN_TYPE: self.config.recon.scan_type,
             constants.IOFields.SHAPE_FIDS: self.dict_dis[constants.IOFields.FIDS].shape,
             constants.IOFields.SHAPE_IMAGE: self.image_gas_highreso.shape,
-            constants.IOFields.SOFTWARE_VERSION: self.dict_dis[
-                constants.IOFields.SOFTWARE_VERSION
-            ],
-            constants.IOFields.SUBJECT_ID: self.config.subject_id,
             constants.IOFields.T2_CORRECTION_FACTOR: signal_utils.calculate_t2star_correction(
                 self.dict_dis[constants.IOFields.TE90],
             ),
@@ -764,7 +784,9 @@ class Subject(object):
             xlim=constants.VENTHISTOGRAMFields.XLIM,
             ylim=constants.VENTHISTOGRAMFields.YLIM,
             num_bins=constants.VENTHISTOGRAMFields.NUMBINS,
-            refer_fit=constants.VENTHISTOGRAMFields.REFERENCE_FIT,
+            refer_fit=self.config.reference_data.reference_fit_vent,
+            xticks=constants.VENTHISTOGRAMFields.XTICKS,
+            yticks=constants.VENTHISTOGRAMFields.YTICKS,
         )
         plot.plot_histogram(
             data=np.abs(self.image_rbc2gas)[np.array(self.mask, dtype=bool)].flatten(),
@@ -773,7 +795,9 @@ class Subject(object):
             xlim=constants.RBCHISTOGRAMFields.XLIM,
             ylim=constants.RBCHISTOGRAMFields.YLIM,
             num_bins=constants.RBCHISTOGRAMFields.NUMBINS,
-            refer_fit=constants.RBCHISTOGRAMFields.REFERENCE_FIT,
+            refer_fit=self.config.reference_data.reference_fit_rbc,
+            xticks=constants.RBCHISTOGRAMFields.XTICKS,
+            yticks=constants.RBCHISTOGRAMFields.YTICKS,
         )
         plot.plot_histogram(
             data=np.abs(self.image_membrane2gas)[
@@ -784,39 +808,60 @@ class Subject(object):
             xlim=constants.MEMBRANEHISTOGRAMFields.XLIM,
             ylim=constants.MEMBRANEHISTOGRAMFields.YLIM,
             num_bins=constants.MEMBRANEHISTOGRAMFields.NUMBINS,
-            refer_fit=constants.MEMBRANEHISTOGRAMFields.REFERENCE_FIT,
+            refer_fit=self.config.reference_data.reference_fit_membrane,
+            xticks=constants.MEMBRANEHISTOGRAMFields.XTICKS,
+            yticks=constants.MEMBRANEHISTOGRAMFields.YTICKS,
         )
 
     def generate_pdf(self):
         """Generate HTML and PDF files."""
-        path = os.path.join(
-            self.config.data_dir,
-            "report_intro_{}.pdf".format(self.config.subject_id),
-        )
-        report.intro(self.dict_info, path=path)
-        path = os.path.join(
-            self.config.data_dir,
-            "report_grayscale_{}.pdf".format(self.config.subject_id),
+
+        # generate individual PDFs
+        pdf_list = [
+            os.path.join(self.config.data_dir, pdf)
+            for pdf in ["intro.pdf", "clinical.pdf", "grayscale.pdf", "qa"]
+        ]
+        report.intro(self.dict_info, path=pdf_list[0])
+        report.clinical(
+            {**self.dict_stats, **self.config.reference_data.reference_stats},
+            path=pdf_list[1],
         )
         report.grayscale(
-            {**self.dict_stats, **self.config.params.reference_stats}, path=path
+            {**self.dict_stats, **self.config.reference_data.reference_stats},
+            path=pdf_list[2],
         )
+        report.qa(
+            {**self.dict_stats, **self.config.reference_data.reference_stats},
+            path=pdf_list[3],
+        )
+
+        # combine PDFs into one
         path = os.path.join(
             self.config.data_dir,
-            "report_clinical_{}.pdf".format(self.config.subject_id),
+            "report_{}.pdf".format(self.config.subject_id),
         )
-        report.clinical(
-            {**self.dict_stats, **self.config.params.reference_stats}, path=path
-        )
-        path = os.path.join(
-            self.config.data_dir,
-            "report_qa_{}.pdf".format(self.config.subject_id),
-        )
-        report.qa({**self.dict_stats, **self.config.params.reference_stats}, path=path)
+        report.combine_pdfs(pdf_list, path)
+
+        # remove indvidual PDFs
+        for pdf in pdf_list:
+            os.remove(pdf)
 
     def write_stats_to_csv(self):
         """Write statistics to file."""
-        io_utils.export_subject_csv(self.dict_stats, path="data/stats_all.csv")
+        # write to combined csv of recently processed subjects
+        io_utils.export_subject_csv(
+            {**self.dict_info, **self.dict_stats}, path="data/stats_all.csv"
+        )
+
+        # write to individual subject csv
+        io_utils.export_subject_csv(
+            {**self.dict_info, **self.dict_stats},
+            path=os.path.join(
+                self.config.data_dir,
+                "stats_{}.csv".format(self.config.subject_id),
+            ),
+            overwrite=True,
+        )
 
     def save_subject_to_mat(self):
         """Save the instance variables into a mat file."""
@@ -837,7 +882,7 @@ class Subject(object):
         )
         io_utils.export_nii(
             np.abs(self.image_gas_highreso),
-            "tmp/gas_highreso.nii",
+            os.path.join(self.config.data_dir, "gas_highreso.nii"),
             self.dict_dis[constants.IOFields.FOV],
         )
         io_utils.export_nii(
@@ -860,7 +905,7 @@ class Subject(object):
         )
         io_utils.export_nii(
             self.mask.astype(float),
-            "tmp/mask.nii",
+            os.path.join(self.config.data_dir, "mask_reg.nii"),
             self.dict_dis[constants.IOFields.FOV],
         )
         io_utils.export_nii(
@@ -872,12 +917,18 @@ class Subject(object):
             io_utils.export_nii(
                 np.abs(self.image_proton),
                 "tmp/proton.nii",
+                self.dict_dis[constants.IOFields.FOV],
             )
+            io_utils.export_nii(
+                np.abs(self.image_proton_reg),
+                os.path.join(self.config.data_dir, "proton_reg.nii"),
+                self.dict_dis[constants.IOFields.FOV],
+            ),
         io_utils.export_nii_4d(
             plot.map_and_overlay_to_rgb(
                 self.image_rbc2gas_binned, proton_reg, constants.CMAP.RBC_BIN2COLOR
             ),
-            "tmp/rbc2gas_rgb.nii",
+            os.path.join(self.config.data_dir, "rbc2gas_rgb.nii"),
         )
         io_utils.export_nii_4d(
             plot.map_and_overlay_to_rgb(
@@ -885,11 +936,38 @@ class Subject(object):
                 proton_reg,
                 constants.CMAP.MEMBRANE_BIN2COLOR,
             ),
-            "tmp/membrane2gas_rgb.nii",
+            os.path.join(self.config.data_dir, "membrane2gas_rgb.nii"),
         )
         io_utils.export_nii_4d(
             plot.map_and_overlay_to_rgb(
                 self.image_gas_binned, proton_reg, constants.CMAP.VENT_BIN2COLOR
             ),
-            "tmp/gas_rgb.nii",
+            os.path.join(self.config.data_dir, "gas_rgb.nii"),
         )
+
+    def save_config_as_json(self):
+        """Save subject config .py file as json."""
+        io_utils.export_config_to_json(
+            self.config,
+            os.path.join(
+                self.config.data_dir, "config_{}.json".format(self.config.subject_id)
+            ),
+        )
+
+    def move_output_files(self):
+        """Move output files into dedicated directory."""
+        # define output path
+        output_path = os.path.join(self.config.data_dir, "Gas_Exchange")
+
+        # define files to move
+        output_files = (
+            glob.glob(os.path.join(self.config.data_dir, "*.mat"))
+            + glob.glob(os.path.join(self.config.data_dir, "*.nii"))
+            + glob.glob(os.path.join(self.config.data_dir, "*.pdf"))
+            + glob.glob(os.path.join(self.config.data_dir, "*.csv"))
+            + glob.glob(os.path.join(self.config.data_dir, "*.py"))
+            + glob.glob(os.path.join(self.config.data_dir, "*.json"))
+        )
+
+        # move files
+        io_utils.move_files(output_files, output_path)
