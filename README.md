@@ -1,6 +1,6 @@
 # xenon-gas-exchange-python
 
-The xenon gas exchange pipeline, developed at the [Driehuyslab](https://sites.duke.edu/driehuyslab/), processes raw MRI data and produces a summary report to analyze the functionality of the human lung. The details of the workflow can be seen in the Wiki(see left menu bar)-- work in progress. This ReadMe presents the installation and basic usage the pipeline. Before moving to the installation process, download or clone this repository in your computer.
+The xenon gas exchange pipeline, developed at the [Driehuys Lab](https://sites.duke.edu/driehuyslab/), processes raw MRI data and produces a summary report to analyze the functionality of the human lung. The details of the workflow can be seen in the Wiki(see left menu bar)-- work in progress. This ReadMe presents the installation and basic usage the pipeline. Before moving to the installation process, download or clone this repository in your computer.
 
 ## Table of contents:
 
@@ -114,9 +114,17 @@ Now install a c compiler. Here we will install gcc compiler.
 
 ##### Linux and WSL users:
 
-Get updates: sudo apt-get update
+Get updates:
 
-Install gcc executing this command: sudo apt install gcc
+```bash
+sudo apt-get update
+```
+
+Install gcc executing this command:
+
+```bash
+sudo apt install gcc
+```
 
 ##### Mac Users:
 
@@ -128,7 +136,7 @@ brew install gcc
 
 ##### Installing Packages in the Virtual Environment:
 
-Now we are ready to install necessary packages. Packages must be installed inside the virtual conda environment. The list of packages are in the requirements.txt or requirements_ubuntu.txt file. These two files can be found in the setup folder of the main program directory. If in the terminal you are not in the main program directory, change the directory using cd command. To install the required packages, execute the command:
+Now we are ready to install necessary packages. Packages must be installed inside the virtual conda environment. The list of packages are in the `setup/requirements.txt` file. In the terminal, if you are not in the main program directory, change the directory using the `cd` command. To install the required packages, execute the command:
 
 ```bash
 pip install -r setup/requirements.txt
@@ -168,7 +176,9 @@ Check the `models/weights` folder if two `.h5` files are not available there, do
 
 Compiling ANTs require to install git, cmake, g++, zlib. Following commands will install these packages.
 
-#### Linux and Windows Subsystem For Linux(WSL) user: execute following commands on your terminal:
+#### Linux and Windows Subsystem For Linux(WSL) Users
+
+Execute following commands on your terminal:
 
 ```bash
 sudo apt-get -y install git
@@ -177,9 +187,11 @@ sudo apt install g++
 sudo apt-get -y install zlib1g-dev
 ```
 
-#### Mac User: check you have git, cmake, g++ writing, e.g. which git, which cmake
+#### Mac Users:
 
-If you don't have any of these, you have to install in the command line.Now you can install packages writing following commands:
+Check if you have git, cmake, g++ using `which git`, `which cmake`, `which g++`
+
+If you don't have any of these, execute the following commands:
 
 ```bash
 brew install git
@@ -204,7 +216,7 @@ make install 2>&1 | tee install.log
 
 Warning: This might take a while.
 
-After sucessful ANTs SuperBuild, you will have to copy 'antApplyTransforms', 'antsRegistration' and 'N4BisaFieldCorrection' files from the `install/bin`, and paste it to the main program directory. Now we are ready to process MRI scan of human lung.
+After sucessful ANTs SuperBuild, you will have to move 'antApplyTransforms', 'antsRegistration' and 'N4BisaFieldCorrection' files to `xe-gas-exchange-refactor/bin/`. Now we are ready to process MRI scan of human lung.
 
 Note: If necesary, the details of ANTs Compilation can be seen [here](https://github.com/ANTsX/ANTs/wiki/Compiling-ANTs-on-Linux-and-Mac-OS)
 
@@ -281,6 +293,6 @@ Warning: this is the Team Xenon workflow only. Other users do not have to follow
 
 Original Author: Ziyi Wang
 
-Developers: Ziyi Wang, Junlan Lu, Sakib Kabir, David Mummy, Suphachart Leewiwatwong, and Isabelle Dummer.
+Developers: Ziyi Wang, Junlan Lu, Sakib Kabir, Suphachart Leewiwatwong, Aryil Bechtel, David Mummy, and Isabelle Dummer.
 
 Correspondence: David Mummy: david.mummy@duke.edu
