@@ -51,6 +51,7 @@ class Subject(object):
         image_membrane2gas (np.array): membrane image normalized by gas-phase image
         image_membrane2gas_binned (np.array): binned image_membrane2gas
         image_proton (np.array): UTE proton image
+        image_proton_reg (np.array): registered UTE proton image
         image_rbc (np.array): RBC image
         image_rbc2gas (np.array): RBC image normalized by gas-phase image
         image_rbc2gas_binned (np.array): binned image_rbc2gas
@@ -85,6 +86,7 @@ class Subject(object):
         self.image_membrane2gas_binned = np.array([0.0])
         self.membrane_hb_correction_factor = 1.0
         self.image_proton = np.array([0.0])
+        self.image_proton_reg = np.array([0.0])
         self.image_rbc = np.array([0.0])
         self.image_rbc2gas = np.array([0.0])
         self.image_rbc2gas_binned = np.array([0.0])
@@ -155,12 +157,16 @@ class Subject(object):
         self.image_gas_highsnr = mdict["image_gas_highsnr"]
         self.image_gas_cor = mdict["image_gas_cor"]
         self.image_proton = mdict["image_proton"]
+        self.image_proton_reg = mdict["image_proton_reg"]
         self.image_biasfield = mdict["image_biasfield"]
         self.mask = mdict["mask"].astype(bool)
         self.mask_vent = mdict["mask_vent"].astype(bool)
-        self.rbc_m_ratio = float(mdict["rbc_m_ratio"])
         self.traj_dissolved = mdict["traj_dissolved"]
         self.traj_gas = mdict["traj_gas"]
+        if self.config.rbc_m_ratio > 0:
+            self.rbc_m_ratio = float(self.config.rbc_m_ratio)
+        else:
+            self.rbc_m_ratio = float(mdict["rbc_m_ratio"])
 
     def calculate_rbc_m_ratio(self):
         """Calculate RBC:M ratio using static spectroscopy.

@@ -68,16 +68,19 @@ def gx_mapping_readin(config: base_config.Config):
     if FLAGS.force_segmentation:
         subject.segmentation()
     subject.gas_binning()
-    subject.save_subject_to_mat()
     subject.dixon_decomposition()
+    subject.hb_correction()
     subject.dissolved_analysis()
     subject.dissolved_binning()
     subject.get_statistics()
     subject.get_info()
+    subject.save_subject_to_mat()
     subject.write_stats_to_csv()
     subject.generate_figures()
     subject.generate_pdf()
     subject.save_files()
+    subject.save_config_as_json()
+    subject.move_output_files()
     logging.info("Complete")
 
 

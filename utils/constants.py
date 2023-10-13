@@ -34,7 +34,6 @@ class IOFields(object):
     FIELD_STRENGTH = "field_strength"
     FLIP_ANGLE_FACTOR = "flip_angle_factor"
     FOV = "fov"
-    FOV = "fov"
     FREQ_CENTER = "freq_center"
     FREQ_EXCITATION = "freq_excitation"
     GIT_BRANCH = "git_branch"
@@ -45,9 +44,7 @@ class IOFields(object):
     HB = "hb"
     RBC_HB_CORRECTION_FACTOR = "rbc_hb_correction_factor"
     MEMBRANE_HB_CORRECTION_FACTOR = "membrane_hb_correction_factor"
-    IMAGE = "image"
     KERNEL_SHARPNESS = "kernel_sharpness"
-    MASK_REG_NII = "mask_reg_nii"
     N_FRAMES = "n_frames"
     N_SKIP_END = "n_skip_end"
     N_SKIP_START = "n_skip_start"
@@ -56,11 +53,8 @@ class IOFields(object):
     N_POINTS = "n_points"
     ORIENTATION = "orientation"
     PIPELINE_VERSION = "pipeline_version"
-    PIXEL_SIZE = "pixel_size"
     PROCESS_DATE = "process_date"
     PROTOCOL_NAME = "protocol_name"
-    PROTON_DICOM_DIR = "proton_dicom_dir"
-    PROTON_REG_NII = "proton_reg_nii"
     RAMP_TIME = "ramp_time"
     REFERENCE_DATA_KEY = "reference_data_key"
     REGISTRATION_KEY = "registration_key"
@@ -71,7 +65,6 @@ class IOFields(object):
     SEGMENTATION_KEY = "segmentation_key"
     SHAPE_FIDS = "shape_fids"
     SHAPE_IMAGE = "shape_image"
-    SITE = "site"
     SLICE_THICKNESS = "slice_thickness"
     SOFTWARE_VERSION = "software_version"
     SUBJECT_ID = "subject_id"
@@ -272,13 +265,6 @@ class StatsIOFields(object):
     DLCO_EST = "dlco_est"
     KCO_EST = "kco_est"
     ALVEOLAR_VOLUME = "alveolar_volume"
-
-
-class MatIOFields(object):
-    """Mat file IO Fields."""
-
-    SUBJECT_ID = "subject_id"
-    IMAGE_RBC_OSC = "image_rbc_osc"
 
 
 class VENTHISTOGRAMFields(object):
