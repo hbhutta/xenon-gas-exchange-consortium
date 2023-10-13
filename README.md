@@ -16,21 +16,25 @@ Gas exchange pipeline, developed at the [Driehuyslab](https://sites.duke.edu/dri
 
 Gas exchange pipeline is a cross platform program that works on Windows, Mac and Linux system. At least 8GB of RAM is required to run this pipeline. Windows users can install Windows Subsystem for Linux (WSL) or install Ubuntu as dual boot/in the virtual box. The details of WSL installation can be seen in Section 1.1. Warning: run time in WSL can be slower compare to Linux or Mac system.
 
-Mac and Linux users skip to installation. Note: Currently, this pipeline works on intel based Mac. Apple silicon based mac is not supported at this moment.
-
 ### 1.1. Windows Subsystem for Linux
 
 Windows Subsystem for Linux installation process can seem overwhelming, espcially following the procedure in the microsoft [documentation](https://docs.microsoft.com/en-us/windows/wsl/install-win10). However a short Youtube video can make the install process much easier. One good example YouTube instruction can be seen [here](https://www.youtube.com/watch?v=X-DHaQLrBi8&t=385s&ab_channel=ProgrammingKnowledge2ProgrammingKnowledge2). Note: If the YouTube link is broken, please search in YouTube.
 
-Next for opening any GUIs or graphical applications in WSL, you need to [install XMing](https://sourceforge.net/projects/xming/). Open the XMing when you want to run this pipeline. Write the following command in the terminal to show the GUI:
+### 1.2. Xcode and Homebrew for Mac
 
+First, open the terminal and install Xcode Command Line Tools using this command:
+
+```bash
+xcode-select --install
 ```
-export DISPLAY=:0;
+
+If homebrew is not already installed, it can be installed using this command:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-To avoide writing above command everytime, add this line to the `bashrc`. To find out the bashrc file, write `cd ~`, and open the file using a text editor. A text editor called `nano` can be installed using: sudo apt install nano
-
-Now you can open the bashrc file using: nano bashrc ; then insert the command in the file and save it.
+Don't forget to add homebrew to your path. Check if homebrew installed correctly, writing `which brew`. The details of homebrew can be seen [here](https://brew.sh/).
 
 ## Installation
 
@@ -40,7 +44,7 @@ This program is written in Python. Some of the code is written in C language. We
 
 First step of the installation process is to install python. This gas exchange pipeline works with Python 3.8.8 in its current version. In order to install necessary Python Libraries, Python 3.8.8 version is required. To create a virtual environment, a 'conda' distribution is required. If you don't have conda distribution installed into your machine, you can install one downloading 'Anaconda' or 'Miniconda'. You can download the 'Anaconda Distribution' from this [link](https://www.anaconda.com/products/individual), or 'Miniconda' from this [link](https://docs.conda.io/en/latest/miniconda.html). Here, command line installation procedure has been presented. So, Mac user can download the Command Line Installer.
 
-#### 2.1.1. Conda Installation on Mac or Linux:
+#### 2.1.1. Conda Installation on Intel Based Mac or Linux systems:
 
 Now, open the terminal. You need to write a command to install Anaconda/Miniconda. Command to install the Anaconda or Miniconda is:
 
@@ -60,7 +64,17 @@ Press "enter" and reply "yes" to agree to the license agreements. After completi
 
 If you don't see 'conda' directory after verifing, you can review the details of [Anconda](https://docs.anaconda.com/anaconda/install/linux/) or [Miniconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html) installation.
 
-#### 2.1.2. Conda Installtion on Windows Subsystem for Linux(WSL):
+#### 2.1.2. Conda Installation on Apple Silicon Based Mac systems:
+
+For full use of this pipeline with Apple silicon based Mac systems, Conda should be installed with miniforge. Install miniforge using Homebrew using the following command:
+
+```bash
+brew install miniforge
+```
+
+More information on miniforge and alternative installation methods can be found at the [miniforge GitHub](https://github.com/conda-forge/miniforge).
+
+#### 2.1.3. Conda Installtion on Windows Subsystem for Linux(WSL):
 
 WSL users need to install `Anaconda` or 'Miniconda' for Linux inside the WSL shell. Change your current directory to where you have downloaded your Anaconda or Miniconda installation file (.sh file). Then run the:
 
@@ -102,7 +116,7 @@ Install gcc executing this command: sudo apt install gcc
 
 ##### Mac Users:
 
-To install pacakges, a homebrew can be installed using this command:
+If homebrew is not already installed, it can be installed using this command:
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -150,27 +164,11 @@ brew install poppler
 
 ### 2.3. Compilation and Download Necessary tools
 
-#### 2.3.1. For Image Reconstruction: Compile C code
-
-A C compiler is required that you already installed in Section 2.2.2.
-
-1. To compile `sparse_gridding_z_double.c`, execute the command
-
-   ```bash
-   gcc -shared -o libsparse.so -fPIC C_code/sparse_gridding_z_double.c
-   ```
-
-2. Similarly, to compile `gen_traj.c`, execute the command
-
-   ```bash
-   gcc -shared -o libtraj.so -fPIC C_code/gen_traj.c
-   ```
-
-#### 2.3.2. For Segmentation: Downloading the h5 models for machine learning
+#### 2.3.1. For Segmentation: Downloading the h5 models for machine learning
 
 Check the `models/weights` folder if two `.h5` files are not available there, download `model_ANATOMY_UTE.h5` and `model_ANATOMY_VEN.h5` from this [link](https://drive.google.com/drive/folders/1gcwT14_6Tl_2zkLZ_MHsm-pAYHXWtVOA?usp=sharing) and place it in the `models/weights` folder in your main program directory.
 
-#### 2.3.3. For Registration: Compiling ANTs
+#### 2.3.2. For Registration: Compiling ANTs
 
 Compiling ANTs require to install git, cmake, g++, zlib. Following commands will install these packages.
 
