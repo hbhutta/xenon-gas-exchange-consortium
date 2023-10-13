@@ -216,22 +216,46 @@ Note: If necesary, the details of ANTs Compilation can be seen [here](https://gi
 
 To process raw MRI data, you can follow the Team Xenon workflow outlined below. Note: Wiki presents the code structure and workflow of this pipeline -- work-in-progress.
 
-### 3.1. Team Xenon Worflow for External Sites (Such as UVA, UM, SickKids, Western, etc.)
+### 3.1. General usage
+
+#### 3.1.1 Config files
+All subject information and processing parameters are specified in a subject-specific configuration file. Default configuration settings are defined in `config/base_config.py`. The defaults are inhereted by subject-specific config files, unless overriden.
+<br />
+<br />`config/demo_config_basic.py` shows examples of basic config settings that you will usually want to change for each subject scan.
+
+- `data_dir`: Directory containing dixon, ute, and (optionally) calibration scan files or .mat file. This is where output files will be saved.
+- `subject_id`: Subject ID number that will be used to label output files
+- `site`: Site of data acquisition
+- `rbc_m_ratio`: RBC to membrane signal ratio for Dixon decomposition. If not set in config file, a calibartion scan file is required from which the ratio will be calculated.
+- `segmentation_key`: Defines what kind of segmentation to use. Typically set to CNN_VENT for automatic segmentation of the gas image or MANUAL_VENT for manual segmentation of the gas image.
+- `manual_seg_filepath`: Path of manual segmentation file, if MANUAL_VENT is chosen.
+
+`config/demo_config_advanced.py` shows examples of advanced config settings that may commonly be modified for more specific cases. See `config/base_config.py` for all config settings that can be modified.
+
+#### 3.1.2 Processing a subject
+
+First, copy one of the demo config files or the base_config file, rename it, and modify configuration settings. In terminal, navigate to the main pipeline directory and activate the virtual environment you set up earlier:
 
 ```bash
-  conda activate XeGas #activates the conda environment
-  python GX_GUI_launch.py
+conda activate XeGas
 ```
 
-The above comands should open the GUI.
+#### Running full pipeline with image reconstruction
 
-WSL user: Did you write "export DISPLAY=:0;" in your terminal? Is your Xming open? If not, open the Xming and write "export DISPLAY=:0;" in the WSL terminal. Then execute the above commands.
+Run the full pipeline with:
+```bash
+python main.py --config [path-to-config-file]
+```
 
-After opening the GUI:
-Direct the GX Scan folder to the folder that has the twix files. Execute the sequence, don't forget to check segmentation if it is very off.
+#### Running previously processed subject scan from .mat file
 
-1.  When the program is done running, it will automatically create a `Gas_Exchange` folder and a `Dedicated_Ventilation` folder (if you have a 3D radial dedicated ventilation scan) with all the analyzed files inside
-2.  Edit the segmentation as needed (if not, you are done)
+If a subject scan has already been processed through the pipeline and you wish to reprocess the previously constructed images, you can run the pipeline on the subject's .mat file with:
+
+```bash
+python main.py --config [path-to-config-file] --force_readin
+```
+
+NOTE: 
 
 ### 3.2. Team Xenon Worflow for Duke Data Processing
 
@@ -239,33 +263,26 @@ Warning: this is the Team Xenon workflow only. Other users do not have to follow
 
 1. Create a new subject folder. This will typically have the format of `###-###` or `###-###X`.
 
-2. Then log onto the `smb://duhsnas-pri/xenon_MRI_raw/` drive and enter the directory of interest corresponding to the recently scanned subject. Copy the files on your computer. Determine how many dixon scans are there (usually 1 or 2). If there is only 1, create a subfolder named `###-###` in your new subject folder and copy all twix files(should be at least three files: dixon, calibration, and BHUTE) into that subfolder.[NOTE: scan can be processed using only one dixon scan. In that case, only one dixon should be in the subfolder, and rbc2barrier should be inserted manually] If there are 2 dixons, create subfolders `###-###_s1` (for the first dixon scan) and `###-###_s2`(for the second dixon scan) and copy the twix files corresponding to the first dixon (cali, dixon, ute, and optionally dedicated ventilation) and copy the twix files corresponding the second dixon (cali, dixon, ute) into the other.
+2. Then log onto the `smb://duhsnas-pri/xenon_MRI_raw/` drive and enter the directory of interest corresponding to the recently scanned subject. Copy the files on your computer. Determine how many dixon scans are there (usually 1 or 2). If there is only 1, create a subfolder named `###-###` in your new subject folder and copy all twix files(should be at least three files: dixon, calibration, and BHUTE) into that subfolder.(NOTE: scan can be processed using only one dixon scan. In that case, only one dixon should be in the subfolder) If there are 2 dixons, create subfolders `###-###_s1` (for the first dixon scan) and `###-###_s2`(for the second dixon scan) and copy the twix files corresponding to the first dixon (cali, dixon, ute, and optionally dedicated ventilation) and copy the twix files corresponding the second dixon (cali, dixon, ute) into the other.
 
-3. Process the Spectroscopy using MATLAB first. Instructions are on the repository ("Spectroscopy_Processing_Production").
+3. Process the spectroscopy using the MATLAB spectroscopy pipeline first. Instructions are on the repository ("Spectroscopy_Processing_Production").
 
-4. Now to process Dixon scan using Gas Exchange pipeline, navigate to the repository folder (xe-gas-exchange-ver3). Before you run any code, make sure you have the latest updates. You can do this by
+4. Before running the gas exchange pipline, make sure you have the latest updates. You can do this by
 
    ```
    git pull
    ```
 
-5. Create a new config file titled "[subject_id].py" in lower case by copying the demo config file. Then, edit the parameters like subjet id and rbc:m ratio and save it.
+5. Create a new config file titled "[subject_id].py" in lower case by copying one of the demo config files. Then, edit the parameters like subject id and rbc/m ratio and save it. Run the pipeline.
 
-6. Run the pipeline by
+6. Copy all the contents in the subject folder and paste it into `smb://duhsnas-pri/duhs_radiology/Private/TeamXenon/01_ClinicalOutput/Processed_Subjects`
 
-   ```bash
-   conda activate XeGas #activates the conda environment
-   python main --config [path to config file]
-   ```
-
-7. Copy all the contents in the subject folder and paste it into `smb://duhsnas-pri/duhs_radiology/Private/TeamXenon/01_ClinicalOutput/Processed_Subjects`
-
-8. Upload `.pptx` reports to Slack
+7. Upload `.pdf` reports to Slack
 
 ## Acknowledgements:
 
 Original Author: Ziyi Wang
 
-Developers: Ziyi Wang, David Mummy, Junlan Lu, Suphachart Leewiwatwong, Isabelle Dummer, and Sakib Kabir.
+Developers: Ziyi Wang, Junlan Lu, Sakib Kabir, David Mummy, Suphachart Leewiwatwong, and Isabelle Dummer.
 
-Correspondence: Sakib Kabir: sakib.kabir@duke.edu ; David Mummy: david.mummy@duke.edu
+Correspondence: David Mummy: david.mummy@duke.edu
