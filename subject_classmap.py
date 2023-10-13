@@ -364,7 +364,7 @@ class Subject(object):
         elif (
             self.config.segmentation_key == constants.SegmentationKey.MANUAL_VENT.value
         ):
-            logging.info("loading mask file specified by the user.")
+            logging.info("Loading mask file specified by the user.")
             try:
                 self.mask = np.squeeze(
                     np.array(nib.load(self.config.manual_seg_filepath).get_fdata())

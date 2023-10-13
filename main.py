@@ -30,7 +30,6 @@ def gx_mapping_reconstruction(config: base_config.Config):
             subject.read_mrd_files()
         except:
             raise ValueError("Cannot read in raw data files.")
-    logging.info("Getting RBC:M ratio from static spectroscopy.")
     subject.calculate_rbc_m_ratio()
     logging.info("Reconstructing images")
     subject.preprocess()
@@ -38,7 +37,6 @@ def gx_mapping_reconstruction(config: base_config.Config):
     subject.reconstruction_dissolved()
     if config.recon.recon_proton:
         subject.reconstruction_ute()
-    logging.info("Segmenting Proton Mask")
     subject.segmentation()
     subject.registration()
     subject.biasfield_correction()
@@ -68,7 +66,6 @@ def gx_mapping_readin(config: base_config.Config):
     subject = Subject(config=config)
     subject.read_mat_file()
     if FLAGS.force_segmentation:
-        logging.info("Segmenting Proton Mask")
         subject.segmentation()
     subject.gas_binning()
     subject.save_subject_to_mat()
