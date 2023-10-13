@@ -48,7 +48,7 @@ class Recon(base_config.Recon):
     def __init__(self):
         """Initialize the reconstruction parameters."""
         super().__init__()
-        self.recon_key = constants.ReconKey.ROBERTSON
+        self.recon_key = constants.ReconKey.ROBERTSON.value
         self.remove_noisy_projections = True
 
 
