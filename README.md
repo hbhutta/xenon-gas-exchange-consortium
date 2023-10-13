@@ -1,6 +1,6 @@
 # xenon-gas-exchange-python
 
-Gas exchange pipeline, developed at the [Driehuyslab](https://sites.duke.edu/driehuyslab/), processes raw MRI data and produce summary report to analyze the functionality of the human lung. The details of the workflow can be seen in the Wiki(see left menu bar)-- work in progress. This ReadMe presents the installation procedure of the pipeline. Before moving to the installation process, download or clone this repository in your computer.
+The xenon gas exchange pipeline, developed at the [Driehuyslab](https://sites.duke.edu/driehuyslab/), processes raw MRI data and produces a summary report to analyze the functionality of the human lung. The details of the workflow can be seen in the Wiki(see left menu bar)-- work in progress. This ReadMe presents the installation and basic usage the pipeline. Before moving to the installation process, download or clone this repository in your computer.
 
 ## Table of contents:
 
@@ -8,13 +8,13 @@ Gas exchange pipeline, developed at the [Driehuyslab](https://sites.duke.edu/dri
 
 2. [Installation](#installation)
 
-3. [Execution](#execution)
+3. [Usage](#usage)
 
 4. [Acknowledgments](#acknowledgements)
 
 ## Setup
 
-Gas exchange pipeline is a cross platform program that works on Windows, Mac and Linux system. At least 8GB of RAM is required to run this pipeline. Windows users can install Windows Subsystem for Linux (WSL) or install Ubuntu as dual boot/in the virtual box. The details of WSL installation can be seen in Section 1.1. Warning: run time in WSL can be slower compare to Linux or Mac system.
+The xenon gas exchange pipeline is a cross platform program that works on Windows, Mac and Linux system. At least 8GB of RAM is required to run this pipeline. Windows users can install Windows Subsystem for Linux (WSL) or install Ubuntu as dual boot/in the virtual box. The details of WSL installation can be seen in Section 1.1. Warning: run time in WSL can be slower compare to Linux or Mac system.
 
 ### 1.1. Windows Subsystem for Linux
 
@@ -208,7 +208,7 @@ After sucessful ANTs SuperBuild, you will have to copy 'antApplyTransforms', 'an
 
 Note: If necesary, the details of ANTs Compilation can be seen [here](https://github.com/ANTsX/ANTs/wiki/Compiling-ANTs-on-Linux-and-Mac-OS)
 
-## Execution
+## Usage
 
 To process raw MRI data, you can follow the Team Xenon workflow outlined below. Note: Wiki presents the code structure and workflow of this pipeline -- work-in-progress.
 
