@@ -1,6 +1,5 @@
 """Scripts to run gas exchange mapping pipeline."""
 import logging
-import pdb
 
 from absl import app, flags
 from ml_collections import config_flags

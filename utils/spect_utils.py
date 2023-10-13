@@ -1,6 +1,5 @@
 """Spectroscopy util functions."""
 import math
-import pdb
 import sys
 
 sys.path.append("..")

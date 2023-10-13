@@ -17,7 +17,6 @@ This code is based off the code written by Scott Robertson.
 """
 import logging
 import math
-import pdb
 from typing import Tuple
 
 import numpy as np

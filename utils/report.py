@@ -1,6 +1,5 @@
 """Make reports."""
 import os
-import pdb
 import sys
 from typing import Any, Dict
 

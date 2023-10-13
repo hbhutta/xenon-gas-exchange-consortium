@@ -1,7 +1,6 @@
 """Gridding kernels."""
 
 import logging
-import pdb
 import sys
 from abc import ABC, abstractmethod
 

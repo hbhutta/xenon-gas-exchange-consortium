@@ -1,8 +1,6 @@
 """Registration module."""
 import logging
 import os
-import pdb
-import platform
 from typing import Tuple
 
 import nibabel as nib

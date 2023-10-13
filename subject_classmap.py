@@ -2,7 +2,6 @@
 import glob
 import logging
 import os
-import pdb
 from typing import Any, Dict
 
 import nibabel as nib

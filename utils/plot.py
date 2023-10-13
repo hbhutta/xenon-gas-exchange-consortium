@@ -1,6 +1,5 @@
 """Plotting functions for the project."""
 
-import pdb
 import sys
 from typing import Dict, List, Optional, Tuple
 
@@ -8,12 +7,10 @@ import skimage
 
 sys.path.append("..")
 import cv2
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy.stats as stats
 
-from utils import constants, io_utils
+from utils import io_utils
 
 
 def _merge_rgb_and_gray(gray_slice: np.ndarray, rgb_slice: np.ndarray) -> np.ndarray:

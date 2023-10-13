@@ -1,7 +1,6 @@
 """Trajectory calculation util functions."""
 
 import math
-import pdb
 import sys
 from typing import Callable, Tuple
 

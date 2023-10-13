@@ -1,6 +1,5 @@
 """Metrics for evaluating images."""
 import math
-import pdb
 import sys
 from datetime import datetime
 

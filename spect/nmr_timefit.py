@@ -1,6 +1,4 @@
 """NMR time fit class."""
-import logging
-import pdb
 import sys
 from typing import Optional
 

@@ -1,7 +1,6 @@
 """Script to combine PDFs in a folder into a single PDF."""
 import glob
 import os
-import pdb
 from typing import List
 
 from absl import app, flags
