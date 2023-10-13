@@ -1,6 +1,6 @@
 # xenon-gas-exchange-python
 
-The xenon gas exchange pipeline, developed at the [Driehuys Lab](https://sites.duke.edu/driehuyslab/), processes raw MRI data and produces a summary report to analyze the functionality of the human lung. The details of the workflow can be seen in the Wiki(see left menu bar)-- work in progress. This ReadMe presents the installation and basic usage the pipeline. Before moving to the installation process, download or clone this repository in your computer.
+The xenon gas exchange pipeline, developed at the [Driehuys Lab](https://sites.duke.edu/driehuyslab/), processes raw MRI data and produces a summary report to analyze the functionality of the human lung. This ReadMe presents the installation and basic usage the pipeline. Before moving to the installation process, download or clone this repository in your computer.
 
 ## Table of contents:
 
@@ -221,8 +221,6 @@ After sucessful ANTs SuperBuild, you will have to move 'antApplyTransforms', 'an
 Note: If necesary, the details of ANTs Compilation can be seen [here](https://github.com/ANTsX/ANTs/wiki/Compiling-ANTs-on-Linux-and-Mac-OS)
 
 ## Usage
-
-To process raw MRI data, you can follow the Team Xenon workflow outlined below. Note: Wiki presents the code structure and workflow of this pipeline -- work-in-progress.
 
 ### 3.1. General usage
 
