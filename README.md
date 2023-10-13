@@ -116,15 +116,7 @@ Install gcc executing this command: sudo apt install gcc
 
 ##### Mac Users:
 
-If homebrew is not already installed, it can be installed using this command:
-
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-Don't forget to add homebrew to your path. Check if homebrew installed correctly, writing `which brew`. The details of homebrew can be seen [here](https://brew.sh/).
-
-Now install gcc:
+Install gcc:
 
 ```bash
 brew install gcc
@@ -219,6 +211,7 @@ To process raw MRI data, you can follow the Team Xenon workflow outlined below. 
 ### 3.1. General usage
 
 #### 3.1.1 Config files
+
 All subject information and processing parameters are specified in a subject-specific configuration file. Default configuration settings are defined in `config/base_config.py`. The defaults are inhereted by subject-specific config files, unless overriden.
 <br />
 <br />`config/demo_config_basic.py` shows examples of basic config settings that you will usually want to change for each subject scan.
@@ -243,6 +236,7 @@ conda activate XeGas
 #### Running full pipeline with image reconstruction
 
 Run the full pipeline with:
+
 ```bash
 python main.py --config [path-to-config-file]
 ```
@@ -255,7 +249,7 @@ If a subject scan has already been processed through the pipeline and you wish t
 python main.py --config [path-to-config-file] --force_readin
 ```
 
-NOTE: 
+NOTE:
 
 ### 3.2. Team Xenon Worflow for Duke Data Processing
 
