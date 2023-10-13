@@ -104,7 +104,11 @@ conda activate XeGas
 
 #### 2.2.2. Install Required Packages
 
-We will be using pip to install the required packages. First update the pip using: pip install --upgrade pip
+We will be using pip to install the required packages. First update the pip using:
+
+```bash
+pip install --upgrade pip
+```
 
 Now install a c compiler. Here we will install gcc compiler.
 
@@ -210,7 +214,7 @@ To process raw MRI data, you can follow the Team Xenon workflow outlined below. 
 
 ### 3.1. General usage
 
-#### 3.1.1 Config files
+#### 3.1.1 Config file
 
 All subject information and processing parameters are specified in a subject-specific configuration file. Default configuration settings are defined in `config/base_config.py`. The defaults are inhereted by subject-specific config files, unless overriden.
 <br />
