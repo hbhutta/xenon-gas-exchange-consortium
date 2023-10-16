@@ -818,7 +818,7 @@ class Subject(object):
 
         # generate individual PDFs
         pdf_list = [
-            os.path.join(self.config.data_dir, pdf)
+            os.path.join("tmp", pdf)
             for pdf in ["intro.pdf", "clinical.pdf", "grayscale.pdf", "qa"]
         ]
         report.intro(self.dict_info, path=pdf_list[0])
@@ -836,15 +836,8 @@ class Subject(object):
         )
 
         # combine PDFs into one
-        path = os.path.join(
-            self.config.data_dir,
-            "report_{}.pdf".format(self.config.subject_id),
-        )
+        path = "tmp/{}_report.pdf".format(self.config.subject_id)
         report.combine_pdfs(pdf_list, path)
-
-        # remove indvidual PDFs
-        for pdf in pdf_list:
-            os.remove(pdf)
 
     def write_stats_to_csv(self):
         """Write statistics to file."""
@@ -856,16 +849,13 @@ class Subject(object):
         # write to individual subject csv
         io_utils.export_subject_csv(
             {**self.dict_info, **self.dict_stats},
-            path=os.path.join(
-                self.config.data_dir,
-                "stats_{}.csv".format(self.config.subject_id),
-            ),
+            path="tmp/{}_stats.csv".format(self.config.subject_id),
             overwrite=True,
         )
 
     def save_subject_to_mat(self):
         """Save the instance variables into a mat file."""
-        path = os.path.join(self.config.data_dir, self.config.subject_id + ".mat")
+        path = os.path.join("tmp", self.config.subject_id + ".mat")
         io_utils.export_subject_mat(self, path)
 
     def save_files(self):
@@ -882,7 +872,7 @@ class Subject(object):
         )
         io_utils.export_nii(
             np.abs(self.image_gas_highreso),
-            os.path.join(self.config.data_dir, "gas_highreso.nii"),
+            "tmp/gas_highreso.nii",
             self.dict_dis[constants.IOFields.FOV],
         )
         io_utils.export_nii(
@@ -891,7 +881,9 @@ class Subject(object):
             self.dict_dis[constants.IOFields.FOV],
         )
         io_utils.export_nii(
-            np.abs(self.image_rbc), "tmp/rbc.nii", self.dict_dis[constants.IOFields.FOV]
+            np.abs(self.image_rbc),
+            "tmp/rbc.nii",
+            self.dict_dis[constants.IOFields.FOV],
         )
         io_utils.export_nii(
             np.abs(self.image_membrane),
@@ -905,7 +897,7 @@ class Subject(object):
         )
         io_utils.export_nii(
             self.mask.astype(float),
-            os.path.join(self.config.data_dir, "mask_reg.nii"),
+            "tmp/mask_reg.nii",
             self.dict_dis[constants.IOFields.FOV],
         )
         io_utils.export_nii(
@@ -921,14 +913,14 @@ class Subject(object):
             )
             io_utils.export_nii(
                 np.abs(self.image_proton_reg),
-                os.path.join(self.config.data_dir, "proton_reg.nii"),
+                "tmp/proton_reg.nii",
                 self.dict_dis[constants.IOFields.FOV],
             ),
         io_utils.export_nii_4d(
             plot.map_and_overlay_to_rgb(
                 self.image_rbc2gas_binned, proton_reg, constants.CMAP.RBC_BIN2COLOR
             ),
-            os.path.join(self.config.data_dir, "rbc2gas_rgb.nii"),
+            "tmp/rbc2gas_rgb.nii",
         )
         io_utils.export_nii_4d(
             plot.map_and_overlay_to_rgb(
@@ -936,37 +928,41 @@ class Subject(object):
                 proton_reg,
                 constants.CMAP.MEMBRANE_BIN2COLOR,
             ),
-            os.path.join(self.config.data_dir, "membrane2gas_rgb.nii"),
+            "tmp/membrane2gas_rgb.nii",
         )
         io_utils.export_nii_4d(
             plot.map_and_overlay_to_rgb(
-                self.image_gas_binned, proton_reg, constants.CMAP.VENT_BIN2COLOR
+                self.image_gas_binned,
+                proton_reg,
+                constants.CMAP.VENT_BIN2COLOR,
             ),
-            os.path.join(self.config.data_dir, "gas_rgb.nii"),
+            "tmp/gas_rgb.nii",
         )
 
     def save_config_as_json(self):
         """Save subject config .py file as json."""
         io_utils.export_config_to_json(
             self.config,
-            os.path.join(
-                self.config.data_dir, "config_{}.json".format(self.config.subject_id)
-            ),
+            "tmp/{}_config_gx_imaging.json".format(self.config.subject_id),
         )
 
     def move_output_files(self):
         """Move output files into dedicated directory."""
         # define output path
-        output_path = os.path.join(self.config.data_dir, "Gas_Exchange")
+        output_path = os.path.join(self.config.data_dir, "gx_imaging")
 
         # define files to move
         output_files = (
-            glob.glob(os.path.join(self.config.data_dir, "*.mat"))
-            + glob.glob(os.path.join(self.config.data_dir, "*.nii"))
-            + glob.glob(os.path.join(self.config.data_dir, "*.pdf"))
-            + glob.glob(os.path.join(self.config.data_dir, "*.csv"))
-            + glob.glob(os.path.join(self.config.data_dir, "*.py"))
-            + glob.glob(os.path.join(self.config.data_dir, "*.json"))
+            "tmp/{}_config_gx_imaging.json".format(self.config.subject_id),
+            "tmp/{}.mat".format(self.config.subject_id),
+            "tmp/{}_report.pdf".format(self.config.subject_id),
+            "tmp/{}_stats.csv".format(self.config.subject_id),
+            "tmp/gas_highreso.nii",
+            "tmp/gas_rgb.nii",
+            "tmp/mask_reg.nii",
+            "tmp/membrane2gas_rgb.nii",
+            "tmp/proton_reg.nii",
+            "tmp/rbc2gas_rgb.nii",
         )
 
         # move files
