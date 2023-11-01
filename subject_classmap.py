@@ -180,7 +180,7 @@ class Subject(object):
             logging.info("Calculating RBC:M ratio from static spectroscopy.")
             self.rbc_m_ratio, _ = spect_utils.calculate_static_spectroscopy(
                 fid=self.dict_dyn[constants.IOFields.FIDS_DIS],
-                dwell_time=self.dict_dyn[constants.IOFields.DWELL_TIME],
+                sample_time=self.dict_dyn[constants.IOFields.SAMPLE_TIME],
                 tr=self.dict_dyn[constants.IOFields.TR],
                 center_freq=self.dict_dyn[constants.IOFields.FREQ_CENTER],
                 rf_excitation=self.dict_dyn[constants.IOFields.FREQ_EXCITATION],
@@ -642,8 +642,8 @@ class Subject(object):
             constants.IOFields.GIT_BRANCH: report.get_git_branch(),
             constants.IOFields.REFERENCE_DATA_KEY: self.config.reference_data_key,
             constants.IOFields.BANDWIDTH: self.dict_dis[constants.IOFields.BANDWIDTH],
-            constants.IOFields.DWELL_TIME: (
-                1e6 * self.dict_dis[constants.IOFields.DWELL_TIME]
+            constants.IOFields.SAMPLE_TIME: (
+                1e6 * self.dict_dis[constants.IOFields.SAMPLE_TIME]
             ),
             constants.IOFields.FA_DIS: self.dict_dis[constants.IOFields.FA_DIS],
             constants.IOFields.FA_GAS: self.dict_dis[constants.IOFields.FA_GAS],

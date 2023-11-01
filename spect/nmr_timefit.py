@@ -27,7 +27,7 @@ class NMR_TimeFit(NMR_Mix):
         method (str): Method for fitting, either "voigt" or "lorentzian".
         line_broadening (float): Line broadening in Hz.
         zeropad_size (Optional[int]): Zero padding size.
-        dwell_time (float): Dwell time in seconds.
+        sample_time (float): Dwell time in seconds.
         spectral_signal (np.ndarray): Spectral signal.
         f (np.ndarray): Frequency points in Hz.
     """
@@ -79,11 +79,11 @@ class NMR_TimeFit(NMR_Mix):
             ydata, np.exp(-np.pi * self.line_broadening * self.tdata)
         )
         # calculate dwell time from delta tdata
-        self.dwell_time = self.tdata[1] - self.tdata[0]
-        self.spectral_signal = self.dwell_time * np.fft.fftshift(
+        self.sample_time = self.tdata[1] - self.tdata[0]
+        self.spectral_signal = self.sample_time * np.fft.fftshift(
             np.fft.fft(self.ydata, self.zeropad_size)
         )
-        self.f = np.linspace(-0.5, 0.5, self.zeropad_size + 1) / self.dwell_time
+        self.f = np.linspace(-0.5, 0.5, self.zeropad_size + 1) / self.sample_time
         # take out last sample to have the right number of samples
         self.f = self.f[:-1]
         self.sort_freq()
@@ -230,7 +230,7 @@ class NMR_TimeFit(NMR_Mix):
         ax1.legend(["broad time sig", "fit time sig"])
 
         # calculate fit spectral signal
-        complex_fit_spect = self.dwell_time * np.fft.fftshift(
+        complex_fit_spect = self.sample_time * np.fft.fftshift(
             np.fft.fft(complex_fit_time, self.zeropad_size)
         )
 

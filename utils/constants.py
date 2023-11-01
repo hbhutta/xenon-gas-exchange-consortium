@@ -25,7 +25,7 @@ class IOFields(object):
 
     BANDWIDTH = "bandwidth"
     BIASFIELD_KEY = "biasfield_key"
-    DWELL_TIME = "dwell_time"
+    SAMPLE_TIME = "sample_time"
     FA_DIS = "fa_dis"
     FA_GAS = "fa_gas"
     FIDS = "fids"

@@ -375,12 +375,12 @@ def get_bandwidth(
     Returns:
         bandwidth in Hz/pixel
     """
-    dwell_time = get_dwell_time(twix_obj=twix_obj)
+    sample_time = get_dwell_time(twix_obj=twix_obj)
     npts = data_dict[constants.IOFields.FIDS_DIS].shape[1]
     return (
-        1.0 / (2 * dwell_time * npts)
+        1.0 / (2 * sample_time * npts)
         if "BW" not in filename
-        else 1.0 / (2 * npts * dwell_time / 2)
+        else 1.0 / (2 * npts * sample_time / 2)
     )
 
 
