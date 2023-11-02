@@ -182,8 +182,8 @@ class Site(enum.Enum):
     UVA = "uva"
 
 
-class Platform(enum.Enum):
-    """Scanner platform."""
+class SystemVendor(enum.Enum):
+    """Scanner system_vendor."""
 
     SIEMENS = "siemens"
 

@@ -23,7 +23,7 @@ class Config(config_dict.ConfigDict):
         remove_noisy_projections: bool, whether to remove noisy projections
         processes: Process, the evaluation processes
         reference_data: ReferenceData, reference data
-        platform: Platform, the scanner vendor platform
+        system_vendor: SystemVendor, the scanner vendor system_vendor
         reference_data_key: str, reference data key
         segmentation_key: str, the segmentation key
         hb_correction_key: str, hemoglobin correction key
@@ -43,7 +43,7 @@ class Config(config_dict.ConfigDict):
         self.recon = Recon()
         self.reference_data_key = constants.ReferenceDataKey.REFERENCE_218_PPM_01.value
         self.reference_data = ReferenceData(self.reference_data_key)
-        self.platform = constants.Platform.SIEMENS.value
+        self.system_vendor = constants.SystemVendor.SIEMENS.value
         self.segmentation_key = constants.SegmentationKey.CNN_VENT.value
         self.registration_key = constants.RegistrationKey.SKIP.value
         self.bias_key = constants.BiasfieldKey.N4ITK.value
