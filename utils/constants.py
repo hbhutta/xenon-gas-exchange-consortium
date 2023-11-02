@@ -175,8 +175,8 @@ class ScanType(enum.Enum):
     FASTDIXON = "fast"
 
 
-class Site(enum.Enum):
-    """Site name."""
+class Institution(enum.Enum):
+    """Institution name."""
 
     DUKE = "duke"
     UVA = "uva"

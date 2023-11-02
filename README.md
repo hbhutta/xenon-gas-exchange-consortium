@@ -232,7 +232,7 @@ All subject information and processing parameters are specified in a subject-spe
 
 - `data_dir`: Directory containing dixon, ute, and (optionally) calibration scan files or .mat file. This is where output files will be saved.
 - `subject_id`: Subject ID number that will be used to label output files
-- `site`: Site of data acquisition
+- `institution`: Institution of data acquisition
 - `rbc_m_ratio`: RBC to membrane signal ratio for Dixon decomposition. If not set in config file, a calibartion scan file is required from which the ratio will be calculated.
 - `segmentation_key`: Defines what kind of segmentation to use. Typically set to CNN_VENT for automatic segmentation of the gas image or MANUAL_VENT for manual segmentation of the gas image.
 - `manual_seg_filepath`: Path of manual segmentation file, if MANUAL_VENT is chosen.

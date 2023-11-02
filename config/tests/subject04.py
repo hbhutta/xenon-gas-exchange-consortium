@@ -25,7 +25,7 @@ class Config(base_config.Config):
         self.system_vendor = constants.SystemVendor.SIEMENS.value
         self.segmentation_key = constants.SegmentationKey.MANUAL_VENT.value
         self.manual_seg_filepath = os.path.join(self.data_dir, "mask.nii")
-        self.site = constants.Site.DUKE.value
+        self.institution = constants.Institution.DUKE.value
         self.subject_id = "test"
         self.rbc_m_ratio = 0.133
         self.recon = Recon()
