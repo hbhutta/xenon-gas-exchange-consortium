@@ -948,9 +948,6 @@ class Subject(object):
 
     def move_output_files(self):
         """Move output files into dedicated directory."""
-        # define output path
-        output_path = os.path.join(self.config.data_dir, "gx_imaging")
-
         # define files to move
         output_files = (
             "tmp/{}_config_gx_imaging.json".format(self.config.subject_id),
@@ -966,4 +963,4 @@ class Subject(object):
         )
 
         # move files
-        io_utils.move_files(output_files, output_path)
+        io_utils.move_files(output_files, self.config.data_dir)
