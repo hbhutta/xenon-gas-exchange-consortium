@@ -115,7 +115,7 @@ def get_excitation_freq(
         ].value
     )
     freq_excitation_ppm = (freq_excitation_hz) / (
-        get_field_strength * constants.GRYOMAGNETIC_RATIO
+        get_field_strength(header) * constants.GRYOMAGNETIC_RATIO
     )
     return freq_excitation_ppm
 
@@ -164,7 +164,7 @@ def get_scan_date(header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader) -> st
     Returns:
         str: scan date in MM-DD-YYYY format.
     """
-    xml_date = header.measurementInformation.seriesDate
+    xml_date = header.studyInformation.studyDate
     YYYY = str(xml_date[0])
     MM = str(xml_date[1])
     DD = str(xml_date[2])
