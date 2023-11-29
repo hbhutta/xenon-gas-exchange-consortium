@@ -397,9 +397,9 @@ def read_dis_mrd(path: str) -> Dict[str, Any]:
     except:
         raise ValueError("Invalid mrd file.")
 
-    data_dict = mrd_utils.get_gx_data(dataset, header)
+    data_dict = mrd_utils.get_gx_data(dataset)
     return {
-        constants.IOFields.DWELL_TIME: mrd_utils.get_sample_time(header),
+        constants.IOFields.DWELL_TIME: mrd_utils.get_sample_time(dataset),
         constants.IOFields.FA_DIS: mrd_utils.get_flipangle_dissolved(header),
         constants.IOFields.FA_GAS: mrd_utils.get_flipangle_gas(header),
         constants.IOFields.FIDS_DIS: data_dict[constants.IOFields.FIDS_DIS],

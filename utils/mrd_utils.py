@@ -103,18 +103,21 @@ def get_excitation_freq(
         header (ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader): MRD header
 
     Returns:
-        excitation frequency in MHz (float)
+        excitation frequency in ppm (float)
     """
     var_names = [
         header.userParameters.userParameterLong[i].name
         for i in range(len(header.userParameters.userParameterLong))
     ]
-    freq_center = float(
+    freq_excitation_hz = float(
         header.userParameters.userParameterLong[
             var_names.index(constants.IOFields.FREQ_EXCITATION)
         ].value
     )
-    return freq_center * 1e-6
+    freq_excitation_ppm = (freq_excitation_hz) / (
+        get_field_strength * constants.GRYOMAGNETIC_RATIO
+    )
+    return freq_excitation_ppm
 
 
 def get_center_freq(header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader) -> float:
@@ -307,10 +310,7 @@ def get_TR_dissolved(header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader) ->
     return (gas_interleaf + dissolved_interleaf) * 1e-3
 
 
-def get_gx_data(
-    dataset: ismrmrd.hdf5.Dataset,
-    header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader,
-) -> Dict[str, Any]:
+def get_gx_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
     """Get the dissolved phase and gas phase FIDs from twix object.
 
     For reconstruction, we also need important information like the gradient delay,
