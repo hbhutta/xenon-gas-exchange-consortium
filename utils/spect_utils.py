@@ -99,7 +99,7 @@ def get_area_guess(data: Optional[np.ndarray], center_freq: float, rf_excitation
 
 def calculate_static_spectroscopy(
     fid: np.ndarray,
-    dwell_time: float = 1.95e-05,
+    sample_time: float = 1.95e-05,
     tr: float = 0.015,
     center_freq: float = 34.09,
     rf_excitation: int = 218,
@@ -114,7 +114,7 @@ def calculate_static_spectroscopy(
     peak area.
     Args:
         fid (np.ndarray): Dissolved phase FIDs in format (n_points, n_frames).
-        dwell_time (float): Dwell time in seconds.
+        sample_time (float): Dwell time in seconds.
         tr (float): TR in seconds.
         center_freq (float): Center frequency in MHz.
         rf_excitation (int, optional): _description_. Excitation frequency in ppm.
@@ -126,7 +126,7 @@ def calculate_static_spectroscopy(
     Returns:
         Tuple of RBC:M ratio and fit object
     """
-    t = np.array(range(0, np.shape(fid)[0])) * dwell_time
+    t = np.array(range(0, np.shape(fid)[0])) * sample_time
     t_tr = np.array(range(0, np.shape(fid)[1])) * tr
 
     start_ind, _ = get_breathhold_indices(t=t_tr, start_time=2, end_time=10)

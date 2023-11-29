@@ -14,7 +14,7 @@ def remove_contamination(dict_dyn: Dict[str, Any], dict_dis: Dict[str, Any]) -> 
     """Remove gas contamination from data."""
     _, fit_obj = spect_utils.calculate_static_spectroscopy(
         fid=dict_dyn[constants.IOFields.FIDS_DIS],
-        dwell_time=dict_dyn[constants.IOFields.DWELL_TIME],
+        sample_time=dict_dyn[constants.IOFields.SAMPLE_TIME],
         tr=dict_dyn[constants.IOFields.TR],
         center_freq=dict_dyn[constants.IOFields.FREQ_CENTER],
         rf_excitation=dict_dyn[constants.IOFields.FREQ_EXCITATION],
@@ -23,7 +23,7 @@ def remove_contamination(dict_dyn: Dict[str, Any], dict_dis: Dict[str, Any]) -> 
     dict_dis[constants.IOFields.FIDS_DIS] = signal_utils.remove_gasphase_contamination(
         data_dissolved=dict_dis[constants.IOFields.FIDS_DIS],
         data_gas=dict_dis[constants.IOFields.FIDS_DIS],
-        dwell_time=dict_dyn[constants.IOFields.DWELL_TIME],
+        sample_time=dict_dyn[constants.IOFields.SAMPLE_TIME],
         freq_gas_acq_diss=fit_obj.freq[2],
         phase_gas_acq_diss=fit_obj.phase[2],
         area_gas_acq_diss=fit_obj.area[2],
@@ -53,7 +53,7 @@ def prepare_data_and_traj(
     data = data_dict[constants.IOFields.FIDS]
     if generate_traj:
         traj_x, traj_y, traj_z = traj_utils.generate_trajectory(
-            dwell_time=1e6 * data_dict[constants.IOFields.DWELL_TIME],
+            sample_time=1e6 * data_dict[constants.IOFields.SAMPLE_TIME],
             ramp_time=data_dict[constants.IOFields.RAMP_TIME],
             n_frames=data_dict[constants.IOFields.N_FRAMES],
             n_points=data.shape[1],
@@ -100,7 +100,7 @@ def prepare_data_and_traj_interleaved(
 
     if generate_traj:
         traj_x, traj_y, traj_z = traj_utils.generate_trajectory(
-            dwell_time=1e6 * data_dict[constants.IOFields.DWELL_TIME],
+            sample_time=1e6 * data_dict[constants.IOFields.SAMPLE_TIME],
             ramp_time=data_dict[constants.IOFields.RAMP_TIME],
             n_frames=data_dict[constants.IOFields.N_FRAMES],
             n_points=data_gas.shape[1],

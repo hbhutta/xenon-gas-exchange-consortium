@@ -129,7 +129,7 @@ venv.bak/
 .ropeproject
 
 # mkdocs documentation
-/site
+/institution
 
 # mypy
 .mypy_cache/
@@ -175,6 +175,7 @@ assets/tests/**/**.pdf
 assets/tests/**/**.mat
 assets/tests/**/**.pptx
 assets/tests/**/**.dat
+assets/tests/**/**.csv
 # ignore the data folder
 data/*
 !data/.gitkeep

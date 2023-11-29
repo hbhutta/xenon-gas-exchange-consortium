@@ -293,7 +293,7 @@ def _gen_traj(num_projPerFrame: int, traj_type: str) -> np.ndarray:
 
 def _generate_radial_1D_traj(
     decay_time: float = 60,
-    dwell_time: float = 10,
+    sample_time: float = 10,
     grad_delay_time: float = 0,
     n_points: int = 64,
     plat_time: float = 2500,
@@ -305,7 +305,7 @@ def _generate_radial_1D_traj(
         and the gradient delay.
 
     Args:
-        dwell_time (float): dwell time in us
+        sample_time (float): dwell time in us
         grad_delay_time (float): gradient delay time in us
         ramp_time (float): gradient ramp time in us
         plat_time (float): plateau time in us
@@ -315,10 +315,10 @@ def _generate_radial_1D_traj(
     Returns:
         np.ndarray: 1D radial distances
     """
-    grad_delay_npts = grad_delay_time / dwell_time
-    ramp_npts = ramp_time / dwell_time
-    plat_npts = plat_time / dwell_time
-    decay_npts = decay_time / dwell_time
+    grad_delay_npts = grad_delay_time / sample_time
+    ramp_npts = ramp_time / sample_time
+    plat_npts = plat_time / sample_time
+    decay_npts = decay_time / sample_time
     pts_vec = np.array(range(0, n_points))
     # calculate sample number of each region boundary
     ramp_start_pt = grad_delay_npts
@@ -352,7 +352,7 @@ def generate_trajectory(
     del_x: float = 0,
     del_y: float = 0,
     del_z: float = 0,
-    dwell_time: float = 10,
+    sample_time: float = 10,
     n_frames: int = 1000,
     n_points: int = 64,
     plat_time: float = 2500,
@@ -365,7 +365,7 @@ def generate_trajectory(
         generate the full 3D trajectory coordinates.
 
     Args:
-        dwell_time (float): dwell time in us
+        sample_time (float): dwell time in us
         grad_delay_time (float): gradient delay time in us
         ramp_time (float): gradient ramp time in us
         plat_time (float): plateau time in us
@@ -388,7 +388,7 @@ def generate_trajectory(
     """
     radial_distance_x = _generate_radial_1D_traj(
         decay_time=decay_time,
-        dwell_time=dwell_time,
+        sample_time=sample_time,
         n_points=n_points,
         grad_delay_time=del_x,
         plat_time=plat_time,
@@ -396,7 +396,7 @@ def generate_trajectory(
     )
     radial_distance_y = _generate_radial_1D_traj(
         decay_time=decay_time,
-        dwell_time=dwell_time,
+        sample_time=sample_time,
         n_points=n_points,
         grad_delay_time=del_y,
         plat_time=plat_time,
@@ -404,7 +404,7 @@ def generate_trajectory(
     )
     radial_distance_z = _generate_radial_1D_traj(
         decay_time=decay_time,
-        dwell_time=dwell_time,
+        sample_time=sample_time,
         n_points=n_points,
         grad_delay_time=del_z,
         plat_time=plat_time,

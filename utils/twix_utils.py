@@ -154,11 +154,11 @@ def get_field_strength(twix_obj: mapvbvd._attrdict.AttrDict) -> float:
         magnetic field strength in Tesla.
     """
     try:
-        mag_strength = twix_obj.hdr.Dicom.flMagneticFieldStrength
+        field_strength = twix_obj.hdr.Dicom.flMagneticFieldStrength
     except:
         logging.warning("Could not find magnetic field strength, using 3T.")
-        mag_strength = 3.0
-    return mag_strength
+        field_strength = 3.0
+    return field_strength
 
 
 def get_ramp_time(twix_obj: mapvbvd._attrdict.AttrDict) -> float:
@@ -375,12 +375,12 @@ def get_bandwidth(
     Returns:
         bandwidth in Hz/pixel
     """
-    dwell_time = get_dwell_time(twix_obj=twix_obj)
+    sample_time = get_dwell_time(twix_obj=twix_obj)
     npts = data_dict[constants.IOFields.FIDS_DIS].shape[1]
     return (
-        1.0 / (2 * dwell_time * npts)
+        1.0 / (2 * sample_time * npts)
         if "BW" not in filename
-        else 1.0 / (2 * npts * dwell_time / 2)
+        else 1.0 / (2 * npts * sample_time / 2)
     )
 
 
