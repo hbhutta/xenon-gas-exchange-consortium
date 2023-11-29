@@ -155,21 +155,6 @@ def get_TR(header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader) -> float:
     return 1e-3 * header.sequenceParameters.TR[0]
 
 
-def get_excitation_freq(
-    header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader,
-) -> float:
-    """Get the excitation frequency from the MRD header.
-
-    See: https://mriquestions.com/center-frequency.html
-    Args:
-        header (ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader): MRD header
-
-    Returns:
-        float: excitation frequency in ppm
-    """
-    return header.userParameters.userParameterDouble[0].value
-
-
 def get_scan_date(header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader) -> str:
     """Get the scan date from the MRD header in MM-DD-YYYY format.
 
