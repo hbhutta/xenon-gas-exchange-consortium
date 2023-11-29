@@ -201,7 +201,7 @@ def read_dyn_twix(path: str) -> Dict[str, Any]:
     twix_obj.image.flagRemoveOS = False
 
     # Get scan information
-    dwell_time = twix_utils.get_dwell_time(twix_obj=twix_obj)
+    dwell_time = twix_utils.get_sample_time(twix_obj=twix_obj)
     fids_dis = twix_utils.get_dyn_fids(twix_obj)
     freq_center = twix_utils.get_center_freq(twix_obj=twix_obj)
     freq_excitation = twix_utils.get_excitation_freq(twix_obj=twix_obj)
@@ -257,7 +257,7 @@ def read_dis_twix(path: str) -> Dict[str, Any]:
     filename = os.path.basename(path)
 
     return {
-        constants.IOFields.DWELL_TIME: twix_utils.get_dwell_time(twix_obj),
+        constants.IOFields.DWELL_TIME: twix_utils.get_sample_time(twix_obj),
         constants.IOFields.FA_DIS: twix_utils.get_flipangle_dissolved(twix_obj),
         constants.IOFields.FA_GAS: twix_utils.get_flipangle_gas(twix_obj),
         constants.IOFields.FIELD_STRENGTH: twix_utils.get_field_strength(twix_obj),
@@ -314,7 +314,7 @@ def read_ute_twix(path: str) -> Dict[str, Any]:
     data_dict = twix_utils.get_ute_data(twix_obj=twix_obj)
 
     return {
-        constants.IOFields.DWELL_TIME: twix_utils.get_dwell_time(twix_obj),
+        constants.IOFields.DWELL_TIME: twix_utils.get_sample_time(twix_obj),
         constants.IOFields.FIDS: data_dict[constants.IOFields.FIDS],
         constants.IOFields.RAMP_TIME: twix_utils.get_ramp_time(twix_obj),
         constants.IOFields.GRAD_DELAY_X: data_dict[constants.IOFields.GRAD_DELAY_X],
@@ -347,7 +347,7 @@ def read_dyn_mrd(path: str) -> Dict[str, Any]:
     except:
         raise ValueError("Invalid mrd file.")
     # Get scan information
-    dwell_time = mrd_utils.get_dwell_time(header=header)
+    dwell_time = mrd_utils.get_sample_time(dataset=dataset)
     fids_dis = mrd_utils.get_dyn_fids(dataset=dataset)
     freq_center = mrd_utils.get_center_freq(header=header)
     freq_excitation = mrd_utils.get_excitation_freq(header=header)
@@ -399,7 +399,7 @@ def read_dis_mrd(path: str) -> Dict[str, Any]:
 
     data_dict = mrd_utils.get_gx_data(dataset, header)
     return {
-        constants.IOFields.DWELL_TIME: mrd_utils.get_dwell_time(header),
+        constants.IOFields.DWELL_TIME: mrd_utils.get_sample_time(header),
         constants.IOFields.FA_DIS: mrd_utils.get_flipangle_dissolved(header),
         constants.IOFields.FA_GAS: mrd_utils.get_flipangle_gas(header),
         constants.IOFields.FIDS_DIS: data_dict[constants.IOFields.FIDS_DIS],

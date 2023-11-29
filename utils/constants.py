@@ -34,8 +34,8 @@ class IOFields(object):
     FIELD_STRENGTH = "field_strength"
     FLIP_ANGLE_FACTOR = "flip_angle_factor"
     FOV = "fov"
-    FREQ_CENTER = "freq_center"
-    FREQ_EXCITATION = "freq_excitation"
+    FREQ_CENTER = "129Xe_center_frequency"
+    FREQ_EXCITATION = "129Xe_dissolved_offset_frequency"
     GIT_BRANCH = "git_branch"
     GRAD_DELAY_X = "grad_delay_x"
     GRAD_DELAY_Y = "grad_delay_y"
@@ -371,6 +371,14 @@ class HbCorrection(object):
     R1 = 0.288  # coefficient of rbc hb correction equation
     M1 = 0.029  # first coefficient of membrane hb correction equation
     M2 = 0.011  # second coefficient of membrane hb correction equation
+
+
+class ContrastLabels(object):
+    """Numbers for labelling type of FID acquisition excitation."""
+
+    PROTON = 0  # proton acquisition
+    GAS = 1  # gas phase 129Xe acquisition
+    DISSOLVED = 2  # dissolved phase 129Xe acquisition
 
 
 class PipelineVersion(object):

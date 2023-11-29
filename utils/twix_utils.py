@@ -26,7 +26,7 @@ def get_scan_date(twix_obj: mapvbvd._attrdict.AttrDict) -> str:
     return scan_date[:4] + "-" + scan_date[4:6] + "-" + scan_date[6:]
 
 
-def get_dwell_time(twix_obj: mapvbvd._attrdict.AttrDict) -> float:
+def get_sample_time(twix_obj: mapvbvd._attrdict.AttrDict) -> float:
     """Get the dwell time in seconds.
 
     Args:
@@ -375,7 +375,7 @@ def get_bandwidth(
     Returns:
         bandwidth in Hz/pixel
     """
-    dwell_time = get_dwell_time(twix_obj=twix_obj)
+    dwell_time = get_sample_time(twix_obj=twix_obj)
     npts = data_dict[constants.IOFields.FIDS_DIS].shape[1]
     return (
         1.0 / (2 * dwell_time * npts)
