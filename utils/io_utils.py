@@ -156,10 +156,7 @@ def get_dis_mrd_files(path: str) -> str:
         str file path of MRD file
     """
     try:
-        return (
-            glob.glob(os.path.join(path, "**Gas***.h5"))
-            + glob.glob(os.path.join(path, "**dixon***.h5"))
-        )[0]
+        return (glob.glob(os.path.join(path, "**dixon***.h5")))[0]
     except:
         raise ValueError("Can't find MRD file in path.")
 
