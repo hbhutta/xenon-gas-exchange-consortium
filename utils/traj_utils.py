@@ -448,7 +448,7 @@ def get_scaling_factor(
 
     NOTE: for some reason, cincinnati (CCHMC) requires a unique scaling factor
     """
-    if institution == constants.Site.CCHMC:
+    if institution == constants.Site.CCHMC.value:
         return 0.903
     else:
         return n_points / recon_size if scale else 1

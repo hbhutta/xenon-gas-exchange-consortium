@@ -46,7 +46,7 @@ def get_institution_name(
     Returns:
         institution name (str)
     """
-    return header.acquisitionSystemInformation.institutionName
+    return header.acquisitionSystemInformation.institutionName.lower()
 
 
 def get_field_strength(
