@@ -44,6 +44,7 @@ class IOFields(object):
     GRAD_DELAY_Z = "grad_delay_z"
     HB_CORRECTION_KEY = "hb_correction_key"
     HB = "hb"
+    INSTITUTION = "institution"
     RBC_HB_CORRECTION_FACTOR = "rbc_hb_correction_factor"
     MEMBRANE_HB_CORRECTION_FACTOR = "membrane_hb_correction_factor"
     KERNEL_SHARPNESS = "kernel_sharpness"
@@ -182,6 +183,7 @@ class Site(enum.Enum):
 
     DUKE = "duke"
     UVA = "uva"
+    CCHMC = "cchmc"
 
 
 class Platform(enum.Enum):

@@ -232,6 +232,7 @@ class Subject(object):
         self.traj_scaling_factor = traj_utils.get_scaling_factor(
             recon_size=int(self.config.recon.recon_size),
             n_points=self.data_gas.shape[1],
+            institution=self.dict_dis[constants.IOFields.INSTITUTION],
             scale=True,
         )
         self.traj_dissolved *= self.traj_scaling_factor

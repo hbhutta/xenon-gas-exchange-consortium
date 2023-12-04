@@ -424,6 +424,7 @@ def read_dis_mrd(path: str) -> Dict[str, Any]:
         constants.IOFields.GRAD_DELAY_X: np.nan,
         constants.IOFields.GRAD_DELAY_Y: np.nan,
         constants.IOFields.GRAD_DELAY_Z: np.nan,
+        constants.IOFields.INSTITUTION: mrd_utils.get_institution_name(header),
         constants.IOFields.ORIENTATION: mrd_utils.get_orientation(header),
         constants.IOFields.PROTOCOL_NAME: mrd_utils.get_protocol_name(header),
         constants.IOFields.RAMP_TIME: mrd_utils.get_ramp_time(header),
