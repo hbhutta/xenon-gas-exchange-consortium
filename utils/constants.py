@@ -381,6 +381,13 @@ class ContrastLabels(object):
     DISSOLVED = 2  # dissolved phase 129Xe acquisition
 
 
+class BonusSpectraLabels(object):
+    """Numbers for labelling if FID acquisition is part of bonus spectra."""
+
+    NOT_BONUS = 0  # not part of bonus spectra
+    BONUS = 1  # part of bonus spectra
+
+
 class PipelineVersion(object):
     """Pipeline version."""
 

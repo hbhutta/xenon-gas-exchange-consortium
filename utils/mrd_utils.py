@@ -319,20 +319,31 @@ def get_gx_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
         7. gradient delay y in microseconds.
         8. gradient delay z in microseconds.
     """
-    # get the raw FIDs and contrast labels
+    # get the raw FIDs, contrast labels, and bonus spectra labels
     raw_fids = []
     contrast_labels = []
+    bonus_spectra_labels = []
     n_projections = dataset.number_of_acquisitions()
     for i in range(0, int(n_projections)):
         acquisition_header = dataset.read_acquisition(i).getHead()
         raw_fids.append(dataset.read_acquisition(i).data[0].flatten())
         contrast_labels.append(acquisition_header.idx.contrast)
+        bonus_spectra_labels.append(acquisition_header.measurement_uid)
     raw_fids = np.asarray(raw_fids)
     contrast_labels = np.asarray(contrast_labels)
+    bonus_spectra_labels = np.asarray(bonus_spectra_labels)
+
+    # remove bonus spectra
+    raw_fids = raw_fids[
+        bonus_spectra_labels == constants.BonusSpectraLabels.NOT_BONUS, :
+    ]
+    contrast_labels = contrast_labels[
+        bonus_spectra_labels == constants.BonusSpectraLabels.NOT_BONUS
+    ]
 
     # get the trajectories
     raw_traj = np.empty((raw_fids.shape[0], raw_fids.shape[1], 3))
-    for i in range(0, int(n_projections)):  # type: ignore
+    for i in range(0, raw_fids.shape[0]):
         raw_traj[i, :, :] = dataset.read_acquisition(i).traj
 
     return {
