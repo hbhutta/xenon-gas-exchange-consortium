@@ -115,18 +115,20 @@ def prepare_data_and_traj_interleaved(
             del_z=data_dict[constants.IOFields.GRAD_DELAY_Z],
         )
         shape_traj = traj_x.shape
+        # remove projections at the beginning and end of the trajectory
+        if constants.IOFields.N_SKIP_START in data_dict:
+            nskip_start = int(data_dict[constants.IOFields.N_SKIP_START])
+            nskip_end = int(data_dict[constants.IOFields.N_SKIP_END])
+            traj_x = traj_x[nskip_start : shape_traj[0] - (nskip_end)]
+            traj_y = traj_y[nskip_start : shape_traj[0] - (nskip_end)]
+            traj_z = traj_z[nskip_start : shape_traj[0] - (nskip_end)]
     else:
         traj = data_dict[constants.IOFields.TRAJ]
         shape_traj = traj.shape
         traj_x = traj[:, :, 0]
         traj_y = traj[:, :, 1]
         traj_z = traj[:, :, 2]
-    # remove projections at the beginning and end of the trajectory
-    nskip_start = int(data_dict[constants.IOFields.N_SKIP_START])
-    nskip_end = int(data_dict[constants.IOFields.N_SKIP_END])
-    traj_x = traj_x[nskip_start : shape_traj[0] - (nskip_end)]
-    traj_y = traj_y[nskip_start : shape_traj[0] - (nskip_end)]
-    traj_z = traj_z[nskip_start : shape_traj[0] - (nskip_end)]
+
     # stack trajectory
     traj_dis = np.stack([traj_x, traj_y, traj_z], axis=-1)
     traj_gas = np.copy(traj_dis)

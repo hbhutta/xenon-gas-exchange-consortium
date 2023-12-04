@@ -308,9 +308,6 @@ def get_gx_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
             - dissolved phase fids in shape (number fo projections, number of points in ray)
             - k space trajectory of gas and dissolved acquisitions (for standard 1 pt Dixon
                 these are the same)
-            - number of fids in each phase
-            - number of fids to skip from the beginning
-            - number of fids to skip from the end
     """
     # get the raw FIDs, contrast labels, and bonus spectra labels
     raw_fids = []
@@ -350,9 +347,6 @@ def get_gx_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
         constants.IOFields.TRAJ: raw_traj[
             contrast_labels_truncated == constants.ContrastLabels.GAS, :, :
         ],
-        constants.IOFields.N_FRAMES: raw_fids.shape[0] // 2,
-        constants.IOFields.N_SKIP_START: 0,
-        constants.IOFields.N_SKIP_END: 0,
     }
 
 
@@ -365,9 +359,6 @@ def get_ute_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
         a dictionary containing
             - all proton fids of shape (number of projections, number of points in ray)
             - k space trajectory of proton acquisitions
-            - number of fids
-            - number of fids to skip from the beginning
-            - number of fids to skip from the end
     """
     # get the raw FIDs, contrast labels, and bonus spectra labels
     raw_fids = []
@@ -403,7 +394,4 @@ def get_ute_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
         constants.IOFields.TRAJ: raw_traj[
             contrast_labels_truncated == constants.ContrastLabels.PROTON, :, :
         ],
-        constants.IOFields.N_FRAMES: raw_fids.shape[0] // 2,
-        constants.IOFields.N_SKIP_START: 0,
-        constants.IOFields.N_SKIP_END: 0,
     }

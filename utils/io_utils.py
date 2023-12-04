@@ -424,9 +424,6 @@ def read_dis_mrd(path: str) -> Dict[str, Any]:
         constants.IOFields.GRAD_DELAY_X: np.nan,
         constants.IOFields.GRAD_DELAY_Y: np.nan,
         constants.IOFields.GRAD_DELAY_Z: np.nan,
-        constants.IOFields.N_FRAMES: data_dict[constants.IOFields.N_FRAMES],
-        constants.IOFields.N_SKIP_END: data_dict[constants.IOFields.N_SKIP_END],
-        constants.IOFields.N_SKIP_START: data_dict[constants.IOFields.N_SKIP_START],
         constants.IOFields.ORIENTATION: mrd_utils.get_orientation(header),
         constants.IOFields.PROTOCOL_NAME: mrd_utils.get_protocol_name(header),
         constants.IOFields.RAMP_TIME: mrd_utils.get_ramp_time(header),
@@ -462,9 +459,6 @@ def read_ute_mrd(path: str) -> Dict[str, Any]:
         constants.IOFields.GRAD_DELAY_X: np.nan,
         constants.IOFields.GRAD_DELAY_Y: np.nan,
         constants.IOFields.GRAD_DELAY_Z: np.nan,
-        constants.IOFields.N_FRAMES: data_dict[constants.IOFields.N_FRAMES],
-        constants.IOFields.N_SKIP_END: data_dict[constants.IOFields.N_SKIP_END],
-        constants.IOFields.N_SKIP_START: data_dict[constants.IOFields.N_SKIP_START],
         constants.IOFields.TRAJ: data_dict[constants.IOFields.TRAJ],
     }
 
