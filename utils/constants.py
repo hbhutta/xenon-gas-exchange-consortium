@@ -25,6 +25,8 @@ class IOFields(object):
 
     BANDWIDTH = "bandwidth"
     BIASFIELD_KEY = "biasfield_key"
+    BONUS_SPECTRA_LABELS = "bonus_spectra_labels"
+    CONTRAST_LABELS = "contrast_labels"
     DWELL_TIME = "dwell_time"
     FA_DIS = "fa_dis"
     FA_GAS = "fa_gas"

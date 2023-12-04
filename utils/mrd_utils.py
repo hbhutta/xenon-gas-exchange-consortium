@@ -334,32 +334,30 @@ def get_gx_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
     bonus_spectra_labels = np.asarray(bonus_spectra_labels)
 
     # remove bonus spectra
-    raw_fids = raw_fids[
+    raw_fids_truncated = raw_fids[
         bonus_spectra_labels == constants.BonusSpectraLabels.NOT_BONUS, :
     ]
-    contrast_labels = contrast_labels[
+    contrast_labels_truncated = contrast_labels[
         bonus_spectra_labels == constants.BonusSpectraLabels.NOT_BONUS
     ]
 
     # get the trajectories
-    raw_traj = np.empty((raw_fids.shape[0], raw_fids.shape[1], 3))
-    for i in range(0, raw_fids.shape[0]):
+    raw_traj = np.empty((raw_fids_truncated.shape[0], raw_fids_truncated.shape[1], 3))
+    for i in range(0, raw_fids_truncated.shape[0]):
         raw_traj[i, :, :] = dataset.read_acquisition(i).traj
 
     return {
-        constants.IOFields.FIDS_GAS: raw_fids[
-            contrast_labels == constants.ContrastLabels.GAS, :
+        constants.IOFields.FIDS: raw_fids_truncated,
+        constants.IOFields.FIDS_GAS: raw_fids_truncated[
+            contrast_labels_truncated == constants.ContrastLabels.GAS, :
         ],
-        constants.IOFields.FIDS_DIS: raw_fids[
-            contrast_labels == constants.ContrastLabels.DISSOLVED, :
+        constants.IOFields.FIDS_DIS: raw_fids_truncated[
+            contrast_labels_truncated == constants.ContrastLabels.DISSOLVED, :
         ],
         constants.IOFields.TRAJ: raw_traj[
-            contrast_labels == constants.ContrastLabels.GAS, :, :
+            contrast_labels_truncated == constants.ContrastLabels.GAS, :, :
         ],
         constants.IOFields.N_FRAMES: raw_fids.shape[0] // 2,
         constants.IOFields.N_SKIP_START: 0,
         constants.IOFields.N_SKIP_END: 0,
-        constants.IOFields.GRAD_DELAY_X: 0,
-        constants.IOFields.GRAD_DELAY_Y: 0,
-        constants.IOFields.GRAD_DELAY_Z: 0,
     }

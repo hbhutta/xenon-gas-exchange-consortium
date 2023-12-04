@@ -396,17 +396,20 @@ def read_dis_mrd(path: str) -> Dict[str, Any]:
 
     data_dict = mrd_utils.get_gx_data(dataset)
     return {
+        constants.IOFields.BANDWIDTH: np.nan,
         constants.IOFields.DWELL_TIME: mrd_utils.get_sample_time(dataset),
         constants.IOFields.FA_DIS: mrd_utils.get_flipangle_dissolved(header),
         constants.IOFields.FA_GAS: mrd_utils.get_flipangle_gas(header),
+        constants.IOFields.FIDS: data_dict[constants.IOFields.FIDS],
         constants.IOFields.FIDS_DIS: data_dict[constants.IOFields.FIDS_DIS],
         constants.IOFields.FIDS_GAS: data_dict[constants.IOFields.FIDS_GAS],
+        constants.IOFields.FIELD_STRENGTH: mrd_utils.get_field_strength(header),
         constants.IOFields.FOV: mrd_utils.get_FOV(header),
         constants.IOFields.FREQ_CENTER: mrd_utils.get_center_freq(header),
         constants.IOFields.FREQ_EXCITATION: mrd_utils.get_excitation_freq(header),
-        constants.IOFields.GRAD_DELAY_X: data_dict[constants.IOFields.GRAD_DELAY_X],
-        constants.IOFields.GRAD_DELAY_Y: data_dict[constants.IOFields.GRAD_DELAY_Y],
-        constants.IOFields.GRAD_DELAY_Z: data_dict[constants.IOFields.GRAD_DELAY_Z],
+        constants.IOFields.GRAD_DELAY_X: np.nan,
+        constants.IOFields.GRAD_DELAY_Y: np.nan,
+        constants.IOFields.GRAD_DELAY_Z: np.nan,
         constants.IOFields.N_FRAMES: data_dict[constants.IOFields.N_FRAMES],
         constants.IOFields.N_SKIP_END: data_dict[constants.IOFields.N_SKIP_END],
         constants.IOFields.N_SKIP_START: data_dict[constants.IOFields.N_SKIP_START],
