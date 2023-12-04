@@ -194,20 +194,21 @@ class Subject(object):
     def preprocess(self):
         """Prepare data and trajectory for reconstruction.
 
+        NOTE: for standard 1pt Dixon sequence, gas and dissolved trajectories are the same.
+
         Also, calculates the scaling factor for the trajectory.
         """
-        generate_dis_traj = not constants.IOFields.TRAJ in self.dict_dis.keys()
         if self.config.recon.remove_contamination:
             self.dict_dis = pp.remove_contamination(self.dict_dyn, self.dict_dis)
-        (
-            self.data_dissolved,
-            self.traj_dissolved,
-            self.data_gas,
-            self.traj_gas,
-        ) = pp.prepare_data_and_traj_interleaved(
-            self.dict_dis,
-            generate_traj=generate_dis_traj,
-        )
+
+        if constants.IOFields.TRAJ not in self.dict_dis.keys():
+            self.traj_dissolved = pp.prepare_traj(self.dict_dis)
+        else:
+            self.traj_dissolved = self.dict_dis[constants.IOFields.TRAJ]
+        self.traj_gas = self.traj_dissolved
+
+        self.data_dissolved = self.dict_dis[constants.IOFields.FIDS_DIS]
+        self.data_gas = self.dict_dis[constants.IOFields.FIDS_GAS]
         self.data_dissolved, self.traj_dissolved = pp.truncate_data_and_traj(
             self.data_dissolved,
             self.traj_dissolved,
@@ -235,21 +236,23 @@ class Subject(object):
         )
         self.traj_dissolved *= self.traj_scaling_factor
         self.traj_gas *= self.traj_scaling_factor
+
         if self.config.recon.recon_proton:
-            generate_proton_traj = not constants.IOFields.TRAJ in self.dict_ute.keys()
-            (
-                self.data_ute,
-                self.traj_ute,
-            ) = pp.prepare_data_and_traj(
-                self.dict_ute, generate_traj=generate_proton_traj
-            )
+            if constants.IOFields.TRAJ not in self.dict_ute.keys():
+                self.traj_ute = pp.prepare_traj(self.dict_ute)
+            else:
+                self.traj_ute = self.dict_ute[constants.IOFields.TRAJ]
+
+            self.data_ute = self.dict_ute[constants.IOFields.FIDS]
             self.data_ute, self.traj_ute = pp.truncate_data_and_traj(
                 self.data_ute,
                 self.traj_ute,
                 n_skip_start=0,
                 n_skip_end=0,
             )
+
             self.traj_ute *= self.traj_scaling_factor
+
             if self.config.recon.remove_noisy_projections:
                 self.data_ute, self.traj_ute = pp.remove_noisy_projections(
                     self.data_ute, self.traj_ute
