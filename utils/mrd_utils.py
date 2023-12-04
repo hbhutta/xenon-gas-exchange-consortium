@@ -302,7 +302,15 @@ def get_gx_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
         dataset: ismrmrd dataset object
     Returns:
         a dictionary containing
-        TODO
+            - all raw fids of shape (number of projections for gas and dissolved phase combined,
+                number of points in ray)
+            - gas phase fids in shape (number of projections, number of points in ray)
+            - dissolved phase fids in shape (number fo projections, number of points in ray)
+            - k space trajectory of gas and dissolved acquisitions (for standard 1 pt Dixon
+                these are the same)
+            - number of fids in each phase
+            - number of fids to skip from the beginning
+            - number of fids to skip from the end
     """
     # get the raw FIDs, contrast labels, and bonus spectra labels
     raw_fids = []
@@ -355,7 +363,11 @@ def get_ute_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
         dataset: ismrmrd dataset object
     Returns:
         a dictionary containing
-        TODO
+            - all proton fids of shape (number of projections, number of points in ray)
+            - k space trajectory of proton acquisitions
+            - number of fids
+            - number of fids to skip from the beginning
+            - number of fids to skip from the end
     """
     # get the raw FIDs, contrast labels, and bonus spectra labels
     raw_fids = []
