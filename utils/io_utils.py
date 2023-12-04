@@ -161,6 +161,20 @@ def get_dis_mrd_files(path: str) -> str:
         raise ValueError("Can't find MRD file in path.")
 
 
+def get_ute_mrd_files(path: str) -> str:
+    """Get list of proton MRD files.
+
+    Args:
+        path (str): directory path of MRD files
+    Returns:
+        str file path of MRD file
+    """
+    try:
+        return (glob.glob(os.path.join(path, "**proton***.h5")))[0]
+    except:
+        raise ValueError("Can't find MRD file in path.")
+
+
 def get_mat_file(path: str) -> str:
     """Get list of mat file of reconstructed images.
 
@@ -421,6 +435,36 @@ def read_dis_mrd(path: str) -> Dict[str, Any]:
         constants.IOFields.SOFTWARE_VERSION: "NA",
         constants.IOFields.TE90: mrd_utils.get_TE90(header),
         constants.IOFields.TR: mrd_utils.get_TR_dissolved(header),
+        constants.IOFields.TRAJ: data_dict[constants.IOFields.TRAJ],
+    }
+
+
+def read_ute_mrd(path: str) -> Dict[str, Any]:
+    """Read proton MRD file.
+
+    Args:
+        path (str): file path of mrd file
+    Returns: dictionary containing data and metadata extracted from the mrd file.
+    This includes:
+        TODO
+    """
+    try:
+        dataset = ismrmrd.Dataset(path, "dataset", create_if_needed=False)
+        header = ismrmrd.xsd.CreateFromDocument(dataset.read_xml_header())
+    except:
+        raise ValueError("Invalid mrd file.")
+
+    data_dict = mrd_utils.get_ute_data(dataset)
+    return {
+        constants.IOFields.DWELL_TIME: mrd_utils.get_sample_time(dataset),
+        constants.IOFields.FIDS: data_dict[constants.IOFields.FIDS],
+        constants.IOFields.RAMP_TIME: mrd_utils.get_ramp_time(header),
+        constants.IOFields.GRAD_DELAY_X: np.nan,
+        constants.IOFields.GRAD_DELAY_Y: np.nan,
+        constants.IOFields.GRAD_DELAY_Z: np.nan,
+        constants.IOFields.N_FRAMES: data_dict[constants.IOFields.N_FRAMES],
+        constants.IOFields.N_SKIP_END: data_dict[constants.IOFields.N_SKIP_END],
+        constants.IOFields.N_SKIP_START: data_dict[constants.IOFields.N_SKIP_START],
         constants.IOFields.TRAJ: data_dict[constants.IOFields.TRAJ],
     }
 

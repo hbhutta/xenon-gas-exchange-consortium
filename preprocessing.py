@@ -70,8 +70,14 @@ def prepare_data_and_traj(
             traj_y = traj_y[nskip_start : shape_traj[0] - (nskip_end)]
             traj_z = traj_z[nskip_start : shape_traj[0] - (nskip_end)]
     else:
-        raise ValueError("Manual trajectory import not implemented yet.")
+        traj = data_dict[constants.IOFields.TRAJ]
+        traj_x = traj[:, :, 0]
+        traj_y = traj[:, :, 1]
+        traj_z = traj[:, :, 2]
+
+    # stack trajectory
     traj = np.stack([traj_x, traj_y, traj_z], axis=-1)
+
     return data, traj
 
 

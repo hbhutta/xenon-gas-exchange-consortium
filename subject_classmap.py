@@ -137,6 +137,10 @@ class Subject(object):
             )
         except:
             logging.info("No dynamic spectroscopy MRD file found")
+        if self.config.recon.recon_proton:
+            self.dict_ute = io_utils.read_ute_mrd(
+                io_utils.get_ute_mrd_files(str(self.config.data_dir))
+            )
 
     def read_mat_file(self):
         """Read in mat file of reconstructed images.
@@ -192,7 +196,7 @@ class Subject(object):
 
         Also, calculates the scaling factor for the trajectory.
         """
-        generate_traj = not constants.IOFields.TRAJ in self.dict_dis.keys()
+        generate_dis_traj = not constants.IOFields.TRAJ in self.dict_dis.keys()
         if self.config.recon.remove_contamination:
             self.dict_dis = pp.remove_contamination(self.dict_dyn, self.dict_dis)
         (
@@ -202,7 +206,7 @@ class Subject(object):
             self.traj_gas,
         ) = pp.prepare_data_and_traj_interleaved(
             self.dict_dis,
-            generate_traj=generate_traj,
+            generate_traj=generate_dis_traj,
         )
         self.data_dissolved, self.traj_dissolved = pp.truncate_data_and_traj(
             self.data_dissolved,
@@ -232,10 +236,13 @@ class Subject(object):
         self.traj_dissolved *= self.traj_scaling_factor
         self.traj_gas *= self.traj_scaling_factor
         if self.config.recon.recon_proton:
+            generate_proton_traj = not constants.IOFields.TRAJ in self.dict_ute.keys()
             (
                 self.data_ute,
                 self.traj_ute,
-            ) = pp.prepare_data_and_traj(self.dict_ute)
+            ) = pp.prepare_data_and_traj(
+                self.dict_ute, generate_traj=generate_proton_traj
+            )
             self.data_ute, self.traj_ute = pp.truncate_data_and_traj(
                 self.data_ute,
                 self.traj_ute,

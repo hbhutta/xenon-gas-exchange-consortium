@@ -296,28 +296,13 @@ def get_TR_dissolved(header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader) ->
 
 
 def get_gx_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
-    """Get the dissolved phase and gas phase FIDs from twix object.
+    """Get the FID acquisition data from dixon MRD file.
 
-    For reconstruction, we also need important information like the gradient delay,
-    number of fids in each phase, etc. Note, this cannot be trivially read from the
-    twix object, and need to hard code some values. For example, the gradient delay
-    is slightly different depending on the scanner.
     Args:
-        twix_obj: twix object returned from mapVBVD function
+        dataset: ismrmrd dataset object
     Returns:
         a dictionary containing
-        1. dissolved phase FIDs in shape (number of projections,
-            number of points in ray).
-        2. gas phase FIDs in shape (number of projections, number of points in ray).
-        3. trajectory in shape (number of projections, number of points in ray, 3).
-            assumed that the trajectory is the same for both gas and dissolved phases.
-        3. number of fids in each phase, used for trajectory calculation. Note:
-            this may not always be equal to the shape in 1 and 2.
-        4. number of FIDs to skip from the beginning. This may be due to a noise frame.
-        5. number of FIDs to skip from the end. This may be due to calibration.
-        6. gradient delay x in microseconds.
-        7. gradient delay y in microseconds.
-        8. gradient delay z in microseconds.
+        TODO
     """
     # get the raw FIDs, contrast labels, and bonus spectra labels
     raw_fids = []
@@ -356,6 +341,55 @@ def get_gx_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
         ],
         constants.IOFields.TRAJ: raw_traj[
             contrast_labels_truncated == constants.ContrastLabels.GAS, :, :
+        ],
+        constants.IOFields.N_FRAMES: raw_fids.shape[0] // 2,
+        constants.IOFields.N_SKIP_START: 0,
+        constants.IOFields.N_SKIP_END: 0,
+    }
+
+
+def get_ute_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
+    """Get the FID acquisition data from proton MRD file.
+
+    Args:
+        dataset: ismrmrd dataset object
+    Returns:
+        a dictionary containing
+        TODO
+    """
+    # get the raw FIDs, contrast labels, and bonus spectra labels
+    raw_fids = []
+    contrast_labels = []
+    bonus_spectra_labels = []
+    n_projections = dataset.number_of_acquisitions()
+    for i in range(0, int(n_projections)):
+        acquisition_header = dataset.read_acquisition(i).getHead()
+        raw_fids.append(dataset.read_acquisition(i).data[0].flatten())
+        contrast_labels.append(acquisition_header.idx.contrast)
+        bonus_spectra_labels.append(acquisition_header.measurement_uid)
+    raw_fids = np.asarray(raw_fids)
+    contrast_labels = np.asarray(contrast_labels)
+    bonus_spectra_labels = np.asarray(bonus_spectra_labels)
+
+    # remove bonus spectra
+    raw_fids_truncated = raw_fids[
+        bonus_spectra_labels == constants.BonusSpectraLabels.NOT_BONUS, :
+    ]
+    contrast_labels_truncated = contrast_labels[
+        bonus_spectra_labels == constants.BonusSpectraLabels.NOT_BONUS
+    ]
+
+    # get the trajectories
+    raw_traj = np.empty((raw_fids_truncated.shape[0], raw_fids_truncated.shape[1], 3))
+    for i in range(0, raw_fids_truncated.shape[0]):
+        raw_traj[i, :, :] = dataset.read_acquisition(i).traj
+
+    return {
+        constants.IOFields.FIDS: raw_fids_truncated[
+            contrast_labels_truncated == constants.ContrastLabels.PROTON, :
+        ],
+        constants.IOFields.TRAJ: raw_traj[
+            contrast_labels_truncated == constants.ContrastLabels.PROTON, :, :
         ],
         constants.IOFields.N_FRAMES: raw_fids.shape[0] // 2,
         constants.IOFields.N_SKIP_START: 0,
