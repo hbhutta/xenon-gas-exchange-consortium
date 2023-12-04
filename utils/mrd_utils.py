@@ -205,7 +205,7 @@ def get_FOV(header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader) -> float:
     Returns:
         FOV in cm (float)
     """
-    return header.encoding[0].reconSpace.fieldOfView_mm.x * 1e-2
+    return header.encoding[0].reconSpace.fieldOfView_mm.x * 1e-1
 
 
 def get_orientation(header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader) -> str:
