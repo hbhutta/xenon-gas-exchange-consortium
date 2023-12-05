@@ -300,9 +300,9 @@ def get_TR_dissolved(header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader) ->
     Returns:
         TR in seconds (float)
     """
-    gas_interleaf = header.sequenceParameters.TR[0]
-    dissolved_interleaf = header.sequenceParameters.TR[1]
-    return (gas_interleaf + dissolved_interleaf) * 1e-3
+    tr_gas_to_dissolved = header.sequenceParameters.TR[0]
+    tr_dissolved_to_gas = header.sequenceParameters.TR[1]
+    return (tr_gas_to_dissolved + tr_dissolved_to_gas) * 1e-3
 
 
 def get_gx_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
