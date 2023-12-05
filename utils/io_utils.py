@@ -456,6 +456,7 @@ def read_ute_mrd(path: str) -> Dict[str, Any]:
     return {
         constants.IOFields.DWELL_TIME: mrd_utils.get_sample_time(dataset),
         constants.IOFields.FIDS: data_dict[constants.IOFields.FIDS],
+        constants.IOFields.ORIENTATION: mrd_utils.get_orientation(header),
         constants.IOFields.RAMP_TIME: mrd_utils.get_ramp_time(header),
         constants.IOFields.GRAD_DELAY_X: np.nan,
         constants.IOFields.GRAD_DELAY_Y: np.nan,

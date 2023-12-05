@@ -269,7 +269,7 @@ class Subject(object):
                 kernel_extent=9 * float(self.config.recon.kernel_sharpness_hr),
                 image_size=int(self.config.recon.recon_size),
             )
-            orientation = self.dict_dis[constants.IOFields.ORIENTATION]
+            orientation = self.dict_ute[constants.IOFields.ORIENTATION]
         elif self.config.recon.recon_key == constants.ReconKey.PLUMMER.value:
             self.image_proton = reconstruction.reconstruct_cs(
                 data=(recon_utils.flatten_data(self.data_ute)),

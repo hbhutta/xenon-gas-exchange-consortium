@@ -214,16 +214,26 @@ def get_orientation(header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader) -> 
     Args:
         header (ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader): MRD header
     Returns:
-        orientation. Returns coronal if not found.
+        orientation (str): orientation of reconstructed image (coronal, transverse, axial).
+            Returns coronal if not found.
     """
     orientation = ""
     institution = get_institution_name(header)
+
     try:
-        orientation = str(header.userParameters.userParameterString[0].value)
+        var_names = [
+            header.userParameters.userParameterString[i].name
+            for i in range(len(header.userParameters.userParameterString))
+        ]
+        orientation = header.userParameters.userParameterString[
+            var_names.index(constants.IOFields.ORIENTATION)
+        ].value
     except:
         logging.info("Unable to find orientation from twix object, returning coronal.")
 
-    if institution == "CCHMC" and orientation.lower() == constants.Orientation.CORONAL:
+    if institution == constants.Site.CCHMC.value and (
+        orientation.lower() == constants.Orientation.CORONAL or not orientation
+    ):
         return constants.Orientation.CORONAL_CCHMC
     else:
         return orientation.lower() if orientation else constants.Orientation.CORONAL
