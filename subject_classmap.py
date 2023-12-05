@@ -186,8 +186,10 @@ class Subject(object):
                 fid=self.dict_dyn[constants.IOFields.FIDS_DIS],
                 dwell_time=self.dict_dyn[constants.IOFields.DWELL_TIME],
                 tr=self.dict_dyn[constants.IOFields.TR],
-                center_freq=self.dict_dyn[constants.IOFields.FREQ_CENTER],
-                rf_excitation=self.dict_dyn[constants.IOFields.FREQ_EXCITATION],
+                center_freq=self.dict_dyn[constants.IOFields.XE_CENTER_FREQUENCY],
+                rf_excitation=self.dict_dyn[
+                    constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY
+                ],
                 plot=False,
             )
 
@@ -198,17 +200,32 @@ class Subject(object):
 
         Also, calculates the scaling factor for the trajectory.
         """
+        # remove contamination
         if self.config.recon.remove_contamination:
             self.dict_dis = pp.remove_contamination(self.dict_dyn, self.dict_dis)
 
-        if constants.IOFields.TRAJ not in self.dict_dis.keys():
-            self.traj_dissolved = pp.prepare_traj(self.dict_dis)
-        else:
-            self.traj_dissolved = self.dict_dis[constants.IOFields.TRAJ]
-        self.traj_gas = self.traj_dissolved
-
         self.data_dissolved = self.dict_dis[constants.IOFields.FIDS_DIS]
         self.data_gas = self.dict_dis[constants.IOFields.FIDS_GAS]
+
+        # get or generate trajectories and trajectory scaling factors
+        if constants.IOFields.TRAJ not in self.dict_dis.keys():
+            self.traj_dissolved = pp.prepare_traj(self.dict_dis)
+            self.traj_scaling_factor = traj_utils.get_scaling_factor(
+                recon_size=int(self.config.recon.recon_size),
+                n_points=self.data_gas.shape[1],
+            )
+        else:
+            self.traj_dissolved = self.dict_dis[constants.IOFields.TRAJ]
+            if (
+                self.dict_dis[constants.IOFields.INSTITUTION]
+                == constants.Site.CCHMC.value
+            ):
+                self.traj_scaling_factor = (
+                    0.903  # cincinnati requires a unique scaling factor
+                )
+        self.traj_gas = self.traj_dissolved
+
+        # truncate gas and dissolved data and trajectories
         self.data_dissolved, self.traj_dissolved = pp.truncate_data_and_traj(
             self.data_dissolved,
             self.traj_dissolved,
@@ -222,6 +239,7 @@ class Subject(object):
             n_skip_end=int(self.config.recon.n_skip_end),
         )
 
+        # remove noisy FIDs
         if self.config.recon.remove_noisy_projections:
             self.data_gas, self.traj_gas = pp.remove_noisy_projections(
                 self.data_gas, self.traj_gas
@@ -229,35 +247,30 @@ class Subject(object):
             self.data_dissolved, self.traj_dissolved = pp.remove_noisy_projections(
                 self.data_dissolved, self.traj_dissolved
             )
-        self.traj_scaling_factor = traj_utils.get_scaling_factor(
-            recon_size=int(self.config.recon.recon_size),
-            n_points=self.data_gas.shape[1],
-            institution=self.dict_dis[constants.IOFields.INSTITUTION],
-            scale=True,
-        )
+
+        # rescale trajectories
         self.traj_dissolved *= self.traj_scaling_factor
         self.traj_gas *= self.traj_scaling_factor
 
+        # prepare proton data and trajectories
         if self.config.recon.recon_proton:
+            # get or generate trajectories
             if constants.IOFields.TRAJ not in self.dict_ute.keys():
                 self.traj_ute = pp.prepare_traj(self.dict_ute)
             else:
                 self.traj_ute = self.dict_ute[constants.IOFields.TRAJ]
 
+            # get proton data
             self.data_ute = self.dict_ute[constants.IOFields.FIDS]
-            self.data_ute, self.traj_ute = pp.truncate_data_and_traj(
-                self.data_ute,
-                self.traj_ute,
-                n_skip_start=0,
-                n_skip_end=0,
-            )
 
-            self.traj_ute *= self.traj_scaling_factor
-
+            # remove noisy FIDs
             if self.config.recon.remove_noisy_projections:
                 self.data_ute, self.traj_ute = pp.remove_noisy_projections(
                     self.data_ute, self.traj_ute
                 )
+
+            # rescale trajectories
+            self.traj_ute *= self.traj_scaling_factor
 
     def reconstruction_ute(self):
         """Reconstruct the UTE image."""
@@ -666,8 +679,8 @@ class Subject(object):
                 self.dict_dis[constants.IOFields.FA_DIS],
             ),
             constants.IOFields.FOV: self.dict_dis[constants.IOFields.FOV],
-            constants.IOFields.FREQ_EXCITATION: self.dict_dis[
-                constants.IOFields.FREQ_EXCITATION
+            constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY: self.dict_dis[
+                constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY
             ],
             constants.IOFields.GRAD_DELAY_X: self.dict_dis[
                 constants.IOFields.GRAD_DELAY_X

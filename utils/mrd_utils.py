@@ -111,7 +111,7 @@ def get_excitation_freq(
     ]
     freq_excitation_hz = float(
         header.userParameters.userParameterLong[
-            var_names.index(constants.IOFields.FREQ_EXCITATION)
+            var_names.index(constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY)
         ].value
     )
     freq_excitation_ppm = (freq_excitation_hz) / (
@@ -137,7 +137,7 @@ def get_center_freq(header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader) -> 
     ]
     freq_center = float(
         header.userParameters.userParameterLong[
-            var_names.index(constants.IOFields.FREQ_CENTER)
+            var_names.index(constants.IOFields.XE_CENTER_FREQUENCY)
         ].value
     )
     return freq_center * 1e-6

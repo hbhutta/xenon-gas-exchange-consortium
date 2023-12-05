@@ -222,8 +222,8 @@ def read_dyn_twix(path: str) -> Dict[str, Any]:
     return {
         constants.IOFields.DWELL_TIME: dwell_time,
         constants.IOFields.FIDS_DIS: fids_dis,
-        constants.IOFields.FREQ_CENTER: freq_center,
-        constants.IOFields.FREQ_EXCITATION: freq_excitation,
+        constants.IOFields.XE_CENTER_FREQUENCY: freq_center,
+        constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY: freq_excitation,
         constants.IOFields.SCAN_DATE: scan_date,
         constants.IOFields.TR: tr,
     }
@@ -276,8 +276,10 @@ def read_dis_twix(path: str) -> Dict[str, Any]:
         constants.IOFields.FIDS_DIS: data_dict[constants.IOFields.FIDS_DIS],
         constants.IOFields.FIDS_GAS: data_dict[constants.IOFields.FIDS_GAS],
         constants.IOFields.FOV: twix_utils.get_FOV(twix_obj),
-        constants.IOFields.FREQ_CENTER: twix_utils.get_center_freq(twix_obj),
-        constants.IOFields.FREQ_EXCITATION: twix_utils.get_excitation_freq(twix_obj),
+        constants.IOFields.XE_CENTER_FREQUENCY: twix_utils.get_center_freq(twix_obj),
+        constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY: twix_utils.get_excitation_freq(
+            twix_obj
+        ),
         constants.IOFields.GRAD_DELAY_X: data_dict[constants.IOFields.GRAD_DELAY_X],
         constants.IOFields.GRAD_DELAY_Y: data_dict[constants.IOFields.GRAD_DELAY_Y],
         constants.IOFields.GRAD_DELAY_Z: data_dict[constants.IOFields.GRAD_DELAY_Z],
@@ -370,8 +372,8 @@ def read_dyn_mrd(path: str) -> Dict[str, Any]:
     return {
         constants.IOFields.DWELL_TIME: dwell_time,
         constants.IOFields.FIDS_DIS: fids_dis,
-        constants.IOFields.FREQ_CENTER: freq_center,
-        constants.IOFields.FREQ_EXCITATION: freq_excitation,
+        constants.IOFields.XE_CENTER_FREQUENCY: freq_center,
+        constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY: freq_excitation,
         constants.IOFields.SCAN_DATE: scan_date,
         constants.IOFields.TR: tr,
     }
@@ -421,8 +423,10 @@ def read_dis_mrd(path: str) -> Dict[str, Any]:
         constants.IOFields.FIDS_GAS: data_dict[constants.IOFields.FIDS_GAS],
         constants.IOFields.FIELD_STRENGTH: mrd_utils.get_field_strength(header),
         constants.IOFields.FOV: mrd_utils.get_FOV(header),
-        constants.IOFields.FREQ_CENTER: mrd_utils.get_center_freq(header),
-        constants.IOFields.FREQ_EXCITATION: mrd_utils.get_excitation_freq(header),
+        constants.IOFields.XE_CENTER_FREQUENCY: mrd_utils.get_center_freq(header),
+        constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY: mrd_utils.get_excitation_freq(
+            header
+        ),
         constants.IOFields.GRAD_DELAY_X: np.nan,
         constants.IOFields.GRAD_DELAY_Y: np.nan,
         constants.IOFields.GRAD_DELAY_Z: np.nan,
