@@ -212,7 +212,7 @@ def read_dyn_twix(path: str) -> Dict[str, Any]:
     twix_obj.image.flagRemoveOS = False
 
     # Get scan information
-    dwell_time = twix_utils.get_sample_time(twix_obj=twix_obj)
+    sample_time = twix_utils.get_sample_time(twix_obj=twix_obj)
     fids_dis = twix_utils.get_dyn_fids(twix_obj)
     xe_center_frequency = twix_utils.get_center_freq(twix_obj=twix_obj)
     xe_dissolved_offset_frequency = twix_utils.get_excitation_freq(twix_obj=twix_obj)
@@ -220,7 +220,7 @@ def read_dyn_twix(path: str) -> Dict[str, Any]:
     tr = twix_utils.get_TR(twix_obj=twix_obj)
 
     return {
-        constants.IOFields.DWELL_TIME: dwell_time,
+        constants.IOFields.SAMPLE_TIME: sample_time,
         constants.IOFields.FIDS_DIS: fids_dis,
         constants.IOFields.XE_CENTER_FREQUENCY: xe_center_frequency,
         constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY: xe_dissolved_offset_frequency,
@@ -268,7 +268,7 @@ def read_dis_twix(path: str) -> Dict[str, Any]:
     filename = os.path.basename(path)
 
     return {
-        constants.IOFields.DWELL_TIME: twix_utils.get_sample_time(twix_obj),
+        constants.IOFields.SAMPLE: twix_utils.get_sample_time(twix_obj),
         constants.IOFields.FA_DIS: twix_utils.get_flipangle_dissolved(twix_obj),
         constants.IOFields.FA_GAS: twix_utils.get_flipangle_gas(twix_obj),
         constants.IOFields.FIELD_STRENGTH: twix_utils.get_field_strength(twix_obj),
@@ -328,7 +328,7 @@ def read_ute_twix(path: str) -> Dict[str, Any]:
     data_dict = twix_utils.get_ute_data(twix_obj=twix_obj)
 
     return {
-        constants.IOFields.DWELL_TIME: twix_utils.get_sample_time(twix_obj),
+        constants.IOFields.SAMPLE_TIME: twix_utils.get_sample_time(twix_obj),
         constants.IOFields.FIDS: data_dict[constants.IOFields.FIDS],
         constants.IOFields.INSTITUTION: twix_utils.get_institution_name(twix_obj),
         constants.IOFields.RAMP_TIME: twix_utils.get_ramp_time(twix_obj),
@@ -362,7 +362,7 @@ def read_dyn_mrd(path: str) -> Dict[str, Any]:
     except:
         raise ValueError("Invalid mrd file.")
     # Get scan information
-    dwell_time = mrd_utils.get_sample_time(dataset=dataset)
+    sample_time = mrd_utils.get_sample_time(header=header)
     fids_dis = mrd_utils.get_dyn_fids(dataset=dataset)
     xe_center_frequency = mrd_utils.get_center_freq(header=header)
     xe_dissolved_offset_frequency = mrd_utils.get_excitation_freq(header=header)
@@ -370,7 +370,7 @@ def read_dyn_mrd(path: str) -> Dict[str, Any]:
     tr = mrd_utils.get_TR(header=header)
 
     return {
-        constants.IOFields.DWELL_TIME: dwell_time,
+        constants.IOFields.SAMPLE_TIME: sample_time,
         constants.IOFields.FIDS_DIS: fids_dis,
         constants.IOFields.XE_CENTER_FREQUENCY: xe_center_frequency,
         constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY: xe_dissolved_offset_frequency,
@@ -414,8 +414,7 @@ def read_dis_mrd(path: str) -> Dict[str, Any]:
 
     data_dict = mrd_utils.get_gx_data(dataset)
     return {
-        constants.IOFields.BANDWIDTH: np.nan,
-        constants.IOFields.DWELL_TIME: mrd_utils.get_sample_time(dataset),
+        constants.IOFields.SAMPLE_TIME: mrd_utils.get_sample_time(header),
         constants.IOFields.FA_DIS: mrd_utils.get_flipangle_dissolved(header),
         constants.IOFields.FA_GAS: mrd_utils.get_flipangle_gas(header),
         constants.IOFields.FIDS: data_dict[constants.IOFields.FIDS],
@@ -460,7 +459,7 @@ def read_ute_mrd(path: str) -> Dict[str, Any]:
 
     data_dict = mrd_utils.get_ute_data(dataset)
     return {
-        constants.IOFields.DWELL_TIME: mrd_utils.get_sample_time(dataset),
+        constants.IOFields.SAMPLE_TIME: mrd_utils.get_sample_time(dataset),
         constants.IOFields.FIDS: data_dict[constants.IOFields.FIDS],
         constants.IOFields.ORIENTATION: mrd_utils.get_orientation(header),
         constants.IOFields.RAMP_TIME: mrd_utils.get_ramp_time(header),

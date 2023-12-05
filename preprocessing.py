@@ -14,7 +14,7 @@ def remove_contamination(dict_dyn: Dict[str, Any], dict_dis: Dict[str, Any]) -> 
     """Remove gas contamination from data."""
     _, fit_obj = spect_utils.calculate_static_spectroscopy(
         fid=dict_dyn[constants.IOFields.FIDS_DIS],
-        dwell_time=dict_dyn[constants.IOFields.DWELL_TIME],
+        sample_time=dict_dyn[constants.IOFields.SAMPLE_TIME],
         tr=dict_dyn[constants.IOFields.TR],
         center_freq=dict_dyn[constants.IOFields.XE_CENTER_FREQUENCY],
         rf_excitation=dict_dyn[constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY],
@@ -23,7 +23,7 @@ def remove_contamination(dict_dyn: Dict[str, Any], dict_dis: Dict[str, Any]) -> 
     dict_dis[constants.IOFields.FIDS_DIS] = signal_utils.remove_gasphase_contamination(
         data_dissolved=dict_dis[constants.IOFields.FIDS_DIS],
         data_gas=dict_dis[constants.IOFields.FIDS_DIS],
-        dwell_time=dict_dyn[constants.IOFields.DWELL_TIME],
+        sample_time=dict_dyn[constants.IOFields.SAMPLE_TIME],
         freq_gas_acq_diss=fit_obj.freq[2],
         phase_gas_acq_diss=fit_obj.phase[2],
         area_gas_acq_diss=fit_obj.area[2],

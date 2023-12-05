@@ -141,7 +141,7 @@ def inverse_boxcox(
 def remove_gasphase_contamination(
     data_dissolved: np.ndarray,
     data_gas: np.ndarray,
-    dwell_time: float,
+    sample_time: float,
     freq_gas_acq_diss: float,
     phase_gas_acq_diss: float,
     area_gas_acq_diss: float,
@@ -158,7 +158,7 @@ def remove_gasphase_contamination(
             (n_projections, n_points)
         data_gas (np.ndarray): gas phase k-space data of shape
             (n_projections, n_points)
-        dwell_time (float): dwell time in seconds.
+        sample_time (float): dwell time in seconds.
         freq_gas_acq_diss (float): gas frequency offset in dissolved
             spectra acquisition in Hz.
         phase_gas_acq_diss (float): gas phase in dissolved spectra acquisition.
@@ -171,7 +171,7 @@ def remove_gasphase_contamination(
     Paper: https://pubmed.ncbi.nlm.nih.gov/33665905/
     """
     # step 0: calculate parameters
-    arr_t = dwell_time * np.arange(data_dissolved.shape[1])
+    arr_t = sample_time * np.arange(data_dissolved.shape[1])
     # step 1: modulate contamination (gas) to dissolved frequency - first order
     # phase approximation
     phase_shift1 = 2 * np.pi * freq_gas_acq_diss * arr_t  # calculate phase accumulation

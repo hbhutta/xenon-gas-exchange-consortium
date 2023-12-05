@@ -27,7 +27,7 @@ class IOFields(object):
     BIASFIELD_KEY = "biasfield_key"
     BONUS_SPECTRA_LABELS = "bonus_spectra_labels"
     CONTRAST_LABELS = "contrast_labels"
-    DWELL_TIME = "dwell_time"
+    SAMPLE_TIME = "sample_time"
     FA_DIS = "fa_dis"
     FA_GAS = "fa_gas"
     FIDS = "fids"
@@ -178,16 +178,16 @@ class ScanType(enum.Enum):
     FASTDIXON = "fast"
 
 
-class Site(enum.Enum):
-    """Site name."""
+class Institution(enum.Enum):
+    """Institution name."""
 
     DUKE = "duke"
     UVA = "uva"
     CCHMC = "cchmc"
 
 
-class Platform(enum.Enum):
-    """Scanner platform."""
+class SystemVendor(enum.Enum):
+    """Scanner system_vendor."""
 
     SIEMENS = "siemens"
 
