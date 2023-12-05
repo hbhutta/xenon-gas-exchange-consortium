@@ -135,12 +135,12 @@ def get_center_freq(header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader) -> 
         header.userParameters.userParameterLong[i].name
         for i in range(len(header.userParameters.userParameterLong))
     ]
-    freq_center = float(
+    xe_center_frequency = float(
         header.userParameters.userParameterLong[
             var_names.index(constants.IOFields.XE_CENTER_FREQUENCY)
         ].value
     )
-    return freq_center * 1e-6
+    return xe_center_frequency * 1e-6
 
 
 def get_TR(header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader) -> float:
