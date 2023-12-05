@@ -426,7 +426,6 @@ def generate_trajectory(
 def get_scaling_factor(
     recon_size: float = 128,
     n_points: float = 64,
-    institution=constants.Site.DUKE,
 ) -> float:
     """Get the scaling factor for the trajectory.
 

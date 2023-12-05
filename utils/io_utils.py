@@ -268,7 +268,7 @@ def read_dis_twix(path: str) -> Dict[str, Any]:
     filename = os.path.basename(path)
 
     return {
-        constants.IOFields.SAMPLE: twix_utils.get_sample_time(twix_obj),
+        constants.IOFields.SAMPLE_TIME: twix_utils.get_sample_time(twix_obj),
         constants.IOFields.FA_DIS: twix_utils.get_flipangle_dissolved(twix_obj),
         constants.IOFields.FA_GAS: twix_utils.get_flipangle_gas(twix_obj),
         constants.IOFields.FIELD_STRENGTH: twix_utils.get_field_strength(twix_obj),
@@ -414,7 +414,8 @@ def read_dis_mrd(path: str) -> Dict[str, Any]:
 
     data_dict = mrd_utils.get_gx_data(dataset)
     return {
-        constants.IOFields.SAMPLE_TIME: mrd_utils.get_sample_time(header),
+        constants.IOFields.BANDWIDTH: np.nan,
+        constants.IOFields.SAMPLE_TIME: mrd_utils.get_sample_time(dataset),
         constants.IOFields.FA_DIS: mrd_utils.get_flipangle_dissolved(header),
         constants.IOFields.FA_GAS: mrd_utils.get_flipangle_gas(header),
         constants.IOFields.FIDS: data_dict[constants.IOFields.FIDS],

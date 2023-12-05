@@ -43,7 +43,7 @@ def prepare_traj(data_dict: Dict[str, Any]) -> np.ndarray:
     """
     data = data_dict[constants.IOFields.FIDS]
     traj_x, traj_y, traj_z = traj_utils.generate_trajectory(
-        dwell_time=1e6 * data_dict[constants.IOFields.DWELL_TIME],
+        sample_time=1e6 * data_dict[constants.IOFields.SAMPLE_TIME],
         ramp_time=data_dict[constants.IOFields.RAMP_TIME],
         n_frames=data_dict[constants.IOFields.N_FRAMES],
         n_points=data.shape[1],

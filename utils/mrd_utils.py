@@ -231,7 +231,7 @@ def get_orientation(header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader) -> 
     except:
         logging.info("Unable to find orientation from twix object, returning coronal.")
 
-    if institution == constants.Site.CCHMC.value and (
+    if institution == constants.Institution.CCHMC.value and (
         orientation.lower() == constants.Orientation.CORONAL or not orientation
     ):
         return constants.Orientation.CORONAL_CCHMC

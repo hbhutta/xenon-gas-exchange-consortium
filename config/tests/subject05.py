@@ -22,10 +22,8 @@ class Config(base_config.Config):
         """Initialize config parameters."""
         super().__init__()
         self.data_dir = "assets/tests/subject05"
-        self.system_vendor = constants.SystemVendor.SIEMENS.value
         self.segmentation_key = constants.SegmentationKey.MANUAL_VENT.value
         self.manual_seg_filepath = os.path.join(self.data_dir, "mask.nii")
-        self.institution = constants.Institution.DUKE.value
         self.subject_id = "test"
         self.rbc_m_ratio = 0.600
         self.recon = Recon()

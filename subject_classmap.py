@@ -218,7 +218,7 @@ class Subject(object):
             self.traj_dissolved = self.dict_dis[constants.IOFields.TRAJ]
             if (
                 self.dict_dis[constants.IOFields.INSTITUTION]
-                == constants.Site.CCHMC.value
+                == constants.Institution.CCHMC.value
             ):
                 self.traj_scaling_factor = (
                     0.903  # cincinnati requires a unique scaling factor
