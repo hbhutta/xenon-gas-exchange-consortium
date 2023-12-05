@@ -344,6 +344,20 @@ def get_protocol_name(twix_obj: mapvbvd._attrdict.AttrDict) -> str:
         return "unknown"
 
 
+def get_institution_name(twix_obj: mapvbvd._attrdict.AttrDict) -> str:
+    """Get institution name.
+
+    Args:
+        twix_obj: twix object returned from mapVBVD function.
+    Returns:
+        institution name. Returns "unknown" if not found.
+    """
+    try:
+        return str(twix_obj.hdr.Dicom.InstitutionName)
+    except:
+        return "unknown"
+
+
 def get_dyn_fids(
     twix_obj: mapvbvd._attrdict.AttrDict, n_skip_end: int = 20
 ) -> np.ndarray:
