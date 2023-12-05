@@ -276,28 +276,34 @@ class VENTHISTOGRAMFields(object):
     NUMBINS = 50
     XTICKS = np.linspace(0, XLIM, 4)
     YTICKS = np.linspace(0, YLIM, 5)
+    XTICKLABELS = ["{:.2f}".format(x) for x in XTICKS]
+    YTICKLABELS = ["{:.2f}".format(x) for x in YTICKS]
 
 
 class RBCHISTOGRAMFields(object):
     """Ventilation histogram fields."""
 
     COLOR = (247.0 / 255, 96.0 / 255, 111.0 / 255)
-    XLIM = 1.2
+    XLIM = 0.012
     YLIM = 0.1
     NUMBINS = 50
     XTICKS = np.linspace(0, XLIM, 4)
     YTICKS = np.linspace(0, YLIM, 5)
+    XTICKLABELS = ["{:.1e}".format(x) for x in XTICKS]
+    YTICKLABELS = ["{:.2f}".format(x) for x in YTICKS]
 
 
 class MEMBRANEHISTOGRAMFields(object):
     """Membrane histogram fields."""
 
     COLOR = (0.4, 0.7608, 0.6471)
-    XLIM = 2.5
+    XLIM = 0.025
     YLIM = 0.18
     NUMBINS = 70
     XTICKS = np.linspace(0, XLIM, 4)
     YTICKS = np.linspace(0, YLIM, 5)
+    XTICKLABELS = ["{:.1e}".format(x) for x in XTICKS]
+    YTICKLABELS = ["{:.2f}".format(x) for x in YTICKS]
 
 
 class PDFOPTIONS(object):

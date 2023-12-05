@@ -4,6 +4,7 @@ import sys
 from typing import Dict, List, Optional, Tuple
 
 import skimage
+from matplotlib.ticker import ScalarFormatter
 
 sys.path.append("..")
 import cv2
@@ -371,6 +372,8 @@ def plot_histogram(
     refer_fit: Tuple[float, float, float],
     xticks: Optional[List[float]] = None,
     yticks: Optional[List[float]] = None,
+    xticklabels: Optional[List[str]] = None,
+    yticklabels: Optional[List[str]] = None,
 ):
     """Plot histogram of arbitrary data.
 
@@ -384,6 +387,8 @@ def plot_histogram(
         refer_fit (Tuple[float, float, float]): fit parameters of the healthy reference.
         xticks (Optional[List[float]], optional): x ticks. Defaults to None.
         yticks (Optional[List[float]], optional): y ticks. Defaults to None.
+        xticklabels (Optional[List[str]], optional): x tick labels. Defaults to None.
+        yticklabels (Optional[List[str]], optional): y tick labels. Defaults to None.
     """
     # make a thick frame
     plt.rc("axes", linewidth=4)
@@ -402,15 +407,10 @@ def plot_histogram(
     # define and plot healthy reference line
     normal = refer_fit[0] * np.exp(-(((bins - refer_fit[1]) / refer_fit[2]) ** 2))
     ax.plot(bins, normal, "--", color="k", linewidth=4)
-
-    # ax.set_xlabel('Pixel Intensity', fontsize=26)
-    ax.set_ylabel("Fraction of Total Pixels", fontsize=35)
     plt.xlim((0, xlim))
     plt.ylim((0, ylim))
     plt.locator_params(axis="x", nbins=4)
     try:
-        xticklabels = ["{:.1f}".format(x) for x in xticks]
-        yticklabels = ["{:.2f}".format(x) for x in yticks]
         plt.xticks(xticks, xticklabels, fontsize=35)
         plt.yticks(yticks, yticklabels, fontsize=35)
     except TypeError:

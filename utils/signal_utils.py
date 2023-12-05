@@ -208,9 +208,7 @@ def calculate_flipangle_correction(fa_gas: float, fa_dis: float) -> float:
         fa_gas (float): gas flip angle in degrees
         fa_dis (float): dissolved flip angle in degrees
     """
-    return np.round(
-        (100 * np.sin(fa_gas * np.pi / 180) / np.sin(fa_dis * np.pi / 180)), 3
-    )
+    return np.round((np.sin(fa_gas * np.pi / 180) / np.sin(fa_dis * np.pi / 180)), 3)
 
 
 def calculate_flipangle_factor(fa_gas: float, fa_dis: float) -> float:

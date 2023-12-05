@@ -59,15 +59,30 @@ def format_dict(dict_stats: Dict[str, Any]) -> Dict[str, Any]:
     ]
     # list of variables to round to 3 decimal places
     list_round_3 = [constants.StatsIOFields.RBC_M_RATIO]
+    # list of variables to output to scientific notation
+    list_scientific = [
+        constants.StatsIOFields.RBC_MEAN,
+        constants.StatsIOFields.MEMBRANE_MEAN,
+        constants.StatsIOFields.RBC_MEDIAN,
+        constants.StatsIOFields.MEMBRANE_MEDIAN,
+        constants.StatsIOFields.RBC_STDDEV,
+        constants.StatsIOFields.MEMBRANE_STDDEV,
+    ]
+
     for key in dict_stats.keys():
         if isinstance(dict_stats[key], float) and key in list_round_0:
             dict_stats[key] = int(np.round(dict_stats[key], 0))
         elif isinstance(dict_stats[key], float) and key in list_round_3:
             dict_stats[key] = np.round(dict_stats[key], 3)
+        elif isinstance(dict_stats[key], float) and key in list_scientific:
+            dict_stats[key] = "{:.1e}".format(dict_stats[key])
         elif isinstance(dict_stats[key], float) and (
-            key not in list_round_3 or key not in list_round_0
+            key not in list_round_3
+            or key not in list_round_0
+            or key not in list_scientific
         ):
             dict_stats[key] = np.round(dict_stats[key], 2)
+
     return dict_stats
 
 

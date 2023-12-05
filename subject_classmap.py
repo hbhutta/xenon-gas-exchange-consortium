@@ -787,6 +787,8 @@ class Subject(object):
             refer_fit=self.config.reference_data.reference_fit_vent,
             xticks=constants.VENTHISTOGRAMFields.XTICKS,
             yticks=constants.VENTHISTOGRAMFields.YTICKS,
+            xticklabels=constants.VENTHISTOGRAMFields.XTICKLABELS,
+            yticklabels=constants.VENTHISTOGRAMFields.YTICKLABELS,
         )
         plot.plot_histogram(
             data=np.abs(self.image_rbc2gas)[np.array(self.mask, dtype=bool)].flatten(),
@@ -798,6 +800,8 @@ class Subject(object):
             refer_fit=self.config.reference_data.reference_fit_rbc,
             xticks=constants.RBCHISTOGRAMFields.XTICKS,
             yticks=constants.RBCHISTOGRAMFields.YTICKS,
+            xticklabels=constants.RBCHISTOGRAMFields.XTICKLABELS,
+            yticklabels=constants.RBCHISTOGRAMFields.YTICKLABELS,
         )
         plot.plot_histogram(
             data=np.abs(self.image_membrane2gas)[
@@ -811,6 +815,8 @@ class Subject(object):
             refer_fit=self.config.reference_data.reference_fit_membrane,
             xticks=constants.MEMBRANEHISTOGRAMFields.XTICKS,
             yticks=constants.MEMBRANEHISTOGRAMFields.YTICKS,
+            xticklabels=constants.MEMBRANEHISTOGRAMFields.XTICKLABELS,
+            yticklabels=constants.MEMBRANEHISTOGRAMFields.YTICKLABELS,
         )
 
     def generate_pdf(self):
