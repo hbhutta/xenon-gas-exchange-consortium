@@ -1,4 +1,4 @@
-"""Demo configuration file."""
+"""Demo configuration file of processing with MRD files."""
 import os
 import sys
 
@@ -49,7 +49,6 @@ class Recon(base_config.Recon):
         self.scan_type = constants.ScanType.NORMALDIXON.value
         self.remove_noisy_projections = True
         self.n_skip_start = config_utils.get_n_skip_start(self.scan_type)
-        self.recon_size = 128
 
 
 def get_config() -> config_dict.ConfigDict:
