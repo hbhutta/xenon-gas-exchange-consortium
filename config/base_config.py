@@ -23,12 +23,10 @@ class Config(config_dict.ConfigDict):
         remove_noisy_projections: bool, whether to remove noisy projections
         processes: Process, the evaluation processes
         reference_data: ReferenceData, reference data
-        platform: Platform, the scanner vendor platform
         reference_data_key: str, reference data key
         segmentation_key: str, the segmentation key
         hb_correction_key: str, hemoglobin correction key
         hb: float, subject hb value in g/dL
-        site: str, the scan site
         subject_id: str, the subject id
         rbc_m_ratio: float, the RBC to M ratio
     """
@@ -43,13 +41,11 @@ class Config(config_dict.ConfigDict):
         self.recon = Recon()
         self.reference_data_key = constants.ReferenceDataKey.REFERENCE_218_PPM_01.value
         self.reference_data = ReferenceData(self.reference_data_key)
-        self.platform = constants.Platform.SIEMENS.value
         self.segmentation_key = constants.SegmentationKey.CNN_VENT.value
         self.registration_key = constants.RegistrationKey.SKIP.value
         self.bias_key = constants.BiasfieldKey.N4ITK.value
         self.hb_correction_key = constants.HbCorrectionKey.NONE.value
         self.hb = 0.0
-        # self.site = constants.Site.DUKE.value
         self.subject_id = "test"
         self.rbc_m_ratio = 0.0
 
