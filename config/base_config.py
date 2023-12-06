@@ -17,18 +17,18 @@ class Config(config_dict.ConfigDict):
 
     Attributes:
         data_dir: str, path to the data directory
-        manual_seg_filepath: str, path to the manual segmentation nifti file
-        manual_reg_filepath: str, path to manual registration nifti file
-        remove_contamination: bool, whether to remove gas contamination
-        remove_noisy_projections: bool, whether to remove noisy projections
-        processes: Process, the evaluation processes
-        reference_data: ReferenceData, reference data
-        reference_data_key: str, reference data key
-        segmentation_key: str, the segmentation key
         hb_correction_key: str, hemoglobin correction key
         hb: float, subject hb value in g/dL
-        subject_id: str, the subject id
+        manual_reg_filepath: str, path to manual registration nifti file
+        manual_seg_filepath: str, path to the manual segmentation nifti file
+        processes: Process, the evaluation processes
         rbc_m_ratio: float, the RBC to M ratio
+        reference_data_key: str, reference data key
+        reference_data: ReferenceData, reference data
+        remove_contamination: bool, whether to remove gas contamination
+        remove_noisy_projections: bool, whether to remove noisy projections
+        segmentation_key: str, the segmentation key
+        subject_id: str, the subject id
     """
 
     def __init__(self):
