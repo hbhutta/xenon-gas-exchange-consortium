@@ -260,12 +260,7 @@ class Subject(object):
             )
             orientation = self.dict_dis[constants.IOFields.ORIENTATION]
         elif self.config.recon.recon_key == constants.ReconKey.PLUMMER.value:
-            self.image_proton = reconstruction.reconstruct_cs(
-                data=(recon_utils.flatten_data(self.data_ute)),
-                traj=recon_utils.flatten_traj(self.traj_ute),
-                image_size=int(self.config.recon.recon_size),
-            )
-            orientation = constants.Orientation.NONE
+            raise NotImplementedError("Plummer CS reconstruction not implemented.")
         else:
             raise ValueError(f"Unknown reconstruction key")
         self.image_proton = img_utils.interp(
@@ -297,13 +292,7 @@ class Subject(object):
             )
             orientation = self.dict_dis[constants.IOFields.ORIENTATION]
         elif self.config.recon.recon_key == constants.ReconKey.PLUMMER.value:
-            self.image_gas_highsnr = reconstruction.reconstruct_cs(
-                data=recon_utils.flatten_data(self.data_gas),
-                traj=recon_utils.flatten_traj(self.traj_gas),
-                image_size=int(self.config.recon.recon_size),
-            )
-            self.image_gas_highreso = self.image_gas_highsnr
-            orientation = constants.Orientation.NONE
+            raise NotImplementedError("Plummer CS reconstruction not implemented.")
         else:
             raise ValueError(
                 f"Unknown reconstruction key: {self.config.recon.recon_key}"
@@ -342,13 +331,7 @@ class Subject(object):
             )
             orientation = self.dict_dis[constants.IOFields.ORIENTATION]
         elif self.config.recon.recon_key == constants.ReconKey.PLUMMER.value:
-            self.image_dissolved = reconstruction.reconstruct_cs(
-                data=recon_utils.flatten_data(self.data_dissolved),
-                traj=recon_utils.flatten_traj(self.traj_dissolved),
-                image_size=int(self.config.recon.recon_size),
-            )
-            # self.image_dissolved = np.conjugate(self.image_dissolved)
-            orientation = constants.Orientation.NONE
+            raise NotImplementedError("Plummer CS reconstruction not implemented.")
         else:
             raise ValueError(f"Unknown reconstruction key")
         self.image_dissolved = img_utils.interp(
