@@ -15,7 +15,6 @@ class Config(base_config.Config):
     """Demo config file.
 
     Inherit from base_config.Config and override the parameters.
-    Subject 007-005B from Duke is used as the example.
     """
 
     def __init__(self):
