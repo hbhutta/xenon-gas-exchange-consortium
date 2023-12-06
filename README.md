@@ -1,6 +1,6 @@
 # xenon-gas-exchange-python
 
-The xenon gas exchange pipeline, developed at the [Driehuys Lab](https://sites.duke.edu/driehuyslab/), processes raw MRI data and produces a summary report to analyze the functionality of the human lung. This ReadMe presents the installation and basic usage the pipeline. Before moving to the installation process, download or clone this repository in your computer.
+The xenon gas exchange pipeline, developed at the [Driehuys Lab](https://sites.duke.edu/driehuyslab/), processes raw <sup>129</sup>Xe MRI data and produces a summary report to analyze the functionality of the human lung. This README presents the installation and basic usage the pipeline. Before moving to the installation process, download or clone this repository in your computer.
 
 ## Table of contents:
 
@@ -224,22 +224,28 @@ Note: If necesary, the details of ANTs Compilation can be seen [here](https://gi
 
 ### 3.1. General usage
 
-#### 3.1.1 Config file
+#### 3.1.1 Accepted file inputs
+
+The pipeline accepts Siemens twix (.dat) or ISMRMRD (.h5) files for standard proton UTE, 1-point Dixon, and (optionally) calibration scans. Alternatively, if a subject scan has already been processed through the pipeline and you wish to reprocess the previously constructed images, you can run the pipeline on the subject's .mat file. ISMRMRD files must be named and formatted according to the <sup>129</sup>Xe MRI clinical trials consortium specifications: https://docs.google.com/spreadsheets/d/1SeG4K4VgA1DUrTBhSjgeSqu3UCGiCWaLG3wqHg6hBh8/edit?usp=sharing.
+
+More information on consortium protocol for the proton UTE, 1-point Dixon, and calibration scans can be found in the following reference:
+>Niedbalski, PJ, Hall, CS, Castro, M, et al. Protocols for multi-site trials using hyperpolarized 129Xe MRI for imaging of ventilation, alveolar-airspace size, and gas exchange: A position paper from the 129Xe MRI clinical trials consortium. Magn Reson Med. 2021; 86: 2966–2986. https://doi.org/10.1002/mrm.28985
+
+#### 3.1.2 Config file
 
 All subject information and processing parameters are specified in a subject-specific configuration file. Default configuration settings are defined in `config/base_config.py`. The defaults are inhereted by subject-specific config files, unless overriden.
 <br />
 <br />`config/demo_config_basic.py` shows examples of basic config settings that you will usually want to change for each subject scan.
 
-- `data_dir`: Directory containing dixon, ute, and (optionally) calibration scan files or .mat file. This is where output files will be saved.
+- `data_dir`: Directory containing Dixon, proton, and (optionally) calibration scan files or .mat file. This is where output files will be saved.
 - `subject_id`: Subject ID number that will be used to label output files
-- `institution`: Institution of data acquisition
 - `rbc_m_ratio`: RBC to membrane signal ratio for Dixon decomposition. If not set in config file, a calibartion scan file is required from which the ratio will be calculated.
 - `segmentation_key`: Defines what kind of segmentation to use. Typically set to CNN_VENT for automatic segmentation of the gas image or MANUAL_VENT for manual segmentation of the gas image.
 - `manual_seg_filepath`: Path of manual segmentation file, if MANUAL_VENT is chosen.
 
 `config/demo_config_advanced.py` shows examples of advanced config settings that may commonly be modified for more specific cases. See `config/base_config.py` for all config settings that can be modified.
 
-#### 3.1.2 Processing a subject
+#### 3.1.3 Processing a subject
 
 First, copy one of the demo config files or the base_config file, rename it, and modify configuration settings. In terminal, navigate to the main pipeline directory and activate the virtual environment you set up earlier:
 
