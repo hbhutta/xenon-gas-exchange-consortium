@@ -119,14 +119,14 @@ class ReferenceData(object):
         if (
             reference_data_key == constants.ReferenceDataKey.REFERENCE_218_PPM_01.value
         ) or (reference_data_key == constants.ReferenceDataKey.MANUAL.value):
-            self.threshold_vent = np.array([0.185, 0.418, 0.647, 0.806, 0.933])
-            self.threshold_rbc = np.array([0.066, 0.250, 0.453, 0.675, 0.956])
-            self.threshold_membrane = np.array(
-                [0.180, 0.458, 0.736, 1.014, 1.292, 1.57, 1.848]
+            self.threshold_vent = np.array([0.3621, 0.5724, 0.7265, 0.8543, 0.9662])
+            self.threshold_rbc = np.array([0.1007, 0.2723, 0.512, 0.814, 1.1743]) * 1e-2
+            self.threshold_membrane = (
+                np.array([0.3826, 0.5928, 0.8486, 1.1498, 1.4964]) * 1e-2
             )
-            self.reference_fit_vent = (0.04074, 0.619, 0.196)
-            self.reference_fit_rbc = (0.06106, 0.471, 0.259)
-            self.reference_fit_membrane = (0.0700, 0.736, 0.278)
+            self.reference_fit_vent = (0.04074, 0.712, 0.15)
+            self.reference_fit_rbc = (0.06106, 0.543 * 1e-2, 0.277 * 1e-2)
+            self.reference_fit_membrane = (0.0700, 0.871 * 1e-2, 0.284 * 1e-2)
             self.reference_stats = {
                 "vent_defect_avg": "5",
                 "vent_defect_std": "3",

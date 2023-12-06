@@ -260,12 +260,7 @@ class Subject(object):
             )
             orientation = self.dict_dis[constants.IOFields.ORIENTATION]
         elif self.config.recon.recon_key == constants.ReconKey.PLUMMER.value:
-            self.image_proton = reconstruction.reconstruct_cs(
-                data=(recon_utils.flatten_data(self.data_ute)),
-                traj=recon_utils.flatten_traj(self.traj_ute),
-                image_size=int(self.config.recon.recon_size),
-            )
-            orientation = constants.Orientation.NONE
+            raise NotImplementedError("Plummer CS reconstruction not implemented.")
         else:
             raise ValueError(f"Unknown reconstruction key")
         self.image_proton = img_utils.interp(
@@ -297,13 +292,7 @@ class Subject(object):
             )
             orientation = self.dict_dis[constants.IOFields.ORIENTATION]
         elif self.config.recon.recon_key == constants.ReconKey.PLUMMER.value:
-            self.image_gas_highsnr = reconstruction.reconstruct_cs(
-                data=recon_utils.flatten_data(self.data_gas),
-                traj=recon_utils.flatten_traj(self.traj_gas),
-                image_size=int(self.config.recon.recon_size),
-            )
-            self.image_gas_highreso = self.image_gas_highsnr
-            orientation = constants.Orientation.NONE
+            raise NotImplementedError("Plummer CS reconstruction not implemented.")
         else:
             raise ValueError(
                 f"Unknown reconstruction key: {self.config.recon.recon_key}"
@@ -342,13 +331,7 @@ class Subject(object):
             )
             orientation = self.dict_dis[constants.IOFields.ORIENTATION]
         elif self.config.recon.recon_key == constants.ReconKey.PLUMMER.value:
-            self.image_dissolved = reconstruction.reconstruct_cs(
-                data=recon_utils.flatten_data(self.data_dissolved),
-                traj=recon_utils.flatten_traj(self.traj_dissolved),
-                image_size=int(self.config.recon.recon_size),
-            )
-            # self.image_dissolved = np.conjugate(self.image_dissolved)
-            orientation = constants.Orientation.NONE
+            raise NotImplementedError("Plummer CS reconstruction not implemented.")
         else:
             raise ValueError(f"Unknown reconstruction key")
         self.image_dissolved = img_utils.interp(
@@ -502,15 +485,23 @@ class Subject(object):
             image2=np.abs(self.image_gas_highsnr),
             mask=self.mask_vent,
         )
-        # scale by flip angle difference and TE90
-        scale_factor = signal_utils.calculate_flipangle_correction(
+        # scale by flip angle difference
+        flip_angle_scale_factor = signal_utils.calculate_flipangle_correction(
             self.dict_dis[constants.IOFields.FA_GAS],
             self.dict_dis[constants.IOFields.FA_DIS],
-        ) * signal_utils.calculate_t2star_correction(
-            self.dict_dis[constants.IOFields.TE90],
         )
-        self.image_rbc2gas = scale_factor * self.image_rbc2gas
-        self.image_membrane2gas = scale_factor * self.image_membrane2gas
+        t2star_scale_factor_rbc = signal_utils.calculate_t2star_correction(
+            self.dict_dis[constants.IOFields.TE90], constants.T2STAR_RBC
+        )
+        t2star_scale_factor_m = signal_utils.calculate_t2star_correction(
+            self.dict_dis[constants.IOFields.TE90], constants.T2STAR_RBC
+        )
+        self.image_rbc2gas = (
+            flip_angle_scale_factor * t2star_scale_factor_rbc * self.image_rbc2gas
+        )
+        self.image_membrane2gas = (
+            flip_angle_scale_factor * t2star_scale_factor_m * self.image_membrane2gas
+        )
 
     def dissolved_binning(self):
         """Bin dissolved images to colormap bins."""
@@ -692,8 +683,13 @@ class Subject(object):
             constants.IOFields.REMOVE_NOISE: self.config.recon.remove_noisy_projections,
             constants.IOFields.SHAPE_FIDS: self.dict_dis[constants.IOFields.FIDS].shape,
             constants.IOFields.SHAPE_IMAGE: self.image_gas_highreso.shape,
-            constants.IOFields.T2_CORRECTION_FACTOR: signal_utils.calculate_t2star_correction(
+            constants.IOFields.T2_CORRECTION_FACTOR_MEMBRANE: signal_utils.calculate_t2star_correction(
                 self.dict_dis[constants.IOFields.TE90],
+                constants.T2STAR_MEMBRANE,
+            ),
+            constants.IOFields.T2_CORRECTION_FACTOR_RBC: signal_utils.calculate_t2star_correction(
+                self.dict_dis[constants.IOFields.TE90],
+                constants.T2STAR_RBC,
             ),
             constants.IOFields.TE90: 1e6 * self.dict_dis[constants.IOFields.TE90],
             constants.IOFields.TR_DIS: self.dict_dis[constants.IOFields.TR],
@@ -787,6 +783,8 @@ class Subject(object):
             refer_fit=self.config.reference_data.reference_fit_vent,
             xticks=constants.VENTHISTOGRAMFields.XTICKS,
             yticks=constants.VENTHISTOGRAMFields.YTICKS,
+            xticklabels=constants.VENTHISTOGRAMFields.XTICKLABELS,
+            yticklabels=constants.VENTHISTOGRAMFields.YTICKLABELS,
         )
         plot.plot_histogram(
             data=np.abs(self.image_rbc2gas)[np.array(self.mask, dtype=bool)].flatten(),
@@ -798,6 +796,8 @@ class Subject(object):
             refer_fit=self.config.reference_data.reference_fit_rbc,
             xticks=constants.RBCHISTOGRAMFields.XTICKS,
             yticks=constants.RBCHISTOGRAMFields.YTICKS,
+            xticklabels=constants.RBCHISTOGRAMFields.XTICKLABELS,
+            yticklabels=constants.RBCHISTOGRAMFields.YTICKLABELS,
         )
         plot.plot_histogram(
             data=np.abs(self.image_membrane2gas)[
@@ -811,6 +811,8 @@ class Subject(object):
             refer_fit=self.config.reference_data.reference_fit_membrane,
             xticks=constants.MEMBRANEHISTOGRAMFields.XTICKS,
             yticks=constants.MEMBRANEHISTOGRAMFields.YTICKS,
+            xticklabels=constants.MEMBRANEHISTOGRAMFields.XTICKLABELS,
+            yticklabels=constants.MEMBRANEHISTOGRAMFields.YTICKLABELS,
         )
 
     def generate_pdf(self):

@@ -4,16 +4,11 @@ import enum
 import numpy as np
 
 FOVINFLATIONSCALE3D = 1000.0
-
-_DEFAULT_SLICE_THICKNESS = 3.125
-_DEFAULT_PIXEL_SIZE = 3.125
-_DEFAULT_MAX_IMG_VALUE = 255.0
-
-_RAYLEIGH_FACTOR = 0.66
 GRYOMAGNETIC_RATIO = 11.777  # MHz/T
-_VEN_PERCENTILE_RESCALE = 99.0
-_VEN_PERCENTILE_THRESHOLD_SEG = 80
-_PROTON_PERCENTILE_RESCALE = 99.8
+T2STAR_GAS = 1.8e-2  # seconds
+T2STAR_RBC = 1.089 * 1e-3  # seconds
+T2STAR_MEMBRANE = 1.183 * 1e-3  # seconds
+
 
 KCO_ALPHA = 11.2  # membrane
 KCO_BETA = 14.6  # RBC
@@ -68,7 +63,8 @@ class IOFields(object):
     SLICE_THICKNESS = "slice_thickness"
     SOFTWARE_VERSION = "software_version"
     SUBJECT_ID = "subject_id"
-    T2_CORRECTION_FACTOR = "t2_correction_factor"
+    T2_CORRECTION_FACTOR_MEMBRANE = "t2_correction_factor_membrane"
+    T2_CORRECTION_FACTOR_RBC = "t2_correction_factor_rbc"
     TE90 = "te90"
     TR = "tr"
     TR_DIS = "tr_dis"
@@ -276,28 +272,34 @@ class VENTHISTOGRAMFields(object):
     NUMBINS = 50
     XTICKS = np.linspace(0, XLIM, 4)
     YTICKS = np.linspace(0, YLIM, 5)
+    XTICKLABELS = ["{:.2f}".format(x) for x in XTICKS]
+    YTICKLABELS = ["{:.2f}".format(x) for x in YTICKS]
 
 
 class RBCHISTOGRAMFields(object):
     """Ventilation histogram fields."""
 
     COLOR = (247.0 / 255, 96.0 / 255, 111.0 / 255)
-    XLIM = 1.2
+    XLIM = 0.012
     YLIM = 0.1
     NUMBINS = 50
     XTICKS = np.linspace(0, XLIM, 4)
     YTICKS = np.linspace(0, YLIM, 5)
+    XTICKLABELS = ["{:.1e}".format(x) for x in XTICKS]
+    YTICKLABELS = ["{:.2f}".format(x) for x in YTICKS]
 
 
 class MEMBRANEHISTOGRAMFields(object):
     """Membrane histogram fields."""
 
     COLOR = (0.4, 0.7608, 0.6471)
-    XLIM = 2.5
+    XLIM = 0.025
     YLIM = 0.18
     NUMBINS = 70
     XTICKS = np.linspace(0, XLIM, 4)
     YTICKS = np.linspace(0, YLIM, 5)
+    XTICKLABELS = ["{:.1e}".format(x) for x in XTICKS]
+    YTICKLABELS = ["{:.2f}".format(x) for x in YTICKS]
 
 
 class PDFOPTIONS(object):
