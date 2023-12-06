@@ -159,7 +159,8 @@ z_connection_lost.txt
 option/*.json
 config/*
 !config/base_config.py
-!config/demo_config.py
+!config/demo_config_basic.py
+!config/demo_config_advanced.py
 !config/config_utils.py
 !config/tests/
 config/tests/*
