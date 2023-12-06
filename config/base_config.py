@@ -17,7 +17,6 @@ class Config(config_dict.ConfigDict):
 
     Attributes:
         data_dir: str, path to the data directory
-        field_strength: float, the B0 field strength in Tesla
         hb_correction_key: str, hemoglobin correction key
         hb: float, subject hb value in g/dL
         manual_reg_filepath: str, path to manual registration nifti file
