@@ -1,4 +1,4 @@
-# xenon-gas-exchange-python
+# <sup>129</sup>Xe gas exchange imaging pipeline
 
 The xenon gas exchange pipeline, developed at the [Driehuys Lab](https://sites.duke.edu/driehuyslab/), processes raw MRI data and produces a summary report to analyze the functionality of the human lung. This ReadMe presents the installation and basic usage the pipeline. Before moving to the installation process, download or clone this repository in your computer.
 
@@ -263,8 +263,6 @@ If a subject scan has already been processed through the pipeline and you wish t
 python main.py --config [path-to-config-file] --force_readin
 ```
 
-NOTE:
-
 ### 3.2. Team Xenon Worflow for Duke Data Processing
 
 Warning: this is the Team Xenon workflow only. Other users do not have to follow the exact procedures.
@@ -289,8 +287,10 @@ Warning: this is the Team Xenon workflow only. Other users do not have to follow
 
 ## Acknowledgements:
 
-Original Author: Ziyi Wang
+Developers: Junlan Lu, Aryil Bechtel, Sakib Kabir, Suphachart Leewiwatwong, David Mummy.
 
-Developers: Ziyi Wang, Junlan Lu, Sakib Kabir, Suphachart Leewiwatwong, Aryil Bechtel, David Mummy, and Isabelle Dummer.
+Code inspired by: Ziyi Wang
+
+Additional help: Isabelle Dummer, Joanna Nowakowska, Shuo Zhang
 
 Correspondence: David Mummy: david.mummy@duke.edu
