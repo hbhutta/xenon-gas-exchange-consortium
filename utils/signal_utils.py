@@ -190,14 +190,14 @@ def remove_gasphase_contamination(
     return data_dissolved - contamination_kspace3
 
 
-def calculate_t2star_correction(te90: float) -> float:
+def calculate_t2star_correction(te90: float, t2star_dis: float) -> float:
     """Calculate T2* correction factor.
 
-    Rounds to 3 decimal places.
     Args:
         te90 (float): echo time in seconds
+        t2star_dis (float): T2* of the dissolved phase in seconds
     """
-    return np.round(np.exp(te90 / 2e-3) / np.exp(te90 / 5e-2), 3)
+    return np.exp(te90 / t2star_dis) / np.exp(te90 / constants.T2STAR_GAS)
 
 
 def calculate_flipangle_correction(fa_gas: float, fa_dis: float) -> float:
