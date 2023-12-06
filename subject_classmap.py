@@ -515,10 +515,14 @@ class Subject(object):
             self.dict_dis[constants.IOFields.FA_DIS],
         )
         t2star_scale_factor_rbc = signal_utils.calculate_t2star_correction(
-            self.dict_dis[constants.IOFields.TE90], constants.T2STAR_RBC
+            self.dict_dis[constants.IOFields.TE90],
+            constants.T2STAR_RBC_3T,
+            self.dict_dis[constants.IOFields.FIELD_STRENGTH],
         )
         t2star_scale_factor_m = signal_utils.calculate_t2star_correction(
-            self.dict_dis[constants.IOFields.TE90], constants.T2STAR_RBC
+            self.dict_dis[constants.IOFields.TE90],
+            constants.T2STAR_RBC_3T,
+            self.dict_dis[constants.IOFields.FIELD_STRENGTH],
         )
         self.image_rbc2gas = (
             flip_angle_scale_factor * t2star_scale_factor_rbc * self.image_rbc2gas
@@ -709,11 +713,13 @@ class Subject(object):
             constants.IOFields.SHAPE_IMAGE: self.image_gas_highreso.shape,
             constants.IOFields.T2_CORRECTION_FACTOR_MEMBRANE: signal_utils.calculate_t2star_correction(
                 self.dict_dis[constants.IOFields.TE90],
-                constants.T2STAR_MEMBRANE,
+                constants.T2STAR_MEMBRANE_3T,
+                self.dict_dis[constants.IOFields.FIELD_STRENGTH],
             ),
             constants.IOFields.T2_CORRECTION_FACTOR_RBC: signal_utils.calculate_t2star_correction(
                 self.dict_dis[constants.IOFields.TE90],
-                constants.T2STAR_RBC,
+                constants.T2STAR_RBC_3T,
+                self.dict_dis[constants.IOFields.FIELD_STRENGTH],
             ),
             constants.IOFields.TE90: 1e6 * self.dict_dis[constants.IOFields.TE90],
             constants.IOFields.TR_DIS: self.dict_dis[constants.IOFields.TR],

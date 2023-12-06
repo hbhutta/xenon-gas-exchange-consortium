@@ -190,14 +190,19 @@ def remove_gasphase_contamination(
     return data_dissolved - contamination_kspace3
 
 
-def calculate_t2star_correction(te90: float, t2star_dis: float) -> float:
+def calculate_t2star_correction(
+    te90: float, t2star_dis: float, field_strength: float
+) -> float:
     """Calculate T2* correction factor.
 
     Args:
         te90 (float): echo time in seconds
-        t2star_dis (float): T2* of the dissolved phase in seconds
+        t2star_dis (float): T2* of the dissolved phase in seconds at 3T.
+        field_strength (float): B0 field strength in Tesla.
     """
-    return np.exp(te90 / t2star_dis) / np.exp(te90 / constants.T2STAR_GAS)
+    return np.exp(te90 / (t2star_dis * 3.0 / field_strength)) / np.exp(
+        te90 / constants.T2STAR_GAS
+    )
 
 
 def calculate_flipangle_correction(fa_gas: float, fa_dis: float) -> float:

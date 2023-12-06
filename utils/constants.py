@@ -6,8 +6,8 @@ import numpy as np
 FOVINFLATIONSCALE3D = 1000.0
 GRYOMAGNETIC_RATIO = 11.777  # MHz/T
 T2STAR_GAS = 1.8e-2  # seconds
-T2STAR_RBC = 1.089 * 1e-3  # seconds
-T2STAR_MEMBRANE = 1.183 * 1e-3  # seconds
+T2STAR_RBC_3T = 1.0502 * 1e-3  # seconds
+T2STAR_MEMBRANE_3T = 1.1416 * 1e-3  # seconds
 
 
 KCO_ALPHA = 11.2  # membrane
