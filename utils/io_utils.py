@@ -156,10 +156,21 @@ def get_dis_mrd_files(path: str) -> str:
         str file path of MRD file
     """
     try:
-        return (
-            glob.glob(os.path.join(path, "**Gas***.h5"))
-            + glob.glob(os.path.join(path, "**dixon***.h5"))
-        )[0]
+        return (glob.glob(os.path.join(path, "**dixon***.h5")))[0]
+    except:
+        raise ValueError("Can't find MRD file in path.")
+
+
+def get_ute_mrd_files(path: str) -> str:
+    """Get list of proton MRD files.
+
+    Args:
+        path (str): directory path of MRD files
+    Returns:
+        str file path of MRD file
+    """
+    try:
+        return (glob.glob(os.path.join(path, "**proton***.h5")))[0]
     except:
         raise ValueError("Can't find MRD file in path.")
 
@@ -201,18 +212,18 @@ def read_dyn_twix(path: str) -> Dict[str, Any]:
     twix_obj.image.flagRemoveOS = False
 
     # Get scan information
-    sample_time = twix_utils.get_dwell_time(twix_obj=twix_obj)
+    sample_time = twix_utils.get_sample_time(twix_obj=twix_obj)
     fids_dis = twix_utils.get_dyn_fids(twix_obj)
-    freq_center = twix_utils.get_center_freq(twix_obj=twix_obj)
-    freq_excitation = twix_utils.get_excitation_freq(twix_obj=twix_obj)
+    xe_center_frequency = twix_utils.get_center_freq(twix_obj=twix_obj)
+    xe_dissolved_offset_frequency = twix_utils.get_excitation_freq(twix_obj=twix_obj)
     scan_date = twix_utils.get_scan_date(twix_obj=twix_obj)
     tr = twix_utils.get_TR(twix_obj=twix_obj)
 
     return {
         constants.IOFields.SAMPLE_TIME: sample_time,
         constants.IOFields.FIDS_DIS: fids_dis,
-        constants.IOFields.FREQ_CENTER: freq_center,
-        constants.IOFields.FREQ_EXCITATION: freq_excitation,
+        constants.IOFields.XE_CENTER_FREQUENCY: xe_center_frequency,
+        constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY: xe_dissolved_offset_frequency,
         constants.IOFields.SCAN_DATE: scan_date,
         constants.IOFields.TR: tr,
     }
@@ -257,7 +268,7 @@ def read_dis_twix(path: str) -> Dict[str, Any]:
     filename = os.path.basename(path)
 
     return {
-        constants.IOFields.SAMPLE_TIME: twix_utils.get_dwell_time(twix_obj),
+        constants.IOFields.SAMPLE_TIME: twix_utils.get_sample_time(twix_obj),
         constants.IOFields.FA_DIS: twix_utils.get_flipangle_dissolved(twix_obj),
         constants.IOFields.FA_GAS: twix_utils.get_flipangle_gas(twix_obj),
         constants.IOFields.FIELD_STRENGTH: twix_utils.get_field_strength(twix_obj),
@@ -265,11 +276,14 @@ def read_dis_twix(path: str) -> Dict[str, Any]:
         constants.IOFields.FIDS_DIS: data_dict[constants.IOFields.FIDS_DIS],
         constants.IOFields.FIDS_GAS: data_dict[constants.IOFields.FIDS_GAS],
         constants.IOFields.FOV: twix_utils.get_FOV(twix_obj),
-        constants.IOFields.FREQ_CENTER: twix_utils.get_center_freq(twix_obj),
-        constants.IOFields.FREQ_EXCITATION: twix_utils.get_excitation_freq(twix_obj),
+        constants.IOFields.XE_CENTER_FREQUENCY: twix_utils.get_center_freq(twix_obj),
+        constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY: twix_utils.get_excitation_freq(
+            twix_obj
+        ),
         constants.IOFields.GRAD_DELAY_X: data_dict[constants.IOFields.GRAD_DELAY_X],
         constants.IOFields.GRAD_DELAY_Y: data_dict[constants.IOFields.GRAD_DELAY_Y],
         constants.IOFields.GRAD_DELAY_Z: data_dict[constants.IOFields.GRAD_DELAY_Z],
+        constants.IOFields.INSTITUTION: twix_utils.get_institution_name(twix_obj),
         constants.IOFields.N_FRAMES: data_dict[constants.IOFields.N_FRAMES],
         constants.IOFields.N_SKIP_END: data_dict[constants.IOFields.N_SKIP_END],
         constants.IOFields.N_SKIP_START: data_dict[constants.IOFields.N_SKIP_START],
@@ -314,8 +328,9 @@ def read_ute_twix(path: str) -> Dict[str, Any]:
     data_dict = twix_utils.get_ute_data(twix_obj=twix_obj)
 
     return {
-        constants.IOFields.SAMPLE_TIME: twix_utils.get_dwell_time(twix_obj),
+        constants.IOFields.SAMPLE_TIME: twix_utils.get_sample_time(twix_obj),
         constants.IOFields.FIDS: data_dict[constants.IOFields.FIDS],
+        constants.IOFields.INSTITUTION: twix_utils.get_institution_name(twix_obj),
         constants.IOFields.RAMP_TIME: twix_utils.get_ramp_time(twix_obj),
         constants.IOFields.GRAD_DELAY_X: data_dict[constants.IOFields.GRAD_DELAY_X],
         constants.IOFields.GRAD_DELAY_Y: data_dict[constants.IOFields.GRAD_DELAY_Y],
@@ -347,18 +362,18 @@ def read_dyn_mrd(path: str) -> Dict[str, Any]:
     except:
         raise ValueError("Invalid mrd file.")
     # Get scan information
-    sample_time = mrd_utils.get_dwell_time(header=header)
+    sample_time = mrd_utils.get_sample_time(header=header)
     fids_dis = mrd_utils.get_dyn_fids(dataset=dataset)
-    freq_center = mrd_utils.get_center_freq(header=header)
-    freq_excitation = mrd_utils.get_excitation_freq(header=header)
+    xe_center_frequency = mrd_utils.get_center_freq(header=header)
+    xe_dissolved_offset_frequency = mrd_utils.get_excitation_freq(header=header)
     scan_date = mrd_utils.get_scan_date(header=header)
     tr = mrd_utils.get_TR(header=header)
 
     return {
         constants.IOFields.SAMPLE_TIME: sample_time,
         constants.IOFields.FIDS_DIS: fids_dis,
-        constants.IOFields.FREQ_CENTER: freq_center,
-        constants.IOFields.FREQ_EXCITATION: freq_excitation,
+        constants.IOFields.XE_CENTER_FREQUENCY: xe_center_frequency,
+        constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY: xe_dissolved_offset_frequency,
         constants.IOFields.SCAN_DATE: scan_date,
         constants.IOFields.TR: tr,
     }
@@ -397,22 +412,25 @@ def read_dis_mrd(path: str) -> Dict[str, Any]:
     except:
         raise ValueError("Invalid mrd file.")
 
-    data_dict = mrd_utils.get_gx_data(dataset, header)
+    data_dict = mrd_utils.get_gx_data(dataset)
     return {
-        constants.IOFields.SAMPLE_TIME: mrd_utils.get_dwell_time(header),
+        constants.IOFields.BANDWIDTH: np.nan,
+        constants.IOFields.SAMPLE_TIME: mrd_utils.get_sample_time(dataset),
         constants.IOFields.FA_DIS: mrd_utils.get_flipangle_dissolved(header),
         constants.IOFields.FA_GAS: mrd_utils.get_flipangle_gas(header),
+        constants.IOFields.FIDS: data_dict[constants.IOFields.FIDS],
         constants.IOFields.FIDS_DIS: data_dict[constants.IOFields.FIDS_DIS],
         constants.IOFields.FIDS_GAS: data_dict[constants.IOFields.FIDS_GAS],
+        constants.IOFields.FIELD_STRENGTH: mrd_utils.get_field_strength(header),
         constants.IOFields.FOV: mrd_utils.get_FOV(header),
-        constants.IOFields.FREQ_CENTER: mrd_utils.get_center_freq(header),
-        constants.IOFields.FREQ_EXCITATION: mrd_utils.get_excitation_freq(header),
-        constants.IOFields.GRAD_DELAY_X: data_dict[constants.IOFields.GRAD_DELAY_X],
-        constants.IOFields.GRAD_DELAY_Y: data_dict[constants.IOFields.GRAD_DELAY_Y],
-        constants.IOFields.GRAD_DELAY_Z: data_dict[constants.IOFields.GRAD_DELAY_Z],
-        constants.IOFields.N_FRAMES: data_dict[constants.IOFields.N_FRAMES],
-        constants.IOFields.N_SKIP_END: data_dict[constants.IOFields.N_SKIP_END],
-        constants.IOFields.N_SKIP_START: data_dict[constants.IOFields.N_SKIP_START],
+        constants.IOFields.XE_CENTER_FREQUENCY: mrd_utils.get_center_freq(header),
+        constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY: mrd_utils.get_excitation_freq(
+            header
+        ),
+        constants.IOFields.GRAD_DELAY_X: np.nan,
+        constants.IOFields.GRAD_DELAY_Y: np.nan,
+        constants.IOFields.GRAD_DELAY_Z: np.nan,
+        constants.IOFields.INSTITUTION: mrd_utils.get_institution_name(header),
         constants.IOFields.ORIENTATION: mrd_utils.get_orientation(header),
         constants.IOFields.PROTOCOL_NAME: mrd_utils.get_protocol_name(header),
         constants.IOFields.RAMP_TIME: mrd_utils.get_ramp_time(header),
@@ -421,6 +439,34 @@ def read_dis_mrd(path: str) -> Dict[str, Any]:
         constants.IOFields.SOFTWARE_VERSION: "NA",
         constants.IOFields.TE90: mrd_utils.get_TE90(header),
         constants.IOFields.TR: mrd_utils.get_TR_dissolved(header),
+        constants.IOFields.TRAJ: data_dict[constants.IOFields.TRAJ],
+    }
+
+
+def read_ute_mrd(path: str) -> Dict[str, Any]:
+    """Read proton MRD file.
+
+    Args:
+        path (str): file path of mrd file
+    Returns: dictionary containing data and metadata extracted from the mrd file.
+    This includes:
+        TODO
+    """
+    try:
+        dataset = ismrmrd.Dataset(path, "dataset", create_if_needed=False)
+        header = ismrmrd.xsd.CreateFromDocument(dataset.read_xml_header())
+    except:
+        raise ValueError("Invalid mrd file.")
+
+    data_dict = mrd_utils.get_ute_data(dataset)
+    return {
+        constants.IOFields.SAMPLE_TIME: mrd_utils.get_sample_time(dataset),
+        constants.IOFields.FIDS: data_dict[constants.IOFields.FIDS],
+        constants.IOFields.ORIENTATION: mrd_utils.get_orientation(header),
+        constants.IOFields.RAMP_TIME: mrd_utils.get_ramp_time(header),
+        constants.IOFields.GRAD_DELAY_X: np.nan,
+        constants.IOFields.GRAD_DELAY_Y: np.nan,
+        constants.IOFields.GRAD_DELAY_Z: np.nan,
         constants.IOFields.TRAJ: data_dict[constants.IOFields.TRAJ],
     }
 

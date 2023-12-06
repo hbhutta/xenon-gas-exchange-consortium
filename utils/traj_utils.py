@@ -424,7 +424,8 @@ def generate_trajectory(
 
 
 def get_scaling_factor(
-    recon_size: float = 128, n_points: float = 64, scale: bool = False
+    recon_size: float = 128,
+    n_points: float = 64,
 ) -> float:
     """Get the scaling factor for the trajectory.
 
@@ -435,13 +436,12 @@ def get_scaling_factor(
         recon_size (int): target reconstructed image size in number of voxels in each
             dimension.
         n_points (int): Number of points on each radial projection.
-        scale (bool): Whether to scale the trajectory at all. Otherwise return 1.
-            An example of when this is useful is when the trajectory is already
-            imported and scaled.
     Returns:
         (float) The scaling factor.
+
+    NOTE: for some reason, cincinnati (CCHMC) requires a unique scaling factor
     """
-    return n_points / recon_size if scale else 1
+    return n_points / recon_size
 
 
 def main(argv):

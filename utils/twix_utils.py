@@ -26,7 +26,7 @@ def get_scan_date(twix_obj: mapvbvd._attrdict.AttrDict) -> str:
     return scan_date[:4] + "-" + scan_date[4:6] + "-" + scan_date[6:]
 
 
-def get_dwell_time(twix_obj: mapvbvd._attrdict.AttrDict) -> float:
+def get_sample_time(twix_obj: mapvbvd._attrdict.AttrDict) -> float:
     """Get the dwell time in seconds.
 
     Args:
@@ -344,6 +344,20 @@ def get_protocol_name(twix_obj: mapvbvd._attrdict.AttrDict) -> str:
         return "unknown"
 
 
+def get_institution_name(twix_obj: mapvbvd._attrdict.AttrDict) -> str:
+    """Get institution name.
+
+    Args:
+        twix_obj: twix object returned from mapVBVD function.
+    Returns:
+        institution name. Returns "unknown" if not found.
+    """
+    try:
+        return str(twix_obj.hdr.Dicom.InstitutionName)
+    except:
+        return "unknown"
+
+
 def get_dyn_fids(
     twix_obj: mapvbvd._attrdict.AttrDict, n_skip_end: int = 20
 ) -> np.ndarray:
@@ -375,7 +389,7 @@ def get_bandwidth(
     Returns:
         bandwidth in Hz/pixel
     """
-    sample_time = get_dwell_time(twix_obj=twix_obj)
+    sample_time = get_sample_time(twix_obj=twix_obj)
     npts = data_dict[constants.IOFields.FIDS_DIS].shape[1]
     return (
         1.0 / (2 * sample_time * npts)

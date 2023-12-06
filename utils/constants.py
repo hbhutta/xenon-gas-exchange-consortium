@@ -20,6 +20,8 @@ class IOFields(object):
 
     BANDWIDTH = "bandwidth"
     BIASFIELD_KEY = "biasfield_key"
+    BONUS_SPECTRA_LABELS = "bonus_spectra_labels"
+    CONTRAST_LABELS = "contrast_labels"
     SAMPLE_TIME = "sample_time"
     FA_DIS = "fa_dis"
     FA_GAS = "fa_gas"
@@ -29,14 +31,15 @@ class IOFields(object):
     FIELD_STRENGTH = "field_strength"
     FLIP_ANGLE_FACTOR = "flip_angle_factor"
     FOV = "fov"
-    FREQ_CENTER = "freq_center"
-    FREQ_EXCITATION = "freq_excitation"
+    XE_CENTER_FREQUENCY = "xe_center_frequency"
+    XE_DISSOLVED_OFFSET_FREQUENCY = "xe_dissolved_offset_frequency"
     GIT_BRANCH = "git_branch"
     GRAD_DELAY_X = "grad_delay_x"
     GRAD_DELAY_Y = "grad_delay_y"
     GRAD_DELAY_Z = "grad_delay_z"
     HB_CORRECTION_KEY = "hb_correction_key"
     HB = "hb"
+    INSTITUTION = "institution"
     RBC_HB_CORRECTION_FACTOR = "rbc_hb_correction_factor"
     MEMBRANE_HB_CORRECTION_FACTOR = "membrane_hb_correction_factor"
     KERNEL_SHARPNESS = "kernel_sharpness"
@@ -176,6 +179,7 @@ class Institution(enum.Enum):
 
     DUKE = "duke"
     UVA = "uva"
+    CCHMC = "cchmc"
 
 
 class SystemVendor(enum.Enum):
@@ -373,6 +377,21 @@ class HbCorrection(object):
     R1 = 0.288  # coefficient of rbc hb correction equation
     M1 = 0.029  # first coefficient of membrane hb correction equation
     M2 = 0.011  # second coefficient of membrane hb correction equation
+
+
+class ContrastLabels(object):
+    """Numbers for labelling type of FID acquisition excitation."""
+
+    PROTON = 0  # proton acquisition
+    GAS = 1  # gas phase 129Xe acquisition
+    DISSOLVED = 2  # dissolved phase 129Xe acquisition
+
+
+class BonusSpectraLabels(object):
+    """Numbers for labelling if FID acquisition is part of bonus spectra."""
+
+    NOT_BONUS = 0  # not part of bonus spectra
+    BONUS = 1  # part of bonus spectra
 
 
 class PipelineVersion(object):

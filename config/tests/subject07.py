@@ -1,4 +1,4 @@
-"""Demo configuration file."""
+"""Demo configuration file of processing with MRD files."""
 import os
 import sys
 
@@ -15,18 +15,17 @@ class Config(base_config.Config):
     """Demo config file.
 
     Inherit from base_config.Config and override the parameters.
-    Subject LH-010A from Duke is used as the example.
+    Subject 007-005B from Duke is used as the example.
     """
 
     def __init__(self):
         """Initialize config parameters."""
         super().__init__()
-        self.data_dir = "assets/tests/subject02"
+        self.data_dir = "assets/tests/subject07"
         self.segmentation_key = constants.SegmentationKey.MANUAL_VENT.value
         self.manual_seg_filepath = os.path.join(self.data_dir, "mask.nii")
-
         self.subject_id = "test"
-        self.rbc_m_ratio = 0.427
+        self.rbc_m_ratio = 0.133
         self.recon = Recon()
 
 
@@ -47,7 +46,7 @@ class Recon(base_config.Recon):
     def __init__(self):
         """Initialize the reconstruction parameters."""
         super().__init__()
-        self.scan_type = constants.ScanType.FASTDIXON.value
+        self.scan_type = constants.ScanType.NORMALDIXON.value
         self.remove_noisy_projections = True
         self.n_skip_start = config_utils.get_n_skip_start(self.scan_type)
 
