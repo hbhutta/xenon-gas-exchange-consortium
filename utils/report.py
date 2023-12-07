@@ -57,10 +57,16 @@ def format_dict(dict_stats: Dict[str, Any]) -> Dict[str, Any]:
         constants.StatsIOFields.MEMBRANE_LOW_PCT,
         constants.StatsIOFields.MEMBRANE_HIGH_PCT,
     ]
+    # list of variables to round to 1 decimal places
+    list_round_1 = [
+        constants.StatsIOFields.MEMBRANE_SNR,
+        constants.StatsIOFields.RBC_SNR,
+        constants.StatsIOFields.VENT_SNR,
+    ]
     # list of variables to round to 3 decimal places
     list_round_3 = [constants.StatsIOFields.RBC_M_RATIO]
-    # list of variables to output to scientific notation
-    list_scientific = [
+    # list of variables to output to multiply by 100 for readabiltiy
+    list_mult_100 = [
         constants.StatsIOFields.RBC_MEAN,
         constants.StatsIOFields.MEMBRANE_MEAN,
         constants.StatsIOFields.RBC_MEDIAN,
@@ -72,14 +78,16 @@ def format_dict(dict_stats: Dict[str, Any]) -> Dict[str, Any]:
     for key in dict_stats.keys():
         if isinstance(dict_stats[key], float) and key in list_round_0:
             dict_stats[key] = int(np.round(dict_stats[key], 0))
+        elif isinstance(dict_stats[key], float) and key in list_round_1:
+            dict_stats[key] = np.round(dict_stats[key], 1)
         elif isinstance(dict_stats[key], float) and key in list_round_3:
             dict_stats[key] = np.round(dict_stats[key], 3)
-        elif isinstance(dict_stats[key], float) and key in list_scientific:
-            dict_stats[key] = "{:.1e}".format(dict_stats[key])
+        elif isinstance(dict_stats[key], float) and key in list_mult_100:
+            dict_stats[key] = np.round(dict_stats[key] * 100, 2)
         elif isinstance(dict_stats[key], float) and (
             key not in list_round_3
             or key not in list_round_0
-            or key not in list_scientific
+            or key not in list_mult_100
         ):
             dict_stats[key] = np.round(dict_stats[key], 2)
 

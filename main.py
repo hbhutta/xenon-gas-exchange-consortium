@@ -25,7 +25,7 @@ def gx_mapping_reconstruction(config: base_config.Config):
     try:
         subject.read_twix_files()
     except:
-        logging.warning("No twix files found.")
+        logging.warning("Cannot read in twix files.")
         try:
             subject.read_mrd_files()
         except:

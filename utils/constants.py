@@ -278,6 +278,7 @@ class VENTHISTOGRAMFields(object):
     YTICKS = np.linspace(0, YLIM, 5)
     XTICKLABELS = ["{:.2f}".format(x) for x in XTICKS]
     YTICKLABELS = ["{:.2f}".format(x) for x in YTICKS]
+    TITLE = "Ventilation"
 
 
 class RBCHISTOGRAMFields(object):
@@ -289,8 +290,9 @@ class RBCHISTOGRAMFields(object):
     NUMBINS = 50
     XTICKS = np.linspace(0, XLIM, 4)
     YTICKS = np.linspace(0, YLIM, 5)
-    XTICKLABELS = ["{:.1e}".format(x) for x in XTICKS]
+    XTICKLABELS = ["{:.2f}".format(x * 1e2) for x in XTICKS]
     YTICKLABELS = ["{:.2f}".format(x) for x in YTICKS]
+    TITLE = "RBC:Gas x 100"
 
 
 class MEMBRANEHISTOGRAMFields(object):
@@ -302,8 +304,9 @@ class MEMBRANEHISTOGRAMFields(object):
     NUMBINS = 70
     XTICKS = np.linspace(0, XLIM, 4)
     YTICKS = np.linspace(0, YLIM, 5)
-    XTICKLABELS = ["{:.1e}".format(x) for x in XTICKS]
+    XTICKLABELS = ["{:.2f}".format(x * 1e2) for x in XTICKS]
     YTICKLABELS = ["{:.2f}".format(x) for x in YTICKS]
+    TITLE = "Membrane:Gas x 100"
 
 
 class PDFOPTIONS(object):

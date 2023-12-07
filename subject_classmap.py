@@ -115,7 +115,7 @@ class Subject(object):
             self.dict_dyn = io_utils.read_dyn_twix(
                 io_utils.get_dyn_twix_files(str(self.config.data_dir))
             )
-        except:
+        except ValueError:
             logging.info("No dynamic spectroscopy twix file found")
         if self.config.recon.recon_proton:
             self.dict_ute = io_utils.read_ute_twix(
@@ -135,7 +135,7 @@ class Subject(object):
             self.dict_dyn = io_utils.read_dyn_mrd(
                 io_utils.get_dyn_mrd_files(str(self.config.data_dir))
             )
-        except:
+        except ValueError:
             logging.info("No dynamic spectroscopy MRD file found")
         if self.config.recon.recon_proton:
             self.dict_ute = io_utils.read_ute_mrd(
@@ -150,7 +150,8 @@ class Subject(object):
         """
         mdict = io_utils.import_mat(io_utils.get_mat_file(str(self.config.data_dir)))
         self.dict_dis = io_utils.import_matstruct_to_dict(mdict["dict_dis"])
-        self.dict_dyn = io_utils.import_matstruct_to_dict(mdict["dict_dyn"])
+        if "dict_dyn" in mdict.keys() and mdict["dict_dyn"].flatten()[0] is not None:
+            self.dict_dyn = io_utils.import_matstruct_to_dict(mdict["dict_dyn"])
         if "dict_ute" in mdict.keys():
             logging.info("UTE proton data found.")
             self.dict_ute = io_utils.import_matstruct_to_dict(mdict["dict_ute"])
@@ -182,6 +183,7 @@ class Subject(object):
             logging.info("Using manual RBC:M ratio of {}".format(self.rbc_m_ratio))
         else:
             logging.info("Calculating RBC:M ratio from static spectroscopy.")
+            assert self.dict_dyn[constants.IOFields.FIDS_DIS] is not None
             self.rbc_m_ratio, _ = spect_utils.calculate_static_spectroscopy(
                 fid=self.dict_dyn[constants.IOFields.FIDS_DIS],
                 sample_time=self.dict_dyn[constants.IOFields.SAMPLE_TIME],
@@ -815,9 +817,12 @@ class Subject(object):
             yticks=constants.VENTHISTOGRAMFields.YTICKS,
             xticklabels=constants.VENTHISTOGRAMFields.XTICKLABELS,
             yticklabels=constants.VENTHISTOGRAMFields.YTICKLABELS,
+            title=constants.VENTHISTOGRAMFields.TITLE,
         )
         plot.plot_histogram(
-            data=np.abs(self.image_rbc2gas)[np.array(self.mask, dtype=bool)].flatten(),
+            data=np.abs(self.image_rbc2gas)[
+                np.array(self.mask_vent, dtype=bool)
+            ].flatten(),
             path="tmp/hist_rbc.png",
             color=constants.RBCHISTOGRAMFields.COLOR,
             xlim=constants.RBCHISTOGRAMFields.XLIM,
@@ -828,10 +833,11 @@ class Subject(object):
             yticks=constants.RBCHISTOGRAMFields.YTICKS,
             xticklabels=constants.RBCHISTOGRAMFields.XTICKLABELS,
             yticklabels=constants.RBCHISTOGRAMFields.YTICKLABELS,
+            title=constants.RBCHISTOGRAMFields.TITLE,
         )
         plot.plot_histogram(
             data=np.abs(self.image_membrane2gas)[
-                np.array(self.mask, dtype=bool)
+                np.array(self.mask_vent, dtype=bool)
             ].flatten(),
             path="tmp/hist_membrane.png",
             color=constants.MEMBRANEHISTOGRAMFields.COLOR,
@@ -843,6 +849,7 @@ class Subject(object):
             yticks=constants.MEMBRANEHISTOGRAMFields.YTICKS,
             xticklabels=constants.MEMBRANEHISTOGRAMFields.XTICKLABELS,
             yticklabels=constants.MEMBRANEHISTOGRAMFields.YTICKLABELS,
+            title=constants.MEMBRANEHISTOGRAMFields.TITLE,
         )
 
     def generate_pdf(self):

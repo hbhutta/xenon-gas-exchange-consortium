@@ -24,7 +24,7 @@ class Config(base_config.Config):
         self.data_dir = "assets/tests/subject01"
         self.segmentation_key = constants.SegmentationKey.MANUAL_VENT.value
         self.manual_seg_filepath = os.path.join(self.data_dir, "mask.nii")
-        self.subject_id = "test"
+        self.subject_id = "007-005B"
         self.rbc_m_ratio = 0.133
         self.recon = Recon()
 
