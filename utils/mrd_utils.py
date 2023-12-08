@@ -168,7 +168,7 @@ def get_scan_date(header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader) -> st
     YYYY = str(xml_date[0])
     MM = str(xml_date[1])
     DD = str(xml_date[2])
-    return MM + "-" + DD + "-" + YYYY
+    return YYYY + "-" + MM + "-" + DD
 
 
 def get_flipangle_dissolved(
