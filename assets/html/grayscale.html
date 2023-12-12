@@ -7,6 +7,10 @@
       content="Gas exchange Imaging Report with 129Xe MRI-technical report"
     />
     <meta name="author" content="Junlan Lu" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
     <link href="../assets/css/report_reset.css" rel="stylesheet" />
     <link href="../assets/css/report_clinical.css" rel="stylesheet" />
     <title>Gas exchange Imaging Report</title>
@@ -20,7 +24,6 @@
       <div class="hist-tile" align="right">
         <img src="../tmp/hist_vent.png" style="width: 100%" />
         <div class="top-right">
-          <h2>Ventilation</h2>
           <p>SNR: {vent_snr}</p>
           <p>Mean: {vent_mean}</p>
           <p>Median: {vent_median}</p>
@@ -30,7 +33,6 @@
       <div class="hist-tile" align="right">
         <img src="../tmp/hist_membrane.png" style="width: 100%" />
         <div class="top-right">
-          <h2>Membrane:gas</h2>
           <p>SNR: {membrane_snr}</p>
           <p>Mean: {membrane_mean}</p>
           <p>Median: {membrane_median}</p>
@@ -40,7 +42,6 @@
       <div class="hist-tile" align="right">
         <img src="../tmp/hist_rbc.png" style="width: 100%" />
         <div class="top-right">
-          <h2>RBC:gas</h2>
           <p>SNR: {rbc_snr}</p>
           <p>Mean: {rbc_mean}</p>
           <p>Median: {rbc_median}</p>
@@ -77,7 +78,9 @@
         <img src=../assets/img/colorbin_short.png height=150px>
       </div>
       <div class="predict-values">
-        <p>Estimated KCO:{kco_est} ---- VA:{alveolar_volume} ---- DLCO:{dlco_est}</p>
+        <p>
+          Estimated KCO:{kco_est} ---- VA:{alveolar_volume} ---- DLCO:{dlco_est}
+        </p>
       </div>
     </div>
     <div class="table-container">

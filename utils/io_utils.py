@@ -62,6 +62,7 @@ def import_matstruct_to_dict(struct: np.ndarray) -> Dict[str, Any]:
         dictionary loaded from matlab file
     """
     out_dict = {}
+
     for field in struct.dtype.names:
         value = struct[field].flatten()[0]
         if isinstance(value[0], str):
@@ -362,7 +363,7 @@ def read_dyn_mrd(path: str) -> Dict[str, Any]:
     except:
         raise ValueError("Invalid mrd file.")
     # Get scan information
-    sample_time = mrd_utils.get_sample_time(header=header)
+    sample_time = mrd_utils.get_sample_time(dataset=dataset)
     fids_dis = mrd_utils.get_dyn_fids(dataset=dataset)
     xe_center_frequency = mrd_utils.get_center_freq(header=header)
     xe_dissolved_offset_frequency = mrd_utils.get_excitation_freq(header=header)

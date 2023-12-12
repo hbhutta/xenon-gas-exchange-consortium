@@ -321,47 +321,6 @@ def plot_histogram_rbc_osc(
     plt.close()
 
 
-def plot_histogram_ventilation(data: np.ndarray, path: str):
-    """Plot histogram of ventilation.
-
-    Args:
-        data (np.ndarray): data to plot histogram of.
-        path (str): path to save the image.
-    """
-    fig, ax = plt.subplots(figsize=(9, 6))
-    data = data.flatten()
-    # normalize the 99th percentile
-    data = data / np.percentile(data, 99)
-    data[data > 1] = 1
-    weights = np.ones_like(data) / float(len(data))
-    # plot histogram
-    _, bins, _ = ax.hist(
-        data,
-        bins=50,
-        color=(0.4196, 0.6824, 0.8392),
-        weights=weights,
-        edgecolor="black",
-    )
-
-    # plot healthy reference line
-    refer_fit = np.array([0.0407, 0.619, 0.196])
-    normal = refer_fit[0] * np.exp(-(((bins - refer_fit[1]) / refer_fit[2]) ** 2))
-    ax.plot(bins, normal, "--", color="k", linewidth=4)
-    ax.set_ylabel("Fraction of Total Pixels", fontsize=35)
-    # set plot parameters
-    plt.xlim((0, 1))
-    plt.ylim((0, 0.06))
-    plt.rc("axes", linewidth=4)
-    # set ticks
-    xticks = [0.0, 0.5, 1.0]
-    yticks = [0.02, 0.04, 0.06]
-    plt.xticks(xticks, ["{:.0f}".format(x) for x in xticks], fontsize=40)
-    plt.yticks(yticks, ["{:.2f}".format(x) for x in yticks], fontsize=40)
-    fig.tight_layout()
-    plt.savefig(path)
-    plt.close()
-
-
 def plot_histogram(
     data: np.ndarray,
     path: str,
@@ -374,6 +333,8 @@ def plot_histogram(
     yticks: Optional[List[float]] = None,
     xticklabels: Optional[List[str]] = None,
     yticklabels: Optional[List[str]] = None,
+    xlabel: Optional[str] = None,
+    title: Optional[str] = None,
 ):
     """Plot histogram of arbitrary data.
 
@@ -389,6 +350,7 @@ def plot_histogram(
         yticks (Optional[List[float]], optional): y ticks. Defaults to None.
         xticklabels (Optional[List[str]], optional): x tick labels. Defaults to None.
         yticklabels (Optional[List[str]], optional): y tick labels. Defaults to None.
+        xlabel (Optional[str], optional): x label. Defaults to None.
     """
     # make a thick frame
     plt.rc("axes", linewidth=4)
@@ -416,6 +378,10 @@ def plot_histogram(
     except TypeError:
         plt.xticks(fontsize=40)
         plt.yticks(fontsize=40)
+    if xlabel is not None:
+        ax.set_xlabel(xlabel, fontsize=30)
+    if title is not None:
+        ax.set_title(title, fontsize=30)
     # Tweak spacing to prevent clipping of ylabel
     fig.tight_layout()
     plt.savefig(path)
