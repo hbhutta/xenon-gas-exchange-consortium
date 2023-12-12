@@ -24,7 +24,7 @@ def get_scan_date(twix_obj: mapvbvd._attrdict.AttrDict) -> str:
     try:
         tReferenceImage0 = str(twix_obj.hdr.MeasYaps[("tReferenceImage0",)]).strip('"')
         scan_date = tReferenceImage0.split(".")[-1][:8]
-    except:
+    except KeyError:
         SeriesLOID = twix_obj.hdr.Config[("SeriesLOID")]
         scan_date = SeriesLOID.split(".")[-4][:8]
     return scan_date[:4] + "-" + scan_date[4:6] + "-" + scan_date[6:]
