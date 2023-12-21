@@ -726,7 +726,7 @@ class Subject(object):
                 self.dict_dis[constants.IOFields.FIELD_STRENGTH],
             ),
             constants.IOFields.TE90: 1e6 * self.dict_dis[constants.IOFields.TE90],
-            constants.IOFields.TR_DIS: self.dict_dis[constants.IOFields.TR],
+            constants.IOFields.TR_DIS: 1e3 * self.dict_dis[constants.IOFields.TR],
         }
 
         return self.dict_info
