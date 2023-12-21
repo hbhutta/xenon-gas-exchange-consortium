@@ -523,7 +523,7 @@ class Subject(object):
         )
         t2star_scale_factor_m = signal_utils.calculate_t2star_correction(
             self.dict_dis[constants.IOFields.TE90],
-            constants.T2STAR_RBC_3T,
+            constants.T2STAR_MEMBRANE_3T,
             self.dict_dis[constants.IOFields.FIELD_STRENGTH],
         )
         self.image_rbc2gas = (
