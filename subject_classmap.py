@@ -373,7 +373,7 @@ class Subject(object):
         """Segment the thoracic cavity."""
         if self.config.segmentation_key == constants.SegmentationKey.CNN_VENT.value:
             logging.info("Performing neural network segmenation.")
-            self.mask = segmentation.predict(self.image_gas_highreso, erosion=5)
+            self.mask = segmentation.predict(self.image_gas_highreso)
         elif self.config.segmentation_key == constants.SegmentationKey.SKIP.value:
             self.mask = np.ones_like(self.image_gas_highreso)
         elif (
