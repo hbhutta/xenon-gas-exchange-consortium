@@ -521,7 +521,7 @@ class Subject(object):
             constants.T2STAR_RBC_3T,
             self.dict_dis[constants.IOFields.FIELD_STRENGTH],
         )
-        t2star_scale_factor_m = signal_utils.calculate_t2star_correction(
+        t2star_scale_factor_membrane = signal_utils.calculate_t2star_correction(
             self.dict_dis[constants.IOFields.TE90],
             constants.T2STAR_MEMBRANE_3T,
             self.dict_dis[constants.IOFields.FIELD_STRENGTH],
@@ -530,7 +530,9 @@ class Subject(object):
             flip_angle_scale_factor * t2star_scale_factor_rbc * self.image_rbc2gas
         )
         self.image_membrane2gas = (
-            flip_angle_scale_factor * t2star_scale_factor_m * self.image_membrane2gas
+            flip_angle_scale_factor
+            * t2star_scale_factor_membrane
+            * self.image_membrane2gas
         )
 
     def dissolved_binning(self):
