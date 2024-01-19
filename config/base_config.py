@@ -118,7 +118,8 @@ class ReferenceData(object):
             self.threshold_vent = np.array([0.3621, 0.5724, 0.7265, 0.8543, 0.9662])
             self.threshold_rbc = np.array([0.1007, 0.2723, 0.512, 0.814, 1.1743]) * 1e-2
             self.threshold_membrane = (
-                np.array([0.3826, 0.5928, 0.8486, 1.1498, 1.4964]) * 1e-2
+                np.array([0.3826, 0.5928, 0.8486, 1.1498, 1.4964, 1.8883, 2.3254])
+                * 1e-2
             )
             self.reference_fit_vent = (0.04074, 0.712, 0.15)
             self.reference_fit_rbc = (0.06106, 0.543 * 1e-2, 0.277 * 1e-2)
