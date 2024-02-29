@@ -449,6 +449,15 @@ def get_gx_data(twix_obj: mapvbvd._attrdict.AttrDict) -> Dict[str, Any]:
             n_skip_start = 0
             n_skip_end = 0
             grad_delay_x, grad_delay_y, grad_delay_z = -5, -5, -5
+        elif raw_fids.shape[0] // 100 == 42:
+            logging.info("Reading in fast dixon data on Siemens Prisma.")
+            num_spectra = raw_fids.shape[0] % 100
+            data_gas = raw_fids[:-num_spectra][0::2, :]
+            data_dis = raw_fids[:-num_spectra][1::2, :]
+            n_frames = data_dis.shape[0]
+            n_skip_start = 0
+            n_skip_end = 0
+            grad_delay_x, grad_delay_y, grad_delay_z = -5, -5, -5
         else:
             raise ValueError("Cannot get data from 'fast' dixon twix object.")
     elif flip_angle_dissolved == 15:
@@ -456,6 +465,15 @@ def get_gx_data(twix_obj: mapvbvd._attrdict.AttrDict) -> Dict[str, Any]:
             logging.info("Reading in medium dixon data on Siemens Prisma.")
             data_gas = raw_fids[:-30][0::2, :]
             data_dis = raw_fids[:-30][1::2, :]
+            n_frames = data_dis.shape[0]
+            n_skip_start = 0
+            n_skip_end = 0
+            grad_delay_x, grad_delay_y, grad_delay_z = -5, -5, -5
+        elif raw_fids.shape[0] // 100 == 24:
+            logging.info("Reading in medium dixon data on Siemens Prisma.")
+            num_spectra = raw_fids.shape[0] % 100
+            data_gas = raw_fids[:-num_spectra][0::2, :]
+            data_dis = raw_fids[:-num_spectra][1::2, :]
             n_frames = data_dis.shape[0]
             n_skip_start = 0
             n_skip_end = 0
@@ -504,6 +522,14 @@ def get_gx_data(twix_obj: mapvbvd._attrdict.AttrDict) -> Dict[str, Any]:
             n_skip_start = 0
             n_skip_end = 0
             grad_delay_x, grad_delay_y, grad_delay_z = 0, -4, -3
+        elif raw_fids.shape[0] // 100 == 20:
+            logging.info("Reading in normal dixon on Siemens Trio w/ bonus spectra.")
+            num_spectra = raw_fids.shape[0] % 100
+            data_gas = raw_fids[:-num_spectra][2::2, :]
+            data_dis = raw_fids[:-num_spectra][3::2, :]
+            n_frames = data_dis.shape[0]
+            n_skip_start = 1
+            n_skip_end = num_spectra
         else:
             raise ValueError("Cannot get data from normal dixon twix object.")
     else:
