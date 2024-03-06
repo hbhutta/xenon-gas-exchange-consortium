@@ -1,4 +1,5 @@
 """Base configuration file."""
+
 import sys
 
 import numpy as np
@@ -70,6 +71,10 @@ class Recon(object):
     """Define reconstruction configurations.
 
     Attributes:
+        del_x: str, the x direction gradient delay in microseconds
+        del_y: str, the y direction gradient delay in microseconds
+        del_z: str, the z direction gradient delay in microseconds
+        traj_type: str, the trajectory type
         recon_key: str, the reconstruction key
         scan_type: str, the scan type
         kernel_sharpness_lr: float, the kernel sharpness for low resolution, higher
@@ -94,6 +99,10 @@ class Recon(object):
         self.recon_proton = True
         self.remove_contamination = False
         self.remove_noisy_projections = True
+        self.del_x = "None"
+        self.del_y = "None"
+        self.del_z = "None"
+        self.traj_type = constants.TrajType.HALTONSPIRAL
 
 
 class ReferenceData(object):

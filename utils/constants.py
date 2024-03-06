@@ -1,4 +1,5 @@
 """Define important constants used throughout the pipeline."""
+
 import enum
 
 import numpy as np
@@ -13,6 +14,8 @@ T2STAR_MEMBRANE_3T = 1.1416 * 1e-3  # seconds
 KCO_ALPHA = 11.2  # membrane
 KCO_BETA = 14.6  # RBC
 VA_ALPHA = 1.43
+
+NONE = "None"
 
 
 class IOFields(object):

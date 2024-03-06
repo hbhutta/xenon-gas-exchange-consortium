@@ -1,4 +1,5 @@
 """Demo configuration file."""
+
 import os
 import sys
 
@@ -66,6 +67,9 @@ class Recon(base_config.Recon):
         self.scan_type = constants.ScanType.FASTDIXON.value
         # override default number of views to skip
         self.n_skip_start = config_utils.get_n_skip_start(self.scan_type)
+        self.del_x = 0
+        self.del_y = 0
+        self.del_z = 0
 
 
 class ReferenceData(base_config.ReferenceData):
