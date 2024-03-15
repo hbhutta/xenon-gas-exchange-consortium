@@ -1,4 +1,5 @@
 """Module for gas exchange imaging subject."""
+
 import glob
 import logging
 import os
@@ -211,7 +212,7 @@ class Subject(object):
 
         # get or generate trajectories and trajectory scaling factors
         if constants.IOFields.TRAJ not in self.dict_dis.keys():
-            self.traj_dissolved = pp.prepare_traj(self.dict_dis)
+            self.traj_dissolved = pp.prepare_traj(self.dict_dis, config=self.config)
             self.traj_scaling_factor = traj_utils.get_scaling_factor(
                 recon_size=int(self.config.recon.recon_size),
                 n_points=self.data_gas.shape[1],

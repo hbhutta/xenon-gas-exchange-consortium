@@ -3,8 +3,9 @@
 import sys
 
 sys.path.append("..")
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
 
+import ml_collections
 import numpy as np
 
 from utils import constants, recon_utils, signal_utils, spect_utils, traj_utils
@@ -32,16 +33,23 @@ def remove_contamination(dict_dyn: Dict[str, Any], dict_dis: Dict[str, Any]) -> 
     return dict_dis
 
 
-def prepare_traj(data_dict: Dict[str, Any]) -> np.ndarray:
+def prepare_traj(
+    data_dict: Dict[str, Any], config: Optional[ml_collections.ConfigDict] = None
+) -> np.ndarray:
     """Prepare k space trajectory for use in reconstruction.
 
     Args:
         data_dict: dictionary containing data and metadata extracted from the twix file.
-
+        config: ml_collections.ConfigDict containing the subject configuration.
     Returns:
         traj (np.array): trajectory array of shape (n_projections, n_points, 3)
     """
     data = data_dict[constants.IOFields.FIDS]
+    if config and config.recon.del_x is not constants.NONE:  # type: ignore
+        data_dict[constants.IOFields.GRAD_DELAY_X] = config.recon.del_x  # type: ignore
+        data_dict[constants.IOFields.GRAD_DELAY_Y] = config.recon.del_y  # type: ignore
+        data_dict[constants.IOFields.GRAD_DELAY_Z] = config.recon.del_z  # type: ignore
+
     traj_x, traj_y, traj_z = traj_utils.generate_trajectory(
         sample_time=1e6 * data_dict[constants.IOFields.SAMPLE_TIME],
         ramp_time=data_dict[constants.IOFields.RAMP_TIME],
@@ -50,6 +58,7 @@ def prepare_traj(data_dict: Dict[str, Any]) -> np.ndarray:
         del_x=data_dict[constants.IOFields.GRAD_DELAY_X],
         del_y=data_dict[constants.IOFields.GRAD_DELAY_Y],
         del_z=data_dict[constants.IOFields.GRAD_DELAY_Z],
+        traj_type=config.recon.traj_type if config else constants.TrajType.HALTONSPIRAL,  # type: ignore
     )
     # remove projections at the beginning and end of the trajectory
     shape_traj = traj_x.shape
