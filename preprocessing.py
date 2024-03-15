@@ -46,23 +46,19 @@ def prepare_traj(
     """
     data = data_dict[constants.IOFields.FIDS]
     if config and config.recon.del_x is not constants.NONE:  # type: ignore
-        del_x = config.recon.del_x  # type: ignore
-        del_y = config.recon.del_y  # type: ignore
-        del_z = config.recon.del_z  # type: ignore
-    else:
-        del_x = data_dict[constants.IOFields.GRAD_DELAY_X]
-        del_y = data_dict[constants.IOFields.GRAD_DELAY_Y]
-        del_z = data_dict[constants.IOFields.GRAD_DELAY_Z]
+        data_dict[constants.IOFields.GRAD_DELAY_X] = config.recon.del_x  # type: ignore
+        data_dict[constants.IOFields.GRAD_DELAY_Y] = config.recon.del_y  # type: ignore
+        data_dict[constants.IOFields.GRAD_DELAY_Z] = config.recon.del_z  # type: ignore
 
     traj_x, traj_y, traj_z = traj_utils.generate_trajectory(
         sample_time=1e6 * data_dict[constants.IOFields.SAMPLE_TIME],
         ramp_time=data_dict[constants.IOFields.RAMP_TIME],
         n_frames=data_dict[constants.IOFields.N_FRAMES],
         n_points=data.shape[1],
-        del_x=del_x,
-        del_y=del_y,
-        del_z=del_z,
-        traj_type=config.recon.traj_type,  # type: ignore
+        del_x=data_dict[constants.IOFields.GRAD_DELAY_X],
+        del_y=data_dict[constants.IOFields.GRAD_DELAY_Y],
+        del_z=data_dict[constants.IOFields.GRAD_DELAY_Z],
+        traj_type=config.recon.traj_type if config else constants.TrajType.HALTONSPIRAL,  # type: ignore
     )
     # remove projections at the beginning and end of the trajectory
     shape_traj = traj_x.shape
