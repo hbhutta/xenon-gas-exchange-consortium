@@ -76,6 +76,9 @@ class Recon(object):
         del_z: str, the z direction gradient delay in microseconds
         traj_type: str, the trajectory type
         recon_key: str, the reconstruction key
+        recon_proton: bool, whether to reconstruct proton images
+        remove_contamination: bool, whether to remove gas contamination
+        remove_noisy_projections: bool, whether to remove noisy projections
         scan_type: str, the scan type
         kernel_sharpness_lr: float, the kernel sharpness for low resolution, higher
             SNR images
@@ -84,6 +87,7 @@ class Recon(object):
         n_skip_start: int, the number of frames to skip at the beginning
         n_skip_end: int, the number of frames to skip at the end
         key_radius: int, the key radius for the keyhole image
+        matrix_size: int, the final matrix size
     """
 
     def __init__(self):

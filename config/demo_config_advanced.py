@@ -70,6 +70,7 @@ class Recon(base_config.Recon):
         self.del_x = 0
         self.del_y = 0
         self.del_z = 0
+        self.recon_proton = False
 
 
 class ReferenceData(base_config.ReferenceData):
