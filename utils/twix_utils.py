@@ -525,8 +525,8 @@ def get_gx_data(twix_obj: mapvbvd._attrdict.AttrDict) -> Dict[str, Any]:
         elif raw_fids.shape[0] // 100 == 20:
             logging.info("Reading in normal dixon on Siemens Trio w/ bonus spectra.")
             num_spectra = raw_fids.shape[0] % 100
-            data_gas = raw_fids[:-num_spectra][2::2, :]
-            data_dis = raw_fids[:-num_spectra][3::2, :]
+            data_gas = raw_fids[:-num_spectra][0::2, :]
+            data_dis = raw_fids[:-num_spectra][1::2, :]
             n_frames = data_dis.shape[0]
             n_skip_start = 1
             n_skip_end = num_spectra
