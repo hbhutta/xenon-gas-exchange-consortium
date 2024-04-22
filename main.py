@@ -39,6 +39,8 @@ def gx_mapping_reconstruction(config: base_config.Config):
     subject.reconstruction_dissolved()
     if config.recon.recon_proton:
         subject.reconstruction_ute()
+    elif config.dicom_proton_dir:
+        subject.read_dicom_files()
     else:
         subject.image_proton = np.zeros_like(subject.image_gas_highreso)
     subject.segmentation()

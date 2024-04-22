@@ -14,10 +14,11 @@ import mapvbvd
 import nibabel as nib
 import numpy as np
 import pandas as pd
+import pydicom
 import scipy.io as sio
 from ml_collections import config_dict
 
-from utils import constants, mrd_utils, twix_utils
+from utils import constants, img_utils, mrd_utils, twix_utils
 
 
 def import_np(path: str) -> np.ndarray:
@@ -470,6 +471,39 @@ def read_ute_mrd(path: str) -> Dict[str, Any]:
         constants.IOFields.GRAD_DELAY_Z: np.nan,
         constants.IOFields.TRAJ: data_dict[constants.IOFields.TRAJ],
     }
+
+
+def read_dicom(path: str, shape_gas: Tuple[int, int, int]) -> np.ndarray:
+    """Read in DICOM image as numpy array.
+
+    Args:
+        path (str): path to DICOM proton image
+        shape_gas (tuple[int, int, int]): size of Dixon gas image
+
+    Returns:
+        np.ndarray: numpy array from DICOM image.
+    """
+    files = os.listdir(path)
+    file1 = os.path.join(path, files[0])
+    RefDs = pydicom.dcmread(file1)
+    ConstPixelDims = (int(RefDs.Columns), int(RefDs.Rows), len(files))
+    dicom = np.zeros(ConstPixelDims)
+
+    for i in range(0, len(files)):
+        if files[i] == ".DS_Store":
+            continue
+        file_with_path = os.path.join(path, files[i])
+        RefDs = pydicom.dcmread(file_with_path)
+        slice_num = int(RefDs.InstanceNumber)
+        ds = pydicom.read_file(file_with_path)
+        dicom[:, :, slice_num - 1] = ds.pixel_array
+
+    image = dicom.astype("float64")
+
+    if image.shape[0] != shape_gas[0]:
+        image = img_utils.interp(image, shape_gas[0] / image.shape[0])
+
+    return image
 
 
 def export_nii(image: np.ndarray, path: str, fov: Optional[float] = None):

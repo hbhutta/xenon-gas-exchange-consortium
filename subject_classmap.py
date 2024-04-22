@@ -143,6 +143,12 @@ class Subject(object):
                 io_utils.get_ute_mrd_files(str(self.config.data_dir))
             )
 
+    def read_dicom_files(self):
+        """Read in DICOM files for proton image."""
+        self.image_proton = io_utils.read_dicom(
+            self.config.dicom_proton_dir, self.image_gas_highreso.shape
+        )
+
     def read_mat_file(self):
         """Read in mat file of reconstructed images.
 

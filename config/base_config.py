@@ -22,6 +22,7 @@ class Config(config_dict.ConfigDict):
         hb: float, subject hb value in g/dL
         manual_reg_filepath: str, path to manual registration nifti file
         manual_seg_filepath: str, path to the manual segmentation nifti file
+        dicom_proton_dir: str, path to the DICOM proton images
         processes: Process, the evaluation processes
         rbc_m_ratio: float, the RBC to M ratio
         reference_data_key: str, reference data key
@@ -38,6 +39,7 @@ class Config(config_dict.ConfigDict):
         self.data_dir = ""
         self.manual_seg_filepath = ""
         self.manual_reg_filepath = ""
+        self.dicom_proton_dir = ""
         self.processes = Process()
         self.recon = Recon()
         self.reference_data_key = constants.ReferenceDataKey.REFERENCE_218_PPM_01.value
