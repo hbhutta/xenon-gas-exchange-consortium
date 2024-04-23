@@ -530,6 +530,7 @@ def get_gx_data(twix_obj: mapvbvd._attrdict.AttrDict) -> Dict[str, Any]:
             n_frames = data_dis.shape[0]
             n_skip_start = 1
             n_skip_end = num_spectra
+            grad_delay_x, grad_delay_y, grad_delay_z = -5, -5, -5
         else:
             raise ValueError("Cannot get data from normal dixon twix object.")
     else:
