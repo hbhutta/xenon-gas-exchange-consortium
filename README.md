@@ -293,6 +293,25 @@ Warning: this is the Team Xenon workflow only. Other users do not have to follow
 
 7. Upload `.pdf` reports to Slack
 
+### 3.3  Manual Segmentation Workflow
+
+Note: The following steps are for correcting auto-generated gas image masks.
+
+1. Ensure you have [version 3.8](https://sourceforge.net/projects/itk-snap/files/itk-snap/3.8.0/) of ITK-SNAP installed.
+
+2. Open `gas_highreso.nii` in ITK-SNAP as Main Image.
+
+3. Load `proton_reg.nii` as Additional Image and `mask_reg.nii` as Segmentation.
+
+4. Set Display Layout to Axial View and Thumbnail Layout.
+
+5. Correct the mask with the Paintbrush and save as `mask_reg_corrected.nii` when complete.
+
+6. In your config file, set `segmenation_key` to MANUAL_VENT and `manual_seg_filepath` to the corrected mask filepath.
+
+7. Reprocess subject as specified in 3.1.3.
+
+
 ## Acknowledgements:
 
 Developers: Junlan Lu, Aryil Bechtel, Sakib Kabir, Suphachart Leewiwatwong, David Mummy.
