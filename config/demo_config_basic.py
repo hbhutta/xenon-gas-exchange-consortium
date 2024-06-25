@@ -7,7 +7,7 @@ from ml_collections import config_dict
 # parent directory
 sys.path.append("..")
 
-from config import base_config
+from config import base_config, config_utils
 from utils import constants
 
 
@@ -15,19 +15,40 @@ class Config(base_config.Config):
     """Demo config file.
 
     Inherit from base_config.Config and override the parameters.
+    Subject 007-005B from Duke is used as the example.
     """
 
     def __init__(self):
         """Initialize config parameters."""
         super().__init__()
-        self.data_dir = "assets/demo/"  # define directory containing subject image data
-        self.subject_id = "test"  # define subject ID
-        self.rbc_m_ratio = 0.57  # set RBC to membrane ratio
+        self.data_dir = ""
+        self.segmentation_key = constants.SegmentationKey.CNN_VENT.value
+        #self.manual_seg_filepath = os.path.join(self.data_dir, "mask_reg_corrected.nii")
+        self.subject_id = ""
+        self.rbc_m_ratio = 0.0
+        self.recon = Recon()
 
-        # set what kind of segmentation to use
-        self.segmentation_key = constants.SegmentationKey.MANUAL_VENT.value
-        # define path of manual segmentation
-        self.manual_seg_filepath = os.path.join(self.data_dir, "mask.nii")
+
+class Recon(base_config.Recon):
+    """Define reconstruction configurations.
+
+    Attributes:
+        scan_type: str, the scan type
+        kernel_sharpness_lr: float, the kernel sharpness for low resolution, higher
+            SNR images
+        kernel_sharpness_hr: float, the kernel sharpness for high resolution, lower
+            SNR images
+        n_skip_start: int, the number of frames to skip at the beginning
+        n_skip_end: int, the number of frames to skip at the end
+        key_radius: int, the key radius for the keyhole image
+    """
+
+    def __init__(self):
+        """Initialize the reconstruction parameters."""
+        super().__init__()
+        self.scan_type = constants.ScanType.NORMALDIXON.value
+        self.remove_noisy_projections = True
+        self.n_skip_start = config_utils.get_n_skip_start(self.scan_type)
 
 
 def get_config() -> config_dict.ConfigDict:
