@@ -299,9 +299,9 @@ Note: The following steps are for correcting auto-generated gas image masks.
 
 1. Ensure you have [version 3.8](https://sourceforge.net/projects/itk-snap/files/itk-snap/3.8.0/) of ITK-SNAP installed.
 
-2. Open `gas_highreso.nii` in ITK-SNAP as the Main Image.
+2. Open `gas_highreso.nii` in ITK-SNAP as Main Image.
 
-3. Load `proton_reg.nii` as the Addition Image and `mask_reg.nii` as the Segmentation.
+3. Load `proton_reg.nii` as Additional Image and `mask_reg.nii` as Segmentation.
 
 4. Set Display Layout to Axial View and Thumbnail Layout.
 
