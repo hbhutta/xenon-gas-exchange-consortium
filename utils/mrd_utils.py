@@ -305,7 +305,7 @@ def get_TR_dissolved(header: ismrmrd.xsd.ismrmrdschema.ismrmrd.ismrmrdHeader) ->
     return (tr_gas_to_dissolved + tr_dissolved_to_gas) * 1e-3
 
 
-def get_gx_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
+def get_gx_data(dataset: ismrmrd.hdf5.Dataset, multi_echo: bool) -> Dict[str, Any]:
     """Get the FID acquisition data from dixon MRD file.
 
     Args:
@@ -323,15 +323,25 @@ def get_gx_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
     raw_fids = []
     contrast_labels = []
     bonus_spectra_labels = []
+    set_labels = []
+    set_included = True
     n_projections = dataset.number_of_acquisitions()
     for i in range(0, int(n_projections)):
         acquisition_header = dataset.read_acquisition(i).getHead()
         raw_fids.append(dataset.read_acquisition(i).data[0].flatten())
         contrast_labels.append(acquisition_header.idx.contrast)
         bonus_spectra_labels.append(acquisition_header.measurement_uid)
+        try:
+            set_labels.append(acquisition_header.idx.set)
+        except:
+            logging.info("#############################################")
+            logging.info("Unable to find set paramater from mrd object.")
+            set_included = False
+
     raw_fids = np.asarray(raw_fids)
     contrast_labels = np.asarray(contrast_labels)
     bonus_spectra_labels = np.asarray(bonus_spectra_labels)
+    set_labels = np.asarray(set_labels)
 
     # remove bonus spectra
     raw_fids_truncated = raw_fids[
@@ -340,24 +350,72 @@ def get_gx_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
     contrast_labels_truncated = contrast_labels[
         bonus_spectra_labels == constants.BonusSpectraLabels.NOT_BONUS
     ]
+    set_labels_truncated = set_labels[
+        bonus_spectra_labels == constants.BonusSpectraLabels.NOT_BONUS
+    ]
 
     # get the trajectories
     raw_traj = np.empty((raw_fids_truncated.shape[0], raw_fids_truncated.shape[1], 3))
     for i in range(0, raw_fids_truncated.shape[0]):
         raw_traj[i, :, :] = dataset.read_acquisition(i).traj
 
-    return {
-        constants.IOFields.FIDS: raw_fids_truncated,
-        constants.IOFields.FIDS_GAS: raw_fids_truncated[
-            contrast_labels_truncated == constants.ContrastLabels.GAS, :
-        ],
-        constants.IOFields.FIDS_DIS: raw_fids_truncated[
-            contrast_labels_truncated == constants.ContrastLabels.DISSOLVED, :
-        ],
-        constants.IOFields.TRAJ: raw_traj[
-            contrast_labels_truncated == constants.ContrastLabels.GAS, :, :
-        ],
-    }
+    if(set_included):
+        unique_set_labels = np.unique(set_labels_truncated)
+        
+        gas_fids_all = []
+        dis_fids_all = []
+        trajectories_all = []
+
+        for set_label in unique_set_labels:
+            gas_fids_set = raw_fids_truncated[
+                (contrast_labels_truncated == constants.ContrastLabels.GAS) & (set_labels_truncated == set_label)
+            ]
+            dis_fids_set = raw_fids_truncated[
+                (contrast_labels_truncated == constants.ContrastLabels.DISSOLVED) & (set_labels_truncated == set_label)
+            ]
+            traj_set = raw_traj[
+                (contrast_labels_truncated == constants.ContrastLabels.GAS) & (set_labels_truncated == set_label)
+            ]
+
+            # Append gas_fids_set, dis_fids_set, and traj_set with an additional axis to represent the set dimension
+            gas_fids_all.append(np.expand_dims(gas_fids_set, axis=-1))
+            dis_fids_all.append(np.expand_dims(dis_fids_set, axis=-1))
+            trajectories_all.append(np.expand_dims(traj_set, axis=-1))
+
+        gas_fids_all = np.concatenate(gas_fids_all, axis=-1)
+        dis_fids_all = np.concatenate(dis_fids_all, axis=-1)
+        trajectories_all = np.concatenate(trajectories_all, axis=-1)
+
+        if (multi_echo):
+            return {
+                constants.IOFields.FIDS: raw_fids_truncated,
+                constants.IOFields.FIDS_GAS: gas_fids_all,
+                constants.IOFields.FIDS_DIS: dis_fids_all,
+                constants.IOFields.TRAJ: trajectories_all,
+            }
+        else:
+
+            return {
+                constants.IOFields.FIDS: raw_fids_truncated,
+                constants.IOFields.FIDS_GAS: gas_fids_all[...,0],
+                constants.IOFields.FIDS_DIS: dis_fids_all[...,0],
+                constants.IOFields.TRAJ: trajectories_all[...,0],
+            }
+
+    else:
+
+        return {
+            constants.IOFields.FIDS: raw_fids_truncated,
+            constants.IOFields.FIDS_GAS: raw_fids_truncated[
+                contrast_labels_truncated == constants.ContrastLabels.GAS, :
+            ],
+            constants.IOFields.FIDS_DIS: raw_fids_truncated[
+                contrast_labels_truncated == constants.ContrastLabels.DISSOLVED, :
+            ],
+            constants.IOFields.TRAJ: raw_traj[
+                contrast_labels_truncated == constants.ContrastLabels.GAS, :, :
+            ],
+        }
 
 
 def get_ute_data(dataset: ismrmrd.hdf5.Dataset) -> Dict[str, Any]:
