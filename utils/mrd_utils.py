@@ -364,7 +364,8 @@ def get_gx_data(dataset: ismrmrd.hdf5.Dataset, multi_echo: bool) -> Dict[str, An
         
         gas_fids_all = []
         dis_fids_all = []
-        trajectories_all = []
+        gas_trajectories_all = []
+        dis_trajectories_all = []
 
         for set_label in unique_set_labels:
             gas_fids_set = raw_fids_truncated[
@@ -373,36 +374,51 @@ def get_gx_data(dataset: ismrmrd.hdf5.Dataset, multi_echo: bool) -> Dict[str, An
             dis_fids_set = raw_fids_truncated[
                 (contrast_labels_truncated == constants.ContrastLabels.DISSOLVED) & (set_labels_truncated == set_label)
             ]
-            traj_set = raw_traj[
+            gas_traj_set = raw_traj[
                 (contrast_labels_truncated == constants.ContrastLabels.GAS) & (set_labels_truncated == set_label)
             ]
+            dis_traj_set = raw_traj[
+                (contrast_labels_truncated == constants.ContrastLabels.DISSOLVED) & (set_labels_truncated == set_label)
+            
 
             # Append gas_fids_set, dis_fids_set, and traj_set with an additional axis to represent the set dimension
             gas_fids_all.append(np.expand_dims(gas_fids_set, axis=-1))
             dis_fids_all.append(np.expand_dims(dis_fids_set, axis=-1))
-            trajectories_all.append(np.expand_dims(traj_set, axis=-1))
+            gas_trajectories_all.append(np.expand_dims(gas_traj_set, axis=-1))
+            dis_trajectories_all.append(np.expand_dims(dis_traj_set, axis=-1))
 
         gas_fids_all = np.concatenate(gas_fids_all, axis=-1)
         dis_fids_all = np.concatenate(dis_fids_all, axis=-1)
-        trajectories_all = np.concatenate(trajectories_all, axis=-1)
-
+        gas_trajectories_all = np.concatenate(gas_trajectories_all, axis=-1)
+        dis_trajectories_all = np.concatenate(dis_trajectories_all, axis=-1)
+      
         if (multi_echo):
+            all_traj = [gas_trajectories_all , dis_trajectories_all];
             return {
                 constants.IOFields.FIDS: raw_fids_truncated,
                 constants.IOFields.FIDS_GAS: gas_fids_all,
                 constants.IOFields.FIDS_DIS: dis_fids_all,
-                constants.IOFields.TRAJ: trajectories_all,
+                constants.IOFields.TRAJ: all_traj,
             }
         else:
-
+            all_traj = [gas_trajectories_all[...,0] , dis_trajectories_all[...,0]];
             return {
                 constants.IOFields.FIDS: raw_fids_truncated,
                 constants.IOFields.FIDS_GAS: gas_fids_all[...,0],
                 constants.IOFields.FIDS_DIS: dis_fids_all[...,0],
-                constants.IOFields.TRAJ: trajectories_all[...,0],
+                constants.IOFields.TRAJ: all_traj,
             }
 
     else:
+        gas_traj = raw_traj[
+                contrast_labels_truncated == constants.ContrastLabels.GAS, :, :
+            ];
+
+        dis_traj = raw_traj[
+                contrast_labels_truncated == constants.ContrastLabels.DISSOLVED, :, :
+            ];
+
+        all_traj = [gas_traj , dis_traj];
 
         return {
             constants.IOFields.FIDS: raw_fids_truncated,
@@ -412,9 +428,7 @@ def get_gx_data(dataset: ismrmrd.hdf5.Dataset, multi_echo: bool) -> Dict[str, An
             constants.IOFields.FIDS_DIS: raw_fids_truncated[
                 contrast_labels_truncated == constants.ContrastLabels.DISSOLVED, :
             ],
-            constants.IOFields.TRAJ: raw_traj[
-                contrast_labels_truncated == constants.ContrastLabels.GAS, :, :
-            ],
+            constants.IOFields.TRAJ: all_traj,
         }
 
 
