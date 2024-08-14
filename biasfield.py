@@ -86,14 +86,12 @@ def calculate_biasfield_rf(
     return image_biasfield, image_biasfield_smoothed
 
 
-def correct_biasfield_n4itk(
-    image: np.ndarray, mask: np.ndarray
-) -> Tuple[np.ndarray, np.ndarray]:
-    """Apply N4ITK bias field correction.
+def correct_biasfield_n4itk(image: np.ndarray, mask: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """Apply N4ITK bias field correction with multiple iterations as in Matlab script.
 
     Args:
         image: np.ndarray 3D image to apply n4itk bias field correction.
-        mask: np.ndarray 3D mask for n4itk bias field correcton.
+        mask: np.ndarray 3D mask for n4itk bias field correction.
     """
     current_path = os.path.dirname(__file__)
     tmp_path = os.path.join(current_path, "tmp")
@@ -105,36 +103,114 @@ def correct_biasfield_n4itk(
     pathBiasField = os.path.join(tmp_path, "biasfield.nii")
 
     pathN4 = os.path.join(bin_path, "N4BiasFieldCorrection")
-    # save the inputs into nii files so the execute N4 can read in
-    nii_imge = nib.Nifti1Image(np.abs(image), np.eye(4))
+    
+    # Save the input image and mask as NIfTI files
+    nii_image = nib.Nifti1Image(np.abs(image), np.eye(4))
     nii_mask = nib.Nifti1Image(mask.astype(float), np.eye(4))
-    nib.save(nii_imge, pathInput)
+    nib.save(nii_image, pathInput)
     nib.save(nii_mask, pathMask)
+
+    # Initialize bias field stack and parameters
+    stack_bias_field = []
+    all_bias_field = np.ones(image.shape)
+
+    # Linear Correction
     cmd = (
-        pathN4
-        + " -d 3 -i "
-        + pathInput
-        + " -s 2 -x "
-        + pathMask
-        + " -o ["
-        + pathOutput
-        + ", "
-        + pathBiasField
-        + "]"
+        f'"{pathN4}" -d 3 -i "{pathInput}" -s 1 -w "{pathMask}" '
+        f'-c [25,0] -b [112,1] -t [0.75,0.01,100] '
+        f'-o ["{pathOutput}","{pathBiasField}"]'
     )
-
     os.system(cmd)
+    bias_field = nib.load(pathBiasField).get_fdata()
+    stack_bias_field.append(bias_field)
+    all_bias_field *= bias_field
 
-    image_cor = np.array(nib.load(pathOutput).get_fdata())
-    image_biasfield = np.array(nib.load(pathBiasField).get_fdata())
+    # Binomial Correction
+    cmd = (
+        f'"{pathN4}" -d 3 -i "{pathOutput}" -s 1 -w "{pathMask}" '
+        f'-c [25,0] -b [112,2] -t [0.75,0.01,100] '
+        f'-o ["{pathOutput}","{pathBiasField}"]'
+    )
+    os.system(cmd)
+    bias_field = nib.load(pathBiasField).get_fdata()
+    stack_bias_field.append(bias_field)
+    all_bias_field *= bias_field
 
-    # remove the generated nii files
+    # Trinomial Correction
+    cmd = (
+        f'"{pathN4}" -d 3 -i "{pathOutput}" -s 1 -w "{pathMask}" '
+        f'-c [25,0] -b [112,3] -t [0.75,0.01,100] '
+        f'-o ["{pathOutput}","{pathBiasField}"]'
+    )
+    os.system(cmd)
+    bias_field = nib.load(pathBiasField).get_fdata()
+    stack_bias_field.append(bias_field)
+    all_bias_field *= bias_field
+    all_bias_field /= np.mean(all_bias_field)
+
+    # AP Correction
+    cmd = (
+        f'"{pathN4}" -d 3 -i "{pathOutput}" -s 1 -w "{pathMask}" '
+        f'-c [25,0] -b [1x1x14,3] -t [0.5,0.01,100] '
+        f'-o ["{pathOutput}","{pathBiasField}"]'
+    )
+    os.system(cmd)
+    bias_field = nib.load(pathBiasField).get_fdata()
+    stack_bias_field.append(bias_field)
+    all_bias_field *= bias_field
+    all_bias_field /= np.mean(all_bias_field)
+
+    # RL Correction
+    cmd = (
+        f'"{pathN4}" -d 3 -i "{pathOutput}" -s 1 -w "{pathMask}" '
+        f'-c [25,0] -b [1x14x1,3] -t [0.5,0.01,100] '
+        f'-o ["{pathOutput}","{pathBiasField}"]'
+    )
+    os.system(cmd)
+    bias_field = nib.load(pathBiasField).get_fdata()
+    stack_bias_field.append(bias_field)
+    all_bias_field *= bias_field
+    all_bias_field /= np.mean(all_bias_field)
+
+    # HF Correction
+    cmd = (
+        f'"{pathN4}" -d 3 -i "{pathOutput}" -s 1 -w "{pathMask}" '
+        f'-c [25,0] -b [14x1x1,3] -t [0.5,0.01,100] '
+        f'-o ["{pathOutput}","{pathBiasField}"]'
+    )
+    os.system(cmd)
+    bias_field = nib.load(pathBiasField).get_fdata()
+    stack_bias_field.append(bias_field)
+    all_bias_field *= bias_field
+    all_bias_field /= np.mean(all_bias_field)
+
+    # Complete Correction
+    cmd = (
+        f'"{pathN4}" -d 3 -i "{pathOutput}" -s 2 -w "{pathMask}" '
+        f'-c [50,0] -b [4x4x4,3] -t [0.25,0.01,100] '
+        f'-o ["{pathOutput}","{pathBiasField}"]'
+    )
+    os.system(cmd)
+    bias_field = nib.load(pathBiasField).get_fdata()
+    stack_bias_field.append(bias_field)
+    all_bias_field *= bias_field
+    all_bias_field /= np.mean(all_bias_field)
+
+    # Import Results
+    bias_corrected_image = nib.load(pathOutput).get_fdata()
+    stack_bias_field = np.stack(stack_bias_field, axis=-1)
+
+    # Optionally save the final corrected image and bias field
+    nib.save(nib.Nifti1Image(bias_corrected_image, np.eye(4)), os.path.join(tmp_path, "FinalCorrectedImage.nii"))
+    np.save(os.path.join(tmp_path, "FinalBiasField.npy"), all_bias_field)
+
+    # Clean up temporary files
     os.remove(pathInput)
     os.remove(pathMask)
     os.remove(pathOutput)
     os.remove(pathBiasField)
 
-    return image_cor.astype("float64"), image_biasfield.astype("float64")
+    return bias_corrected_image.astype("float64"), all_bias_field.astype("float64")
 
 
 def correct_biasfield_rf(
