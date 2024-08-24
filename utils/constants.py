@@ -75,6 +75,7 @@ class IOFields(object):
     TR = "tr"
     TR_DIS = "tr_dis"
     TRAJ = "traj"
+    SYSTEM_VENDOR = "system_vendor"
 
 
 class CNNPaths(object):
@@ -183,12 +184,15 @@ class Institution(enum.Enum):
     DUKE = "duke"
     UVA = "uva"
     CCHMC = "cchmc"
+    IOWA = "university of iowa"
 
 
 class SystemVendor(enum.Enum):
     """Scanner system_vendor."""
 
-    SIEMENS = "siemens"
+    SIEMENS = "Siemens"
+    GE = "GE"
+    PHILIPS = "Philips"
 
 
 class TrajType(object):
@@ -208,7 +212,6 @@ class Orientation(object):
     CORONAL = "coronal"
     AXIAL = "axial"
     TRANSVERSE = "transverse"
-    CORONAL_CCHMC = "coronal_cchmc"
     NONE = "none"
 
 
