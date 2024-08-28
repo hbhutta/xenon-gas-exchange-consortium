@@ -379,7 +379,7 @@ def get_gx_data(dataset: ismrmrd.hdf5.Dataset, multi_echo: bool) -> Dict[str, An
             ]
             dis_traj_set = raw_traj[
                 (contrast_labels_truncated == constants.ContrastLabels.DISSOLVED) & (set_labels_truncated == set_label)
-            
+            ]
 
             # Append gas_fids_set, dis_fids_set, and traj_set with an additional axis to represent the set dimension
             gas_fids_all.append(np.expand_dims(gas_fids_set, axis=-1))
