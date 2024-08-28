@@ -44,6 +44,8 @@ class Config(base_config.Config):
         self.reference_data_key = constants.ReferenceDataKey.MANUAL.value
         self.reference_data = ReferenceData(self.reference_data_key)
 
+        self.multi_echo = False;
+
 
 class Recon(base_config.Recon):
     """Define reconstruction configurations.
