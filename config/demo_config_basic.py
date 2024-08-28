@@ -26,6 +26,7 @@ class Config(base_config.Config):
         #self.manual_seg_filepath = os.path.join(self.data_dir, "mask_reg_corrected.nii")
         self.subject_id = ""
         self.rbc_m_ratio = 0.0
+        self.multi_echo = False
         self.recon = Recon()
 
 
