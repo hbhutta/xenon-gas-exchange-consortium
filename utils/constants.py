@@ -166,7 +166,7 @@ class ReferenceDataKey(enum.Enum):
     MANUAL: Use when manualy adjusting default reference data
     """
 
-    REFERENCE_218_PPM_01 = "reference_218_ppm_01"
+    REFERENCE_218_PPM_01 = "218_ppm_StrongN4ITK"
     MANUAL = "manual"
 
 
