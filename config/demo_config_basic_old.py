@@ -28,7 +28,7 @@ class Config(base_config.Config):
         self.segmentation_key = constants.SegmentationKey.MANUAL_VENT.value
         # define path of manual segmentation
         self.manual_seg_filepath = os.path.join(self.data_dir, "mask.nii")
-
+        self.multi_echo = False
 
 def get_config() -> config_dict.ConfigDict:
     """Return the config dict. This is a required function.

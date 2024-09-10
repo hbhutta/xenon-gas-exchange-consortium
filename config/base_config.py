@@ -51,6 +51,7 @@ class Config(config_dict.ConfigDict):
         self.hb = 0.0
         self.subject_id = "test"
         self.rbc_m_ratio = 0.0
+        self.multi_echo = False;
 
 
 class Process(object):
@@ -109,6 +110,7 @@ class Recon(object):
         self.del_y = "None"
         self.del_z = "None"
         self.traj_type = constants.TrajType.HALTONSPIRAL
+
 
 
 class ReferenceData(object):
