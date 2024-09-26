@@ -26,7 +26,6 @@ class Config(config_dict.ConfigDict):
         processes: Process, the evaluation processes
         rbc_m_ratio: float, the RBC to M ratio
         reference_data_key: str, reference data key
-        reference_data: ReferenceData, reference data
         remove_contamination: bool, whether to remove gas contamination
         remove_noisy_projections: bool, whether to remove noisy projections
         segmentation_key: str, the segmentation key
@@ -42,8 +41,7 @@ class Config(config_dict.ConfigDict):
         self.dicom_proton_dir = ""
         self.processes = Process()
         self.recon = Recon()
-        self.reference_data_key = constants.ReferenceDataKey.REFERENCE_218_PPM_01.value
-        self.reference_data = ReferenceData(self.reference_data_key)
+        self.reference_data_key = constants.ReferenceDataKey.DUKE_REFERENCE.value
         self.segmentation_key = constants.SegmentationKey.CNN_VENT.value
         self.registration_key = constants.RegistrationKey.SKIP.value
         self.bias_key = constants.BiasfieldKey.N4ITK.value
@@ -110,63 +108,6 @@ class Recon(object):
         self.del_y = "None"
         self.del_z = "None"
         self.traj_type = constants.TrajType.HALTONSPIRAL
-
-
-
-class ReferenceData(object):
-    """Define reference data.
-
-    Attributes:
-        threshold_vent (np.array): ventilation thresholds for binning
-        threshold_rbc (np.array): rbc thresholds for binning
-        threshold_membrane (np.array): membrane thresholds for binning
-        reference_fit_vent (tuple): scaling factor, mean, and std of reference ventilation distribution
-        reference_fit_rbc (tuple): scaling factor, mean, and std of reference rbc distribution
-        reference_fit_membrane (tuple): scaling factor, mean, and std of reference membrane distribution
-        reference_stats (dict): mean and std of defect, low, and high percentage of ventilation,
-                                membrane, and rbc reference data
-    """
-
-    def __init__(self, reference_data_key):
-        """Initialize the reconstruction parameters."""
-        if (
-            reference_data_key == constants.ReferenceDataKey.REFERENCE_218_PPM_01.value
-        ) or (reference_data_key == constants.ReferenceDataKey.MANUAL.value):
-            self.threshold_vent = np.array([0.3908, 0.5741, 0.7180, 0.8413, 0.9511])
-            self.threshold_rbc = np.array([0.1007, 0.2723, 0.512, 0.814, 1.1743]) * 1e-2
-            self.threshold_membrane = (
-                np.array([0.3826, 0.5928, 0.8486, 1.1498, 1.4964, 1.8883, 2.3254])
-                * 1e-2
-            )
-            self.reference_fit_vent = (0.04074, 0.707, 0.140)
-            self.reference_fit_rbc = (0.06106, 0.543 * 1e-2, 0.277 * 1e-2)
-            self.reference_fit_membrane = (0.0700, 0.871 * 1e-2, 0.284 * 1e-2)
-            self.reference_stats = {
-                "vent_defect_avg": "5",
-                "vent_defect_std": "3",
-                "vent_low_avg": "16",
-                "vent_low_std": "8",
-                "vent_high_avg": "15",
-                "vent_high_std": "5",
-                "membrane_defect_avg": "1",
-                "membrane_defect_std": "<1",
-                "membrane_low_avg": "8",
-                "membrane_low_std": "2",
-                "membrane_high_avg": "1",
-                "membrane_high_std": "1",
-                "rbc_defect_avg": "4",
-                "rbc_defect_std": "2",
-                "rbc_low_avg": "14",
-                "rbc_low_std": "6",
-                "rbc_high_avg": "15",
-                "rbc_high_std": "10",
-                "rbc_m_ratio_avg": "0.59",
-                "rbc_m_ratio_std": "0.12",
-                "inflation_avg": "3.4",
-                "inflation_std": "0.33",
-            }
-        else:
-            raise ValueError("Invalid reference data key")
 
 
 def get_config() -> config_dict.ConfigDict:

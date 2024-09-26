@@ -163,13 +163,11 @@ def get_plot_indices(image: np.ndarray, n_slices: int = 16) -> Tuple[int, int]:
     sum_line = np.sum(np.sum(image, axis=0), axis=0)
     index_start, index_end = get_biggest_island_indices(sum_line > 300)
     flt_inter = (index_end - index_start) // n_slices
-
     # threshold to decide interval number
     if np.modf(flt_inter)[0] > 0.4:
         index_skip = np.ceil(flt_inter).astype(int)
     else:
         index_skip = np.floor(flt_inter).astype(int)
-
     return index_start, index_skip
 
 
@@ -225,6 +223,7 @@ def plot_montage_grey(
         index_start (int): index to start plotting from.
         index_skip (int, optional): indices to skip. Defaults to 1.
     """
+    
     # divide by the maximum value
     image = image / np.max(image)
     # stack the image to make it 4D (x, y, z, 3)
