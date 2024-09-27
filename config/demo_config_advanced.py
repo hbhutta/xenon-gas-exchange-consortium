@@ -40,9 +40,8 @@ class Config(base_config.Config):
         # override specific reconstruction parameters, as set in Recon class below
         self.recon = Recon()
 
-        # override reference data, as set in ReferenceData class below
-        self.reference_data_key = constants.ReferenceDataKey.MANUAL.value
-        self.reference_data = ReferenceData(self.reference_data_key)
+        # set reference data distribution: manual or automatic
+        self.reference_data_key = constants.ReferenceDataKey.DUKE_REFERENCE.value
 
         self.multi_echo = False;
 
@@ -75,28 +74,6 @@ class Recon(base_config.Recon):
         self.recon_proton = False
 
 
-class ReferenceData(base_config.ReferenceData):
-    """Define reference data.
-
-    Attributes:
-        threshold_vent (np.array): ventilation thresholds for binning
-        threshold_rbc (np.array): rbc thresholds for binning
-        threshold_membrane (np.array): membrane thresholds for binning
-        reference_fit_vent (tuple): scaling factor, mean, and std of reference ventilation distribution
-        reference_fit_rbc (tuple): scaling factor, mean, and std of reference rbc distribution
-        reference_fit_membrane (tuple): scaling factor, mean, and std of reference membrane distribution
-        reference_stats (dict): mean and std of defect, low, and high percentage of ventilation,
-                                membrane, and rbc reference data
-    """
-
-    def __init__(self, reference_data_key):
-        super().__init__(reference_data_key)
-        # override default ventilation thresholds
-        self.threshold_vent = np.array([0.185, 0.418, 0.647, 0.806, 0.933])
-        # override default ventilation reference distribution
-        self.reference_fit_vent = (0.04074, 0.619, 0.196)
-
-
 def get_config() -> config_dict.ConfigDict:
     """Return the config dict. This is a required function.
 
@@ -104,3 +81,4 @@ def get_config() -> config_dict.ConfigDict:
         a ml_collections.config_dict.ConfigDict
     """
     return Config()
+

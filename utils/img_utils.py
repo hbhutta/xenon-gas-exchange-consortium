@@ -73,21 +73,22 @@ def flip_and_rotate_image(
     Returns:
         Flipped and rotated image.
     """
-    if system_vendor == constants.SystemVendor.SIEMENS.value:
-        if orientation == constants.Orientation.CORONAL:
-            image = np.rot90(np.rot90(image, 3, axes=(1, 2)), 1, axes=(0, 2))
-            image = np.rot90(image, 1, axes=(0, 1))
-            image = np.flip(np.flip(image, axis=1), axis=2)
-            return image
-        elif orientation == constants.Orientation.TRANSVERSE:
-            return rotate_axial_to_coronal(flip_image_complex(image))
-        elif orientation == constants.Orientation.AXIAL:
-            image = np.rot90(np.rot90(image, 1, axes=(1, 2)), 3, axes=(0, 2))
-            image = np.rot90(image, 1, axes=(0, 1))
-            image = np.flip(image, axis=2)
-            return image
-        elif orientation == constants.Orientation.NONE:
-            return image
+    
+    #if system_vendor == constants.SystemVendor.SIEMENS.value:
+    if orientation == constants.Orientation.CORONAL:
+        image = np.rot90(np.rot90(image, 3, axes=(1, 2)), 1, axes=(0, 2))
+        image = np.rot90(image, 1, axes=(0, 1))
+        image = np.flip(np.flip(image, axis=1), axis=2)
+        return image
+    elif orientation == constants.Orientation.TRANSVERSE:
+        return rotate_axial_to_coronal(flip_image_complex(image))
+    elif orientation == constants.Orientation.AXIAL:
+        image = np.rot90(np.rot90(image, 1, axes=(1, 2)), 3, axes=(0, 2))
+        image = np.rot90(image, 1, axes=(0, 1))
+        image = np.flip(image, axis=2)
+        return image
+    elif orientation == constants.Orientation.NONE:
+        return image
     elif system_vendor == constants.SystemVendor.PHILIPS.value:
         if orientation == constants.Orientation.CORONAL:
             image = np.rot90(np.rot90(image, 3, axes=(1, 2)), 1, axes=(0, 2))

@@ -162,12 +162,12 @@ class ReferenceDataKey(enum.Enum):
     """Reference data flags.
 
     Defines which reference data to use. Options:
-    REFERENCE_218_PPM_01: Reference data for 218 ppm dissolved-phase rf excitation
-    MANUAL: Use when manualy adjusting default reference data
+    DUKE_REFERENCE: Reference data for 218 or 208 ppm dissolved-phase rf excitation
+    MANUAL_REFERENCE: Use when manualy adjusting default reference data
     """
 
-    REFERENCE_218_PPM_01 = "218_ppm_StrongN4ITK"
-    MANUAL = "manual"
+    DUKE_REFERENCE = "duke_reference"
+    MANUAL_REFERENCE = "manual_reference"
 
 
 class ScanType(enum.Enum):
@@ -407,3 +407,112 @@ class PipelineVersion(object):
     """Pipeline version."""
 
     VERSION_NUMBER = 4
+
+
+class ReferenceDistribution(object):
+    """Reference distributions for binning based on RF excitation.
+
+    Reference: Sup's reference distribution paper when published """
+
+    REFERENCE_218_PPM = {
+    "title": "REFERENCE_218_PPM",
+    "threshold_vent": [0.3908, 0.5741, 0.7180, 0.8413, 0.9511],
+    "threshold_rbc": [0.001007, 0.002723, 0.005120, 0.008140, 0.011743],
+    "threshold_membrane": [0.003826, 0.005928, 0.008486, 0.011498, 0.014964, 0.018883, 0.023254],
+    "reference_fit_vent": (0.04074, 0.707, 0.140),
+    "reference_fit_rbc": (0.06106, 0.00543, 0.00277),
+    "reference_fit_membrane": (0.0700, 0.00871, 0.00284),
+    "reference_stats": {
+        "vent_defect_avg": "5",
+        "vent_defect_std": "3",
+        "vent_low_avg": "16",
+        "vent_low_std": "8",
+        "vent_high_avg": "15",
+        "vent_high_std": "5",
+        "membrane_defect_avg": "1",
+        "membrane_defect_std": "<1",
+        "membrane_low_avg": "8",
+        "membrane_low_std": "2",
+        "membrane_high_avg": "1",
+        "membrane_high_std": "1",
+        "rbc_defect_avg": "4",
+        "rbc_defect_std": "2",
+        "rbc_low_avg": "14",
+        "rbc_low_std": "6",
+        "rbc_high_avg": "15",
+        "rbc_high_std": "10",
+        "rbc_m_ratio_avg": "0.59",
+        "rbc_m_ratio_std": "0.12",
+        "inflation_avg": "3.4",
+        "inflation_std": "0.33",
+        }
+    }
+
+    REFERENCE_208_PPM = {
+        "title": "REFERENCE_208_PPM",
+        "threshold_vent": [0.3908, 0.5741, 0.7180, 0.8413, 0.9511],
+        "threshold_rbc": [0.001007, 0.002723, 0.00512, 0.00814, 0.011743],
+        "threshold_membrane": [0.004170, 0.006461, 0.009249, 0.012532, 0.016309, 0.020580, 0.025344],
+        "reference_fit_vent": (0.04074, 0.707, 0.140),
+        "reference_fit_rbc": (0.06106, 0.00527, 0.00268),
+        "reference_fit_membrane": (0.0700, 0.00950, 0.00309),
+        "reference_stats": {
+            "vent_defect_avg": "5",
+            "vent_defect_std": "3",
+            "vent_low_avg": "16",
+            "vent_low_std": "8",
+            "vent_high_avg": "15",
+            "vent_high_std": "5",
+            "membrane_defect_avg": "1",
+            "membrane_defect_std": "<1",
+            "membrane_low_avg": "8",
+            "membrane_low_std": "2",
+            "membrane_high_avg": "1",
+            "membrane_high_std": "1",
+            "rbc_defect_avg": "4",
+            "rbc_defect_std": "2",
+            "rbc_low_avg": "14",
+            "rbc_low_std": "6",
+            "rbc_high_avg": "15",
+            "rbc_high_std": "10",
+            "rbc_m_ratio_avg": "0.59",
+            "rbc_m_ratio_std": "0.12",
+            "inflation_avg": "3.4",
+            "inflation_std": "0.33",
+            }
+        }
+    
+    REFERENCE_MANUAL = {
+        "title": "MANUAL",
+        "threshold_vent": [0.3908, 0.5741, 0.7180, 0.8413, 0.9511],
+        "threshold_rbc": [0.001007, 0.002723, 0.00512, 0.00814, 0.011743],
+        "threshold_membrane": [0.004170, 0.006461, 0.009249, 0.012532, 0.016309, 0.020580, 0.025344],
+        "reference_fit_vent": (0.04074, 0.707, 0.140),
+        "reference_fit_rbc": (0.06106, 0.00527, 0.00268),
+        "reference_fit_membrane": (0.0700, 0.00950, 0.00309),
+        "reference_stats": {
+            "vent_defect_avg": "5",
+            "vent_defect_std": "3",
+            "vent_low_avg": "16",
+            "vent_low_std": "8",
+            "vent_high_avg": "15",
+            "vent_high_std": "5",
+            "membrane_defect_avg": "1",
+            "membrane_defect_std": "<1",
+            "membrane_low_avg": "8",
+            "membrane_low_std": "2",
+            "membrane_high_avg": "1",
+            "membrane_high_std": "1",
+            "rbc_defect_avg": "4",
+            "rbc_defect_std": "2",
+            "rbc_low_avg": "14",
+            "rbc_low_std": "6",
+            "rbc_high_avg": "15",
+            "rbc_high_std": "10",
+            "rbc_m_ratio_avg": "0.59",
+            "rbc_m_ratio_std": "0.12",
+            "inflation_avg": "3.4",
+            "inflation_std": "0.33",
+            }
+        }
+
