@@ -301,12 +301,12 @@ class Subject(object):
         if self.reference_data_key == constants.ReferenceDataKey.DUKE_REFERENCE.value:
             # Choose between 208 ppmm and 218 ppm. 
             # Default to 218 if other or no value for excitation found. 
-            if 216 <= self.dict_dyn[
+            if 216 <= self.dict_dis[
                     constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY
                 ] <= 220:
                 self.reference_data = constants.ReferenceDistribution.REFERENCE_218_PPM
 
-            elif 206 <= self.dict_dyn[
+            elif 206 <= self.dict_dis[
                     constants.IOFields.XE_DISSOLVED_OFFSET_FREQUENCY
                 ] <= 210:    
                 self.reference_data = constants.ReferenceDistribution.REFERENCE_208_PPM
