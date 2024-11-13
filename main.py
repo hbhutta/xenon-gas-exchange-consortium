@@ -9,14 +9,27 @@ from ml_collections import config_flags
 from config import base_config
 from subject_classmap import Subject
 
-FLAGS = flags.FLAGS
+FLAGS = flags.FLAGS # using absl
 
 _CONFIG = config_flags.DEFINE_config_file("config", None, "config file.")
+
+"""
+Reference: https://abseil.io/docs/python/guides/flags
+The strings are cast to boolean since bool("foo") is True
+
+Defining flags to determine which functions to execute
+Presumably these flags are specified with their values in the command line
+"""
 flags.DEFINE_boolean("force_recon", False, "force reconstruction for the subject")
 flags.DEFINE_boolean("force_readin", False, "force read in .mat for the subject")
-flags.DEFINE_bool("force_segmentation", False, "run segmentation again.")
+flags.DEFINE_boolean("force_segmentation", False, "run segmentation again.")
 
+"""
+Haad: 
+- base_config.Config is the type of the configuration file called config.
+- It specifies which attributes should be set (e.g. subject_id, rbc_m_ratio, etc...)
 
+"""
 def gx_mapping_reconstruction(config: base_config.Config):
     """Run the gas exchange mapping pipeline with reconstruction.
 
@@ -43,6 +56,8 @@ def gx_mapping_reconstruction(config: base_config.Config):
         subject.read_dicom_files()
     else:
         subject.image_proton = np.zeros_like(subject.image_gas_highreso)
+        
+    # Haad: The order of function execution below should be fixed
     subject.segmentation()
     subject.registration()
     subject.biasfield_correction()

@@ -188,13 +188,13 @@ class Subject(object):
 
         If a manual RBC:M ratio is specified, use that instead.
         """
-        if self.config.rbc_m_ratio > 0:  # type: ignore
+        if self.config.rbc_m_ratio > 0:  # type: ignore # Haad: This is the case where a manual RBC:M ratio is specified
             self.rbc_m_ratio = float(self.config.rbc_m_ratio)  # type: ignore
             logging.info("Using manual RBC:M ratio of {}".format(self.rbc_m_ratio))
-        else:
+        else: # Haad: Otherwise, the calculate_static_spectroscopy() function is called to calculate the RBC:M ratio
             logging.info("Calculating RBC:M ratio from static spectroscopy.")
             assert self.dict_dyn[constants.IOFields.FIDS_DIS] is not None
-            self.rbc_m_ratio, _ = spect_utils.calculate_static_spectroscopy(
+            self.rbc_m_ratio, _ = spect_utils.calculate_static_spectroscopy( # Haad: The fit object outputted from this is ignored, we just want the RBC:M ratio
                 fid=self.dict_dyn[constants.IOFields.FIDS_DIS],
                 sample_time=self.dict_dyn[constants.IOFields.SAMPLE_TIME],
                 tr=self.dict_dyn[constants.IOFields.TR],
@@ -348,6 +348,21 @@ class Subject(object):
 
     def reconstruction_gas(self):
         """Reconstruct the gas phase image."""
+        """
+        Haad:
+        
+        It looks like the gas phase image can be reconstructed 
+        from its k-space data into two ways, as image_gas_highreso or as image_gas_highsnr
+        
+        The `reconstruction.reconstruct()` function is probably what reconstructs 
+        the image as a .nii file from the k-space data Rachel mentioned.
+        
+        `reconstruction.py` as a file demonstrates how the `reconstruct()` function is used.
+        
+        We can save to a directory of our choice instead of the `tmp/` directory.
+        
+        
+        """
         if self.config.recon.recon_key == constants.ReconKey.ROBERTSON.value:
             self.image_gas_highsnr = reconstruction.reconstruct(
                 data=(recon_utils.flatten_data(self.data_gas)),
@@ -1055,7 +1070,7 @@ class Subject(object):
         )
 
         # move files
-        io_utils.move_files(output_files, self.config.data_dir)
+        io_utils.move_files(output_files, self.config.data_dir) # Haad: Maybe make the dedicated directory "." for the current directory
 
 
 
