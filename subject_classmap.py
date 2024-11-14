@@ -28,7 +28,13 @@ from utils import (
     traj_utils,
 )
 
+"""
+Haad:  
+It is not necessary to subject object when creating classes for Python version >= 3
 
+Source:
+https://stackoverflow.com/questions/2588628/what-is-the-purpose-of-subclassing-the-class-object-in-python
+"""
 class Subject(object):
     """Module to for processing gas exchange imaging.
 
@@ -115,11 +121,11 @@ class Subject(object):
             io_utils.get_dis_twix_files(str(self.config.data_dir))
         )
         try:
-            self.dict_dyn = io_utils.read_dyn_twix(
+            self.dict_dyn = io_utils.read_dyn_twix( # Haad: Reads the spectroscopy information from .dat files (probably used for spectroscopy calculations later on)
                 io_utils.get_dyn_twix_files(str(self.config.data_dir))
             )
         except ValueError:
-            logging.info("No dynamic spectroscopy twix file found")
+            logging.info("No dynamic spectroscopy twix file found") # Haad: What is a "dynamic spectroscopy twix file"?
         if self.config.recon.recon_proton:
             self.dict_ute = io_utils.read_ute_twix(
                 io_utils.get_ute_twix_files(str(self.config.data_dir))
@@ -187,6 +193,11 @@ class Subject(object):
         """Calculate RBC:M ratio using static spectroscopy.
 
         If a manual RBC:M ratio is specified, use that instead.
+        
+        The if statement says:
+        If the subject's config file has already specified a rbc:m ratio (i.e. the rbc:m ratio in the config file 
+        of the subject has a value that is greater than 0, e.g. 0.121, then just set the subject's rbc:m ratio
+        based on their config's rbc:m ratio. Otherwise, calculate the subject's rbc:m ratio)
         """
         if self.config.rbc_m_ratio > 0:  # type: ignore # Haad: This is the case where a manual RBC:M ratio is specified
             self.rbc_m_ratio = float(self.config.rbc_m_ratio)  # type: ignore

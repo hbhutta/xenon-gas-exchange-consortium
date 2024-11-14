@@ -1,0 +1,47 @@
+2024-11-14 19:29:37.338945: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-11-14 19:29:37.454850: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+2024-11-14 19:29:37.454895: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+2024-11-14 19:29:37.488795: E tensorflow/stream_executor/cuda/cuda_blas.cc:2981] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2024-11-14 19:29:38.083199: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer.so.7'; dlerror: libnvinfer.so.7: cannot open shared object file: No such file or directory
+2024-11-14 19:29:38.083297: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer_plugin.so.7'; dlerror: libnvinfer_plugin.so.7: cannot open shared object file: No such file or directory
+2024-11-14 19:29:38.083311: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Cannot dlopen some TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please make sure the missing libraries mentioned above are installed properly.
+WARNING:tensorflow:From /home/hbhutta/miniconda3/envs/XeGas/lib/python3.8/site-packages/tensorflow/python/compat/v2_compat.py:107: disable_resource_variables (from tensorflow.python.ops.variable_scope) is deprecated and will be removed in a future version.
+Instructions for updating:
+non-resource variables are not supported in the long term
+/home/hbhutta/miniconda3/envs/XeGas/lib/python3.8/site-packages/keras/optimizers/optimizer_v2/adam.py:114: UserWarning: The `lr` argument is deprecated, use `learning_rate` instead.
+  super().__init__(name, **kwargs)
+/data/Haad/xe-mri-rachel/xenon-gas-exchange-consortium/utils/metrics.py:8: DeprecationWarning: Please use `binary_dilation` from the `scipy.ndimage` namespace, the `scipy.ndimage.morphology` namespace is deprecated.
+  from scipy.ndimage.morphology import binary_dilation
+/home/hbhutta/miniconda3/envs/XeGas/lib/python3.8/site-packages/PyPDF2/__init__.py:21: DeprecationWarning: PyPDF2 is deprecated. Please move to the pypdf library instead.
+  warnings.warn(
+Traceback (most recent call last):
+  File "main.py", line 132, in <module>
+    app.run(main)
+  File "/home/hbhutta/miniconda3/envs/XeGas/lib/python3.8/site-packages/absl/app.py", line 300, in run
+    args = _run_init(
+  File "/home/hbhutta/miniconda3/envs/XeGas/lib/python3.8/site-packages/absl/app.py", line 369, in _run_init
+    args = _register_and_parse_flags_with_usage(
+  File "/home/hbhutta/miniconda3/envs/XeGas/lib/python3.8/site-packages/absl/app.py", line 216, in _register_and_parse_flags_with_usage
+    args_to_main = flags_parser(original_argv)
+  File "/home/hbhutta/miniconda3/envs/XeGas/lib/python3.8/site-packages/absl/app.py", line 156, in parse_flags_with_usage
+    return FLAGS(args)
+  File "/home/hbhutta/miniconda3/envs/XeGas/lib/python3.8/site-packages/absl/flags/_flagvalues.py", line 643, in __call__
+    unknown_flags, unparsed_args = self._parse_args(args, known_only)
+  File "/home/hbhutta/miniconda3/envs/XeGas/lib/python3.8/site-packages/absl/flags/_flagvalues.py", line 792, in _parse_args
+    flag.parse(value)
+  File "/home/hbhutta/miniconda3/envs/XeGas/lib/python3.8/site-packages/absl/flags/_flag.py", line 165, in parse
+    self.value = self._parse(argument)
+  File "/home/hbhutta/miniconda3/envs/XeGas/lib/python3.8/site-packages/ml_collections/config_flags/config_flags.py", line 620, in _parse
+    config = super(_ConfigFlag, self)._parse(argument)
+  File "/home/hbhutta/miniconda3/envs/XeGas/lib/python3.8/site-packages/absl/flags/_flag.py", line 180, in _parse
+    return self.parser.parse(argument)
+  File "/home/hbhutta/miniconda3/envs/XeGas/lib/python3.8/site-packages/ml_collections/config_flags/config_flags.py", line 530, in parse
+    config = config_module.get_config(*split_path[1:])
+  File "config/tests/PIm02_master.py", line 166, in get_config
+    return Config()
+  File "config/tests/PIm02_master.py", line 44, in __init__
+    self.reference_data_key = constants.ReferenceDataKey.REFERENCE_218_PPM_01.value
+  File "/home/hbhutta/miniconda3/envs/XeGas/lib/python3.8/enum.py", line 384, in __getattr__
+    raise AttributeError(name) from None
+AttributeError: REFERENCE_218_PPM_01

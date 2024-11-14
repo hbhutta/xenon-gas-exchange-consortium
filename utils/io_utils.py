@@ -97,7 +97,7 @@ def get_dyn_twix_files(path: str) -> str:
         raise ValueError("Can't find twix file in path.")
 
 
-def get_dis_twix_files(path: str) -> str:
+def get_dis_twix_files(path: str) -> str: # Haad: This utility function is used in the main.py to read in .dat files when using the forcerecon option
     """Get list of gas exchange twix files.
 
     Args:

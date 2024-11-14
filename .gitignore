@@ -201,3 +201,6 @@ scripts/.gitkeep
 
 # recon/cs
 recon/cs/**
+
+assets/**
+tests/**

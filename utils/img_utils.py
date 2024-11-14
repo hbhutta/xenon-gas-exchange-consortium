@@ -3,7 +3,7 @@
 import os
 import sys
 
-import cv2
+import cv2 as cv
 
 sys.path.append("..")
 from typing import Any, List, Optional, Tuple
@@ -143,7 +143,7 @@ def erode_image(image: np.ndarray, erosion: int) -> np.ndarray:
     """
     kernel = np.ones((erosion, erosion), np.uint8)
     for i in range(image.shape[2]):
-        image[:, :, i] = cv2.erode(image[:, :, i], kernel, iterations=1)
+        image[:, :, i] = cv.erode(image[:, :, i], kernel, iterations=1)
     return image
 
 

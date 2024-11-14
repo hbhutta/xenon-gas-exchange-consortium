@@ -14,6 +14,7 @@ FLAGS = flags.FLAGS # using absl
 _CONFIG = config_flags.DEFINE_config_file("config", None, "config file.")
 
 """
+Haad:
 Reference: https://abseil.io/docs/python/guides/flags
 The strings are cast to boolean since bool("foo") is True
 
@@ -36,7 +37,7 @@ def gx_mapping_reconstruction(config: base_config.Config):
     Args:
         config (config_dict.ConfigDict): config dict
     """
-    subject = Subject(config=config)
+    subject = Subject(config=config) # Haad: Make a subject out of the configuration file
     try:
         subject.read_twix_files()
     except:
@@ -45,7 +46,7 @@ def gx_mapping_reconstruction(config: base_config.Config):
             subject.read_mrd_files()
         except:
             raise ValueError("Cannot read in raw data files.")
-    subject.calculate_rbc_m_ratio()
+    subject.calculate_rbc_m_ratio() # Haad: This will only do a calculation if RBC:M ratio is not already set
     logging.info("Reconstructing images")
     subject.preprocess()
     subject.reconstruction_gas()
@@ -122,7 +123,7 @@ def main(argv):
         gx_mapping_reconstruction(config)
     elif config.processes.gx_mapping_readin:
         logging.info("Gas exchange imaging mapping with reconstruction.")
-        gx_mapping_readin(config)
+        gx_mapping_readin(config) # Haad: Only do this if using a .mat file
     else:
         pass
 
